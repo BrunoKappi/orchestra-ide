@@ -31,6 +31,8 @@ export interface TemplateEntity {
   description: string;
   createdAt: string;
   updatedAt: string;
+  faceplateId?: string | null;
+  faceplateMappings?: Record<string, string>;
 }
 
 export interface ObjectEntity {
@@ -41,6 +43,8 @@ export interface ObjectEntity {
   isDeployed?: boolean;
   createdAt: string;
   updatedAt: string;
+  faceplateId?: string | null;
+  faceplateMappings?: Record<string, string>;
 }
 
 export interface PropertyHistoryConfig {
@@ -75,6 +79,7 @@ export interface PropertyEntity {
   dataType: DataType;
   defaultValue: string;
   description: string;
+  category?: string;
   alarmConfig?: PropertyAlarmConfig;
   historyConfig?: PropertyHistoryConfig;
   createdAt: string;
@@ -309,6 +314,7 @@ export interface WidgetEntity {
   customProperties: WidgetCustomProperty[];
   createdAt: string;
   updatedAt: string;
+  isFaceplate?: boolean;
 }
 
 export interface WidgetFolderEntity {

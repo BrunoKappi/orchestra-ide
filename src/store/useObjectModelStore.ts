@@ -27,12 +27,14 @@ import { deploymentRepo } from '../repository/DeploymentRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
 import { alarmRepo } from '../repository/AlarmRepository';
+import { screenRepo } from '../repository/ScreenRepository';
 import { inheritanceService } from '../services/InheritanceService';
 import { exportImportService } from '../services/ExportImportService';
 import { seedService } from '../services/SeedService';
 import { mockSimulationService } from '../services/MockSimulationService';
 import { AlarmEngine } from '../services/AlarmEngine';
 import { historyEngine } from '../services/HistoryEngine';
+import { propertyBrowserService } from '../services/PropertyBrowserService';
 import { STORAGE_KEYS } from '../repository/storageKey';
 
 interface ObjectModelStoreState {
@@ -86,6 +88,26 @@ interface ObjectModelStoreState {
   isHistoryConfigModalOpen: boolean;
   editingHistoryProperty: MergedProperty | null;
 
+  // Faceplates state
+  openFaceplates: {
+    id: string;
+    objectId: string;
+    faceplateId: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    isMinimized: boolean;
+    zIndex: number;
+  }[];
+
+  // Faceplates Actions
+  openFaceplate: (objectId: string) => void;
+  closeFaceplate: (id: string) => void;
+  toggleMinimizeFaceplate: (id: string) => void;
+  updateFaceplatePosition: (id: string, x: number, y: number) => void;
+  updateFaceplateSize: (id: string, width: number, height: number) => void;
+  bringFaceplateToFront: (id: string) => void;
 
   // Actions
   init: () => void;
@@ -115,13 +137,13 @@ interface ObjectModelStoreState {
   renameEntity: (id: string, type: EntityType, newName: string) => void;
   duplicateEntity: (id: string, type: EntityType) => string;
   deleteEntity: (id: string, type: EntityType) => void;
-  updateEntityDetails: (id: string, type: EntityType, updates: { name?: string; description?: string }) => void;
+  updateEntityDetails: (id: string, type: EntityType, updates: { name?: string; description?: string; faceplateId?: string | null; faceplateMappings?: Record<string, string> }) => void;
 
   // Property Actions
   openAddPropertyModal: () => void;
   openEditPropertyModal: (property: MergedProperty) => void;
   closePropertyModal: () => void;
-  saveProperty: (data: { name: string; dataType: DataType; defaultValue: string; description: string }) => void;
+  saveProperty: (data: { name: string; dataType: DataType; defaultValue: string; description: string; category?: string }) => void;
   deleteProperty: (propertyId: string) => void;
   duplicateProperty: (property: MergedProperty) => void;
 
@@ -216,6 +238,8 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     isHistoryConfigModalOpen: false,
     editingHistoryProperty: null,
 
+    openFaceplates: [],
+
 
     init: () => {
       seedService.seedInitialDataIfNeeded();
@@ -259,6 +283,10 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       const nodes = deploymentRepo.getNodes();
       const alarmEvents = alarmRepo.getAll();
 
+      const screens = screenRepo.getAll();
+      const associatedWidgets = associatedWidgetRepo.getAll();
+      const mockConfigs = mockConfigRepo.getAll();
+
       set((state) => {
         state.templates = templates;
         state.objects = objects;
@@ -277,6 +305,19 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           });
         });
       });
+
+      // Rebuild the Property Browser's index
+      try {
+        propertyBrowserService.rebuildIndex(
+          templates,
+          objects,
+          screens,
+          associatedWidgets,
+          mockConfigs
+        );
+      } catch (err) {
+        console.error('Failed to rebuild property browser index:', err);
+      }
 
       const currentSel = get().selectedEntity;
       if (currentSel) {
@@ -908,6 +949,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           dataType: data.dataType,
           defaultValue: data.defaultValue,
           description: data.description,
+          category: data.category,
           createdAt: editing.createdAt,
           updatedAt: now,
         });
@@ -920,6 +962,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           dataType: data.dataType,
           defaultValue: data.defaultValue,
           description: data.description,
+          category: data.category,
           createdAt: now,
           updatedAt: now,
         });
@@ -927,6 +970,148 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
       get().closePropertyModal();
       get().refreshData();
+    },
+
+    openFaceplate: (objectId) => {
+      // Find object
+      const obj = get().objects.find((o) => o.id === objectId);
+      if (!obj) return;
+
+      // Find faceplateId
+      let fId: string | null = obj.faceplateId || null;
+
+      // If not defined on object, check template ancestry chain
+      if (!fId) {
+        let currentTemplateId: string | null = obj.templateId;
+        const visited = new Set<string>();
+        while (currentTemplateId && !visited.has(currentTemplateId)) {
+          visited.add(currentTemplateId);
+          const t = get().templates.find((x) => x.id === currentTemplateId);
+          if (!t) break;
+          if (t.faceplateId) {
+            fId = t.faceplateId;
+            break;
+          }
+          currentTemplateId = t.parentTemplateId;
+        }
+      }
+
+      if (!fId) {
+        alert(`O objeto ${obj.name} não possui faceplate associado.`);
+        return;
+      }
+
+      // Check if already open
+      const existing = get().openFaceplates.find((x) => x.objectId === objectId && x.faceplateId === fId);
+      if (existing) {
+        // Bring to front
+        get().bringFaceplateToFront(existing.id);
+        // Ensure not minimized
+        set((state) => {
+          const w = state.openFaceplates.find((x) => x.id === existing.id);
+          if (w) w.isMinimized = false;
+        });
+        return;
+      }
+
+      // Read positions from localStorage
+      let savedX = 150;
+      let savedY = 150;
+      try {
+        const stored = localStorage.getItem('archestra_faceplate_positions');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const pos = parsed[objectId];
+          if (pos) {
+            savedX = pos.x;
+            savedY = pos.y;
+          } else {
+            // cascade offset
+            const offset = get().openFaceplates.length * 30;
+            savedX = 150 + offset;
+            savedY = 150 + offset;
+          }
+        } else {
+          const offset = get().openFaceplates.length * 30;
+          savedX = 150 + offset;
+          savedY = 150 + offset;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      const nextZ = get().openFaceplates.reduce((max, w) => Math.max(max, w.zIndex), 0) + 1;
+
+      const newWindow = {
+        id: uuidv4(),
+        objectId,
+        faceplateId: fId,
+        x: savedX,
+        y: savedY,
+        width: 520,
+        height: 450,
+        isMinimized: false,
+        zIndex: nextZ,
+      };
+
+      set((state) => {
+        state.openFaceplates.push(newWindow);
+      });
+    },
+
+    closeFaceplate: (id) => {
+      set((state) => {
+        state.openFaceplates = state.openFaceplates.filter((w) => w.id !== id);
+      });
+    },
+
+    toggleMinimizeFaceplate: (id) => {
+      set((state) => {
+        const w = state.openFaceplates.find((x) => x.id === id);
+        if (w) {
+          w.isMinimized = !w.isMinimized;
+        }
+      });
+    },
+
+    updateFaceplatePosition: (id, x, y) => {
+      set((state) => {
+        const w = state.openFaceplates.find((x) => x.id === id);
+        if (w) {
+          w.x = x;
+          w.y = y;
+
+          // Persist position
+          try {
+            const stored = localStorage.getItem('archestra_faceplate_positions');
+            const parsed = stored ? JSON.parse(stored) : {};
+            parsed[w.objectId] = { x, y };
+            localStorage.setItem('archestra_faceplate_positions', JSON.stringify(parsed));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      });
+    },
+
+    updateFaceplateSize: (id, width, height) => {
+      set((state) => {
+        const w = state.openFaceplates.find((x) => x.id === id);
+        if (w) {
+          w.width = width;
+          w.height = height;
+        }
+      });
+    },
+
+    bringFaceplateToFront: (id) => {
+      set((state) => {
+        const maxZ = state.openFaceplates.reduce((max, w) => Math.max(max, w.zIndex), 0);
+        const w = state.openFaceplates.find((x) => x.id === id);
+        if (w && w.zIndex <= maxZ) {
+          w.zIndex = maxZ + 1;
+        }
+      });
     },
 
     deleteProperty: (propertyId) => {

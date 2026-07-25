@@ -64,7 +64,7 @@ interface WidgetStoreState {
   saveAndCloseWidget: () => void;
 
   // Widget CRUD
-  createWidget: (name?: string, folderId?: string | null) => string;
+  createWidget: (name?: string, folderId?: string | null, isFaceplate?: boolean) => string;
   renameWidget: (id: string, newName: string) => void;
   duplicateWidget: (id: string) => string;
   deleteWidget: (id: string) => void;
@@ -251,12 +251,12 @@ export const useWidgetStore = create<WidgetStoreState>()(
       get().closeWidget();
     },
 
-    createWidget: (name = 'New Graphic Widget', folderId = null) => {
+    createWidget: (name = 'New Graphic Widget', folderId = null, isFaceplate = false) => {
       const newId = uuidv4();
       const newWidget: WidgetEntity = {
         id: newId,
         name,
-        description: 'SCADA Graphic Widget Template',
+        description: isFaceplate ? 'SCADA Faceplate Template' : 'SCADA Graphic Widget Template',
         canvasWidth: 400,
         canvasHeight: 300,
         backgroundColor: '#0f172a',
@@ -265,6 +265,7 @@ export const useWidgetStore = create<WidgetStoreState>()(
         customProperties: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        isFaceplate,
       };
 
       widgetRepo.save(newWidget);

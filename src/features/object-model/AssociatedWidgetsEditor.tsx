@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useObjectModelStore } from '../../store/useObjectModelStore';
 import { useWidgetStore } from '../../store/useWidgetStore';
+import { inheritanceService } from '../../services/InheritanceService';
 import { WidgetMappingModal } from './WidgetMappingModal';
 import { Modal } from '../../components/ui/Modal';
 import type { MergedAssociatedWidget, WidgetEntity } from '../../types/domain';
@@ -202,6 +203,11 @@ export const WidgetThumbnail: React.FC<{ widget: WidgetEntity; className?: strin
 
 export const AssociatedWidgetsEditor: React.FC = () => {
   const {
+    selectedEntity,
+    selectedTemplate,
+    selectedObject,
+    templates,
+    updateEntityDetails,
     mergedAssociatedWidgets,
     associateWidget,
     disassociateWidget,
@@ -221,9 +227,105 @@ export const AssociatedWidgetsEditor: React.FC = () => {
   const [assocSearch, setAssocSearch] = useState('');
   const [assocViewMode, setAssocViewMode] = useState<'grid' | 'list'>('grid');
 
+  // Faceplates lists
+  const faceplates = widgets.filter((w) => !!w.isFaceplate);
+
   useEffect(() => {
     initWidgets();
   }, [initWidgets]);
+
+  // Helper: Get inherited faceplate from parents
+  const getInheritedFaceplate = () => {
+    if (!selectedEntity) return null;
+    let parentTemplateId: string | null = null;
+    if (selectedEntity.type === 'template') {
+      parentTemplateId = selectedTemplate?.parentTemplateId || null;
+    } else {
+      parentTemplateId = selectedObject?.templateId || null;
+    }
+
+    let currentId = parentTemplateId;
+    const visited = new Set<string>();
+    while (currentId && !visited.has(currentId)) {
+      visited.add(currentId);
+      const t = templates.find((x) => x.id === currentId);
+      if (!t) break;
+      if (t.faceplateId) {
+        const f = widgets.find((w) => w.id === t.faceplateId);
+        return {
+          faceplateId: t.faceplateId,
+          faceplateName: f ? f.name : 'Unknown Faceplate',
+          faceplateMappings: t.faceplateMappings || {},
+          sourceTemplateName: t.name,
+          sourceTemplateId: t.id,
+        };
+      }
+      currentId = t.parentTemplateId;
+    }
+    return null;
+  };
+
+  const inheritedFaceplate = getInheritedFaceplate();
+  const isTemplate = selectedEntity?.type === 'template';
+
+  // Active Faceplate resolution
+  const localFaceplateId = isTemplate 
+    ? (selectedTemplate?.faceplateId || null)
+    : (selectedObject?.faceplateId || null);
+
+  const localFaceplateMappings = isTemplate
+    ? (selectedTemplate?.faceplateMappings || {})
+    : (selectedObject?.faceplateMappings || {});
+
+  const isOverridingFaceplate = !isTemplate && localFaceplateId !== null;
+
+  const activeFaceplateId = isTemplate 
+    ? (localFaceplateId || inheritedFaceplate?.faceplateId || null)
+    : (isOverridingFaceplate ? localFaceplateId : (inheritedFaceplate?.faceplateId || null));
+
+  const activeFaceplateMappings = isTemplate
+    ? (localFaceplateId ? localFaceplateMappings : (inheritedFaceplate?.faceplateMappings || {}))
+    : (isOverridingFaceplate ? localFaceplateMappings : (inheritedFaceplate?.faceplateMappings || {}));
+
+  const activeFaceplate = widgets.find((w) => w.id === activeFaceplateId);
+  const targetProperties = selectedEntity 
+    ? inheritanceService.getMergedProperties(selectedEntity.id, selectedEntity.type)
+    : [];
+
+  const handleFaceplateChange = (faceplateId: string | null) => {
+    if (!selectedEntity) return;
+    const updates = {
+      faceplateId,
+      faceplateMappings: faceplateId ? {} : {},
+    };
+    updateEntityDetails(selectedEntity.id, selectedEntity.type, updates);
+  };
+
+  const handleMappingChange = (varId: string, propName: string) => {
+    if (!selectedEntity) return;
+    const nextMappings = { ...activeFaceplateMappings, [varId]: propName };
+    updateEntityDetails(selectedEntity.id, selectedEntity.type, {
+      faceplateMappings: nextMappings,
+    });
+  };
+
+  const handleToggleOverride = (checked: boolean) => {
+    if (!selectedEntity || isTemplate) return;
+    if (checked) {
+      // Set local to inherited or empty if none
+      const updates = {
+        faceplateId: inheritedFaceplate?.faceplateId || faceplates[0]?.id || '',
+        faceplateMappings: inheritedFaceplate?.faceplateMappings ? { ...inheritedFaceplate.faceplateMappings } : {},
+      };
+      updateEntityDetails(selectedEntity.id, selectedEntity.type, updates);
+    } else {
+      // Remove local overrides
+      updateEntityDetails(selectedEntity.id, selectedEntity.type, {
+        faceplateId: null,
+        faceplateMappings: {},
+      });
+    }
+  };
 
   const handleOpenMapping = (assoc: MergedAssociatedWidget) => {
     setMappingAssoc(assoc);
@@ -240,7 +342,6 @@ export const AssociatedWidgetsEditor: React.FC = () => {
     setIsAssociateModalOpen(false);
 
     // After associating, find the newly created association and open mappings for it!
-    // Since refreshData is called synchronously inside associateWidget, we can find it
     setTimeout(() => {
       const storeState = useObjectModelStore.getState();
       const newAssoc = storeState.mergedAssociatedWidgets.find(
@@ -262,13 +363,126 @@ export const AssociatedWidgetsEditor: React.FC = () => {
   const availableWidgets = widgets.filter((w) => {
     const q = assocSearch.toLowerCase();
     return (
-      w.name.toLowerCase().includes(q) ||
-      (w.description || '').toLowerCase().includes(q)
+      !w.isFaceplate &&
+      (w.name.toLowerCase().includes(q) || (w.description || '').toLowerCase().includes(q))
     );
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden p-6 gap-6">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto p-6 gap-6">
+      {/* ─── EQUIPMENT FACEPLATE CONFIGURATION PANEL ─── */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div>
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Faceplate do Equipamento</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+              Associe um painel de operação reutilizável a este {isTemplate ? 'modelo' : 'objeto'} e mapeie suas variáveis.
+            </p>
+          </div>
+
+          {!isTemplate && inheritedFaceplate && (
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-sky-600 dark:text-sky-400">
+              <input
+                type="checkbox"
+                checked={isOverridingFaceplate}
+                onChange={(e) => handleToggleOverride(e.target.checked)}
+                className="rounded accent-sky-500 w-3.5 h-3.5"
+              />
+              <span>Sobrescrever Faceplate herdado</span>
+            </label>
+          )}
+        </div>
+
+        {/* Inherited Notification banner */}
+        {!isTemplate && inheritedFaceplate && !isOverridingFaceplate && (
+          <div className="p-3 bg-slate-50 dark:bg-slate-950/40 rounded-lg border border-slate-200/50 dark:border-slate-800/80 text-[11px] text-slate-500 flex justify-between items-center">
+            <span>
+              Herdado de <strong className="text-slate-700 dark:text-slate-350">{inheritedFaceplate.sourceTemplateName}</strong>: 
+              <strong className="text-sky-600 dark:text-sky-400 ml-1">{inheritedFaceplate.faceplateName}</strong>
+            </span>
+            <span className="text-[10px] text-slate-400 italic">Mapeamento Herdado</span>
+          </div>
+        )}
+
+        {/* Faceplate Selector */}
+        {(isTemplate || isOverridingFaceplate || !inheritedFaceplate) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Selecionar Faceplate</label>
+              <select
+                value={activeFaceplateId || ''}
+                onChange={(e) => handleFaceplateChange(e.target.value || null)}
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-lg text-xs font-semibold outline-none focus:border-sky-500 cursor-pointer"
+              >
+                <option value="">(Nenhum Faceplate)</option>
+                {faceplates.map((f) => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Variable Mapping Table */}
+        {activeFaceplate && (
+          <div className="space-y-2 pt-2">
+            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mapeamento de Variáveis do Faceplate</h4>
+            <div className="border border-slate-200 dark:border-slate-850 rounded-lg overflow-hidden bg-slate-50/50 dark:bg-slate-950/20">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100/50 dark:bg-slate-900/60 text-slate-500 border-b border-slate-200 dark:border-slate-800 font-semibold">
+                    <th className="p-2.5">Variável do Faceplate</th>
+                    <th className="p-2.5 w-1/4">Tipo</th>
+                    <th className="p-2.5">Mapear para Propriedade do {isTemplate ? 'Template' : 'Objeto'}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  {activeFaceplate.customProperties.map((prop) => {
+                    const mappedValue = activeFaceplateMappings[prop.id] || '';
+                    const isReadOnly = !isTemplate && !isOverridingFaceplate && !!inheritedFaceplate;
+
+                    return (
+                      <tr key={prop.id} className="hover:bg-slate-100/30 dark:hover:bg-slate-900/20">
+                        <td className="p-2.5 font-semibold text-slate-800 dark:text-slate-350">{prop.name}</td>
+                        <td className="p-2.5 font-mono text-[10px] text-slate-400">{prop.dataType}</td>
+                        <td className="p-2.5">
+                          <select
+                            disabled={isReadOnly}
+                            value={mappedValue}
+                            onChange={(e) => handleMappingChange(prop.id, e.target.value)}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded text-xs outline-none focus:border-sky-500 w-full max-w-xs cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                          >
+                            <option value="">(Não mapeado)</option>
+                            {targetProperties.map((tp: any) => (
+                              <option key={tp.id} value={tp.name}>{tp.name} ({tp.dataType})</option>
+                            ))}
+                          </select>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {activeFaceplate.customProperties.length === 0 && (
+                    <tr>
+                      <td colSpan={3} className="p-4 text-center text-slate-400 italic">
+                        Este Faceplate não possui variáveis cadastradas. Cadastre variáveis no editor de Widgets para habilitar mapeamentos.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ─── ASSOCIATED WIDGETS SECTION (AS ORIGINAL) ─── */}
+      <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+        <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Componentes Gráficos Associados (Widgets)</h3>
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+          Associação e mapeamento de componentes gráficos locais para este objeto.
+        </p>
+      </div>
+
       {/* Top action bar */}
       <div className="flex items-center justify-between gap-4 shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-xl shadow-xs">
         <div className="relative flex-1 max-w-md">

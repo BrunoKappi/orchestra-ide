@@ -9,7 +9,7 @@ import { RuntimePage } from './pages/RuntimePage';
 import { DatabasePage } from './pages/DatabasePage';
 import { AlarmViewerPage } from './pages/AlarmViewerPage';
 import { HistorianPage } from './pages/HistorianPage';
-
+import { PropertyBrowserPage } from './pages/PropertyBrowserPage';
 
 const setFavicon = (emoji: string) => {
   const link = (document.querySelector("link[rel~='icon']") as HTMLLinkElement) || document.createElement('link');
@@ -30,14 +30,17 @@ export function App() {
     if (path === '/' || path === '/orchestra') {
       title = 'Orquestra IDE - Serrano';
       emoji = '⚙️';
+    } else if (path === '/properties') {
+      title = 'Property Browser - Serrano';
+      emoji = '🔍';
     } else if (path === '/widgets') {
-      title = 'Componentes Gráficos - Serrano';
+      title = 'Widgets - Serrano';
       emoji = '🎨';
     } else if (path === '/simulator' || path === '/simulador') {
       title = 'Simulador - Serrano';
       emoji = '⚡';
     } else if (path === '/screens') {
-      title = 'Designer de Telas - Serrano';
+      title = 'Telas - Serrano';
       emoji = '🖥️';
     } else if (path.startsWith('/screen/')) {
       title = 'Visualização de Tela - Serrano';
@@ -45,11 +48,14 @@ export function App() {
     } else if (path === '/runtime') {
       title = 'Runtime - Serrano';
       emoji = '🚀';
+    } else if (path === '/alarms') {
+      title = 'Alarmes - Serrano';
+      emoji = '🔔';
     } else if (path === '/database') {
       title = 'Banco de Dados - Serrano';
       emoji = '🛢️';
     } else if (path === '/historian') {
-      title = 'Historian - Serrano';
+      title = 'Storyn - Serrano';
       emoji = '📈';
     }
 
@@ -61,6 +67,7 @@ export function App() {
     <Routes>
       <Route path="/" element={<OrchestraPage />} />
       <Route path="/orchestra" element={<OrchestraPage />} />
+      <Route path="/properties" element={<PropertyBrowserPage />} />
       <Route path="/widgets" element={<WidgetsPage />} />
       <Route path="/simulator" element={<SimulatorPage />} />
       <Route path="/simulador" element={<SimulatorPage />} />
@@ -71,7 +78,6 @@ export function App() {
       <Route path="/database" element={<DatabasePage />} />
       <Route path="/historian" element={<HistorianPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
-
     </Routes>
   );
 }

@@ -16,12 +16,12 @@ A solução utiliza persistência local com `localStorage` e gerencia estados di
 
 ---
 
-## 💻 Abas e Funcionalidades Detalhadas
+## 💻 Abas
 
-A aplicação está estruturada em 6 abas principais acessíveis pelo cabeçalho global:
+A aplicação está estruturada em abas operacionais acessíveis pelo cabeçalho global:
 
 ```
-[ Orquestra IDE ] ➔ [ Componentes Gráficos ] ➔ [ Simulador ] ➔ [ Designer de Telas ] ➔ [ Runtime ] ➔ [ Banco de Dados ]
+[ Orquestra IDE ] ➔ [ Property Browser ] ➔ [ Widgets ] ➔ [ Simulador ] ➔ [ Telas ] ➔ [ Runtime ] ➔ [ Alarmes ] ➔ [ Banco de Dados ] ➔ [ Storyn ]
 ```
 
 ### 1. Orquestra IDE (Aba Principal)
@@ -42,12 +42,25 @@ Espaço de engenharia e modelagem estrutural da planta industrial. Divide-se em 
 Ao selecionar um template ou objeto, o painel central exibe abas contextuais:
 - **Tabela de Propriedades**: Gerenciamento de variáveis. Permite criar propriedades definindo tipo de dado (`String`, `Boolean`, `Integer`, `Float`, `Date`, `Enum`), valor padrão e descrição. Propriedades herdadas de modelos superiores são marcadas visualmente com o ícone de camadas, garantindo rastreabilidade.
 - **Editor de Scripts**: Criação de lógicas dinâmicas escritas em JavaScript executadas automaticamente quando o valor de uma variável associada muda.
-- **Mapeamento de Widgets**: Definição de propriedades dos componentes gráficos que serão ligadas às variáveis de telemetria do objeto.
+- **Faceplates e Widgets Mapeamento**: Associação de faceplates operacionais e definição de propriedades dos componentes gráficos ligadas às variáveis de telemetria do objeto.
 - **Configuração de Simulação (Mocks)**: Configuração de simuladores dinâmicos para cada variável numérica ou lógica (ondas senoidais, dentes de serra, rampas lineares e ruído aleatório) para gerar telemetrias vivas.
 
 ---
 
-### 2. Componentes Gráficos (Widgets Designer)
+### 2. Property Browser 🔍 🆕
+Explorador global de todas as variáveis do sistema, permitindo localizar rapidamente qualquer propriedade do projeto independentemente de seu objeto, template ou tela.
+
+- **Busca Instantânea**: Pesquisa em tempo real por nome, descrição, objeto, template, categoria, unidade de engenharia e tipo de dado.
+- **Tabela Operacional**: Exibe Nome da Propriedade, Objeto, Template de Origem, Categoria, Tipo, Valor Atual, Unidade, Qualidade, Status da Simulação, Histórico Habilitado, Alarmes Configurados e contagem de Widgets/Telas que utilizam a propriedade.
+- **Filtros Avançados**: Filtra por tipo de dado, categoria, objeto, template, herdadas, sobrescritas, com alarmes, com histórico, simuladas e utilizadas em telas.
+- **Painel Lateral de Detalhes**: Carrega a descrição da propriedade, valor atual e padrão, unidade, limites de engenharia, regras de alarme, lógicas de histórico, configurações de simulação ativa, além de scripts, widgets e telas relacionadas.
+- **Navegação Rápida**: Links diretos para saltar para o editor do Objeto, Template, Widget ou Tela correspondente.
+- **Bulk Operations**: Seleção múltipla para exportação instantânea dos registros em JSON e CSV.
+- **Performance de Alto Nível**: Indexação em cache local e busca por índice otimizado no serviço dedicado `PropertyBrowserService`.
+
+---
+
+### 3. Widgets (Widgets Designer)
 Permite projetar componentes visuais reutilizáveis.
 - **Geometrias Básicas**: Retângulos, círculos, linhas e caixas de texto.
 - **Configurações Estáticas**: Cor de fundo, bordas, espessuras e rotações.
@@ -56,7 +69,7 @@ Permite projetar componentes visuais reutilizáveis.
 
 ---
 
-### 3. Simulador (Painel de Simulação)
+### 4. Simulador (Painel de Simulação)
 Controla a geração dos sinais físicos e execução dos scripts da aplicação.
 - **Execução Global**: Botões para iniciar/pausar a simulação geral.
 - **Configuração de Velocidade**: Controle de intervalo em milissegundos para os ticks de atualização (ex: atualização a cada 100ms ou 1000ms).
@@ -65,7 +78,7 @@ Controla a geração dos sinais físicos e execução dos scripts da aplicação
 
 ---
 
-### 4. Designer de Telas
+### 5. Telas
 Permite construir painéis sinóticos de monitoramento operacional (IHM/SCADA).
 - **Canvas de Desenho**: Área de design com grade (grid) ajustável e alinhamento inteligente (Snap to Grid) para fácil posicionamento.
 - **Inserção de Variáveis Diretas**: Arraste uma variável de qualquer objeto ativo diretamente para a tela para criar instantaneamente um mostrador numérico/textual reativo.
@@ -74,7 +87,7 @@ Permite construir painéis sinóticos de monitoramento operacional (IHM/SCADA).
 
 ---
 
-### 5. Runtime de Telas
+### 6. Runtime de Telas
 Uma vez criada a tela operacional, ela pode ser executada nesta aba.
 - **Modo de Operação Real**: Desativa os controles de design e renderiza as telas como seriam vistas em uma sala de controle real.
 - **Preenchimento Gradual (Gradual Fill & Fill Level)**: Suporte a níveis visuais realistas (ex: tanques de água que enchem e esvaziam dinamicamente, alternando cores e alturas proporcionais ao valor da telemetria).
@@ -82,16 +95,12 @@ Uma vez criada a tela operacional, ela pode ser executada nesta aba.
 
 ---
 
-### 6. Runtime Monitor
-Monitor central de telemetria do sistema em execução.
-- **Listagem de Objetos Ativos**: Navegação simplificada por árvore de deployment dos objetos rodando em tempo real.
-- **Mecanismos de Busca**: Barra de busca rápida por propriedades, valores ou descrições específicas.
-- **Filtros Avançados**: Filtragem por tipo de dados específico da variável e múltiplas opções de ordenação (alfabética, tipo, etc.).
-- **Deseleção Amigável**: Clique no fundo vazio da barra lateral ou sobre os nós de pasta para fechar a visualização do painel central e limpar o foco atual.
+### 7. Alarmes (Alarm Viewer)
+Central de visualização e monitoramento de alarmes ativos no sistema, com suporte a cores por severidade, filtros e reconhecimento de eventos pelo operador.
 
 ---
 
-### 7. Banco de Dados (Database Explorer) 🆕
+### 8. Banco de Dados (Database Explorer)
 Painel de controle técnico que funciona como um simulador de injeção e inspeção de banco de dados diretamente no `localStorage` do navegador.
 
 - **Mapeamento de Tabelas**: Exibição detalhada de todas as "tabelas" (chaves de localStorage) do sistema, com contagem em tempo real de registros armazenados em cada uma.
@@ -106,6 +115,25 @@ Painel de controle técnico que funciona como um simulador de injeção e inspe�
   - **Truncar (Limpar Tabela)**: Apaga de forma segura todos os dados da tabela selecionada (resetando para vazio ou false).
   - **Exportação JSON**: Download imediato da tabela completa como arquivo `.json`.
 - **Estatísticas de Disco**: Monitoramento de tamanho estimado por tabela em KB e monitor do consumo total de cache da aplicação no `localStorage`.
+
+---
+
+### 9. Storyn (Historian) 📈
+Aba de séries temporais que armazena, compacta e plota o histórico de variações das variáveis industriais ao longo do tempo.
+
+---
+
+## 📺 Sistema de Faceplates Reutilizáveis 🆕
+Os **Faceplates** são painéis operacionais estruturados e reutilizáveis para operar e monitorar equipamentos específicos (como Tanques, Motores, Válvulas).
+
+- **Editor Dedicado**: Localizado como tab especial dentro de **Widgets**, permitindo compor o layout do faceplate a partir de componentes básicos com tags genéricas independentes de objetos reais.
+- **Mapeamento de Variáveis**: O painel de Mapeamento do Modeler vincula as tags internas do faceplate às variáveis reais do objeto/template.
+- **Herança e Overrides**: O mapeamento definido no template é herdado por todas as instâncias, mas o operador pode cadastrar overrides personalizados para instâncias de objetos específicos.
+- **Janelas Flutuantes de Runtime**: Ao dar duplo clique em elementos vinculados a um objeto em execução nas Telas ou no Runtime, abre-se uma janela flutuante, arrastável e redimensionável contendo:
+  - **IHM Canvas**: Renderização do faceplate em tempo real com dynamics aplicados.
+  - **Comandos**: Interface para escrever valores manuais e enviar parâmetros ao simulador.
+  - **Alarmes**: Lista de alarmes ativos da instância com botão de reconhecimento.
+  - **Tendências**: Gráficos SVG reativos contendo o histórico recente do Storyn.
 
 ---
 

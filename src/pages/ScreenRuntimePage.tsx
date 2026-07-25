@@ -7,8 +7,8 @@ import { useWidgetStore } from '../store/useWidgetStore';
 
 import { inheritanceService } from '../services/InheritanceService';
 import { resolveWidgetElementStyle, resolveWidgetElementText } from '../utils/widgetDynamics';
+import { FaceplateWindowsManager } from '../components/faceplates/FaceplateWindowsManager';
 import type { ScreenEntity, ScreenElement } from '../types/domain';
-
 
 // ─── Variable Display ─────────────────────────────────────────────────────────
 const RuntimeVariableDisplay: React.FC<{
@@ -163,6 +163,9 @@ const RuntimeElement: React.FC<{
   element: ScreenElement;
   simulatedValues: Record<string, string>;
 }> = ({ element, simulatedValues }) => {
+  const { openFaceplate } = useObjectModelStore();
+  const hasObject = !!element.objectId;
+
   if (element.type === 'line') {
     const x1 = element.fromX ?? element.x;
     const y1 = element.fromY ?? element.y;
@@ -208,6 +211,7 @@ const RuntimeElement: React.FC<{
     zIndex: element.zIndex,
     transform: element.rotation ? `rotate(${element.rotation}deg)` : undefined,
     boxSizing: 'border-box',
+    cursor: hasObject ? 'pointer' : undefined,
   };
 
   const getContent = () => {
@@ -251,7 +255,20 @@ const RuntimeElement: React.FC<{
     }
   };
 
-  return <div style={style}>{getContent()}</div>;
+  return (
+    <div
+      style={style}
+      onDoubleClick={(e) => {
+        if (hasObject) {
+          e.stopPropagation();
+          openFaceplate(element.objectId!);
+        }
+      }}
+      title={hasObject ? `Duplo clique para abrir Faceplate de ${element.objectId}` : undefined}
+    >
+      {getContent()}
+    </div>
+  );
 };
 
 // ─── Runtime Page ─────────────────────────────────────────────────────────────
@@ -367,7 +384,7 @@ export const ScreenRuntimePage: React.FC = () => {
       </div>
 
       {/* Canvas */}
-      <div className="flex-1 overflow-auto flex items-center justify-center bg-slate-950 p-4">
+      <div className="flex-1 overflow-auto flex items-center justify-center bg-slate-950 p-4 relative">
         <div
           className="relative shrink-0"
           style={{
@@ -384,6 +401,9 @@ export const ScreenRuntimePage: React.FC = () => {
             ))}
         </div>
       </div>
+
+      {/* Faceplates overlays container */}
+      <FaceplateWindowsManager />
     </div>
   );
 };

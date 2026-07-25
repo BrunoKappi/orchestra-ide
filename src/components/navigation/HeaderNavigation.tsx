@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Cpu, Shapes, Activity, Sun, Moon, RotateCcw, Upload, Monitor, Zap, Database, Bell, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react';
+import { Cpu, Shapes, Activity, Sun, Moon, RotateCcw, Upload, Monitor, Zap, Database, Bell, ChevronDown, ChevronUp, TrendingUp, Search } from 'lucide-react';
 
 
 import { useObjectModelStore } from '../../store/useObjectModelStore';
@@ -90,6 +90,21 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onImportClic
           </NavLink>
 
           <NavLink
+            to="/properties"
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150',
+                isActive
+                  ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              )
+            }
+          >
+            <Search className="w-3.5 h-3.5 text-sky-500" />
+            <span>Property Browser</span>
+          </NavLink>
+
+          <NavLink
             to="/widgets"
             className={({ isActive }) =>
               cn(
@@ -101,7 +116,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onImportClic
             }
           >
             <Shapes className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Componentes Gráficos (Widgets)</span>
+            <span>Widgets</span>
           </NavLink>
 
           <NavLink
@@ -131,7 +146,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onImportClic
             }
           >
             <Monitor className="w-3.5 h-3.5 text-violet-500" />
-            <span>Designer de Telas</span>
+            <span>Telas</span>
           </NavLink>
 
           <NavLink
@@ -161,7 +176,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onImportClic
             }
           >
             <Bell className={cn('w-3.5 h-3.5 text-rose-500', activeUnackCount > 0 && 'animate-bounce')} />
-            <span>Alarm Viewer</span>
+            <span>Alarmes</span>
             {activeUnackCount > 0 && (
               <span className="ml-1 px-1.5 py-0.1 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold select-none shrink-0 animate-pulse">
                 {activeUnackCount}
@@ -197,7 +212,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onImportClic
             }
           >
             <TrendingUp className="w-3.5 h-3.5 text-violet-500" />
-            <span>Historian</span>
+            <span>Storyn</span>
           </NavLink>
         </nav>
       </div>

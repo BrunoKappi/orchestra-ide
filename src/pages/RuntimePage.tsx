@@ -17,12 +17,14 @@ import {
   Database,
   Edit2,
   Check,
-  X
+  X,
+  Tv
 } from 'lucide-react';
 
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
 import { useObjectModelStore } from '../store/useObjectModelStore';
 import { inheritanceService } from '../services/InheritanceService';
+import { FaceplateWindowsManager } from '../components/faceplates/FaceplateWindowsManager';
 import type { MergedProperty, DeploymentTreeNode, DataType } from '../types/domain';
 import { cn } from '../utils/cn';
 
@@ -39,6 +41,7 @@ export const RuntimePage: React.FC = () => {
     tickSimulation,
     init: initObjectModel,
     updateSimulatedValue,
+    openFaceplate,
   } = useObjectModelStore();
 
   const [editingPropKey, setEditingPropKey] = useState<string | null>(null);
@@ -244,6 +247,21 @@ export const RuntimePage: React.FC = () => {
   const localPropsCount = allProperties.filter((p) => !p.isInherited).length;
   const inheritedPropsCount = allProperties.filter((p) => p.isInherited).length;
 
+  const hasFaceplate = () => {
+    if (!selectedObj) return false;
+    if (selectedObj.faceplateId) return true;
+    let currentTemplateId: string | null = selectedObj.templateId;
+    const visited = new Set<string>();
+    while (currentTemplateId && !visited.has(currentTemplateId)) {
+      visited.add(currentTemplateId);
+      const t = templates.find((x) => x.id === currentTemplateId);
+      if (!t) break;
+      if (t.faceplateId) return true;
+      currentTemplateId = t.parentTemplateId;
+    }
+    return false;
+  };
+
   // Format DataType display badges
   const renderTypeBadge = (type: DataType) => {
     const base = "px-2 py-0.5 rounded text-[10px] font-semibold border";
@@ -274,6 +292,10 @@ export const RuntimePage: React.FC = () => {
         onClick={(e) => {
           e.stopPropagation();
           setSelectedObjectId(node.targetId);
+        }}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          openFaceplate(node.targetId);
         }}
         style={{ paddingLeft: `${(depth + 1) * 12 + 6}px` }}
         className={cn(
@@ -438,6 +460,16 @@ export const RuntimePage: React.FC = () => {
                       </span>
                     )}
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Objeto em Execução" />
+                    
+                    {hasFaceplate() && (
+                      <button
+                        onClick={() => openFaceplate(selectedObj.id)}
+                        className="flex items-center gap-1 px-2 py-0.5 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950 dark:hover:bg-sky-900 text-sky-600 dark:text-sky-455 border border-sky-200 dark:border-sky-800 text-[10px] font-bold rounded-lg transition-colors ml-2 cursor-pointer shadow-3xs"
+                      >
+                        <Tv className="w-3 h-3 text-sky-500 shrink-0" />
+                        <span>Abrir Faceplate</span>
+                      </button>
+                    )}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl truncate">
                     {selectedObj.description || 'Sem descrição cadastrada para este objeto.'}
@@ -727,6 +759,9 @@ export const RuntimePage: React.FC = () => {
         </div>
         <span>Orquestra Runtime Panel v1.0</span>
       </footer>
+
+      {/* Faceplate windows renderer */}
+      <FaceplateWindowsManager />
     </div>
   );
 };
