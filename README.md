@@ -21,7 +21,7 @@ A solução utiliza persistência local com `localStorage` e gerencia estados di
 A aplicação está estruturada em abas operacionais acessíveis pelo cabeçalho global:
 
 ```
-[ Orquestra IDE ] ➔ [ Property Browser ] ➔ [ Widgets ] ➔ [ Simulador ] ➔ [ Telas ] ➔ [ Runtime ] ➔ [ Alarmes ] ➔ [ Banco de Dados ] ➔ [ Storyn ]
+[ Orquestra IDE ] ➔ [ Property Browser ] ➔ [ Widgets ] ➔ [ Simulador ] ➔ [ Telas ] ➔ [ Runtime ] ➔ [ Alarmes ] ➔ [ Banco de Dados ] ➔ [ Historian ]
 ```
 
 ### 1. Orquestra IDE (Aba Principal)
@@ -42,7 +42,7 @@ Espaço de engenharia e modelagem estrutural da planta industrial. Divide-se em 
 Ao selecionar um template ou objeto, o painel central exibe abas contextuais:
 - **Tabela de Propriedades**: Gerenciamento de variáveis. Permite criar propriedades definindo tipo de dado (`String`, `Boolean`, `Integer`, `Float`, `Date`, `Enum`), valor padrão e descrição. Propriedades herdadas de modelos superiores são marcadas visualmente com o ícone de camadas, garantindo rastreabilidade.
 - **Editor de Scripts**: Criação de lógicas dinâmicas escritas em JavaScript executadas automaticamente quando o valor de uma variável associada muda.
-- **Faceplates e Widgets Mapeamento**: Associação de faceplates operacionais e definição de propriedades dos componentes gráficos ligadas às variáveis de telemetria do objeto.
+- **Mapeamento de Widgets**: Definição de propriedades dos componentes gráficos que serão ligadas às variáveis de telemetria do objeto.
 - **Configuração de Simulação (Mocks)**: Configuração de simuladores dinâmicos para cada variável numérica ou lógica (ondas senoidais, dentes de serra, rampas lineares e ruído aleatório) para gerar telemetrias vivas.
 
 ---
@@ -118,22 +118,8 @@ Painel de controle técnico que funciona como um simulador de injeção e inspe�
 
 ---
 
-### 9. Storyn (Historian) 📈
+### 9. Historian 📈
 Aba de séries temporais que armazena, compacta e plota o histórico de variações das variáveis industriais ao longo do tempo.
-
----
-
-## 📺 Sistema de Faceplates Reutilizáveis 🆕
-Os **Faceplates** são painéis operacionais estruturados e reutilizáveis para operar e monitorar equipamentos específicos (como Tanques, Motores, Válvulas).
-
-- **Editor Dedicado**: Localizado como tab especial dentro de **Widgets**, permitindo compor o layout do faceplate a partir de componentes básicos com tags genéricas independentes de objetos reais.
-- **Mapeamento de Variáveis**: O painel de Mapeamento do Modeler vincula as tags internas do faceplate às variáveis reais do objeto/template.
-- **Herança e Overrides**: O mapeamento definido no template é herdado por todas as instâncias, mas o operador pode cadastrar overrides personalizados para instâncias de objetos específicos.
-- **Janelas Flutuantes de Runtime**: Ao dar duplo clique em elementos vinculados a um objeto em execução nas Telas ou no Runtime, abre-se uma janela flutuante, arrastável e redimensionável contendo:
-  - **IHM Canvas**: Renderização do faceplate em tempo real com dynamics aplicados.
-  - **Comandos**: Interface para escrever valores manuais e enviar parâmetros ao simulador.
-  - **Alarmes**: Lista de alarmes ativos da instância com botão de reconhecimento.
-  - **Tendências**: Gráficos SVG reativos contendo o histórico recente do Storyn.
 
 ---
 

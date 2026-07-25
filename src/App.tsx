@@ -55,7 +55,7 @@ export function App() {
       title = 'Banco de Dados - Serrano';
       emoji = '🛢️';
     } else if (path === '/historian') {
-      title = 'Storyn - Serrano';
+      title = 'Historian - Serrano';
       emoji = '📈';
     }
 

@@ -12,7 +12,6 @@ import {
   Trash2,
   Search,
   FolderOpen,
-  Monitor,
 } from 'lucide-react';
 import { useWidgetStore } from '../../store/useWidgetStore';
 import type { WidgetTreeNode } from '../../types/domain';
@@ -45,7 +44,6 @@ export const WidgetTree: React.FC = () => {
     moveWidgetToFolder,
   } = useWidgetStore();
 
-  const [activeTab, setActiveTab] = useState<'widgets' | 'faceplates'>('widgets');
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
@@ -82,11 +80,7 @@ export const WidgetTree: React.FC = () => {
       }
     });
 
-    const activeWidgets = widgets.filter((w) =>
-      activeTab === 'faceplates' ? !!w.isFaceplate : !w.isFaceplate
-    );
-
-    activeWidgets.forEach((w) => {
+    widgets.forEach((w) => {
       const nodeRef = nodes.find((n) => n.targetId === w.id && n.type === 'widget');
       const parentFolderId = nodeRef ? nodeRef.parentFolderId : null;
 
@@ -268,8 +262,6 @@ export const WidgetTree: React.FC = () => {
               ) : (
                 <Folder className="w-4 h-4 text-amber-500 shrink-0" />
               )
-            ) : node.widgetDetail?.isFaceplate ? (
-              <Monitor className="w-4 h-4 text-sky-500 shrink-0" />
             ) : (
               <Shapes className="w-4 h-4 text-emerald-500 shrink-0" />
             )}
@@ -324,7 +316,7 @@ export const WidgetTree: React.FC = () => {
       <div
         onClick={(e) => e.stopPropagation()}
         onContextMenu={(e) => e.stopPropagation()}
-        className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-100/30 dark:bg-slate-900/30 space-y-2"
+        className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-100/30 dark:bg-slate-900/30"
       >
         <div className="relative">
           <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -332,41 +324,9 @@ export const WidgetTree: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Pesquisar..."
+            placeholder="Pesquisar widgets e pastas..."
             className="w-full pl-8 pr-2.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-emerald-500 transition-colors"
           />
-        </div>
-
-        {/* Widgets vs Faceplates Tab Switcher */}
-        <div className="flex bg-slate-200/60 dark:bg-slate-950 p-0.5 rounded-lg border border-slate-300/35 dark:border-slate-800 text-[10px] font-bold">
-          <button
-            onClick={() => {
-              setActiveTab('widgets');
-              selectWidget(null);
-            }}
-            className={cn(
-              "flex-1 py-1 rounded-md text-center transition-all",
-              activeTab === 'widgets'
-                ? "bg-white dark:bg-slate-850 text-emerald-600 dark:text-emerald-400 shadow-xs"
-                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
-            )}
-          >
-            Widgets
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('faceplates');
-              selectWidget(null);
-            }}
-            className={cn(
-              "flex-1 py-1 rounded-md text-center transition-all",
-              activeTab === 'faceplates'
-                ? "bg-white dark:bg-slate-850 text-sky-600 dark:text-sky-400 shadow-xs"
-                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
-            )}
-          >
-            Faceplates
-          </button>
         </div>
       </div>
 
@@ -374,7 +334,7 @@ export const WidgetTree: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-2 space-y-1 min-h-[200px]">
         {filteredTree.length === 0 ? (
           <div className="p-6 text-center text-xs text-slate-400 italic">
-            Nenhum item encontrado. Clique com botão direito nesta área para criar uma Pasta ou {activeTab === 'faceplates' ? 'Faceplate' : 'Widget'}.
+            Nenhum item encontrado. Clique com botão direito nesta área para criar uma Pasta ou Widget.
           </div>
         ) : (
           filteredTree.map((node) => renderNode(node))
@@ -403,17 +363,13 @@ export const WidgetTree: React.FC = () => {
 
               <button
                 onClick={() => {
-                  if (activeTab === 'faceplates') {
-                    createWidget('Novo Faceplate', null, true);
-                  } else {
-                    createWidget('Novo Widget Gráfico', null, false);
-                  }
+                  createWidget('Novo Widget Gráfico', null);
                   closeContextMenu();
                 }}
                 className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium"
               >
                 <FilePlus className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Novo {activeTab === 'faceplates' ? 'Faceplate' : 'Widget'} Raiz</span>
+                <span>Novo Widget Raiz</span>
               </button>
             </>
           )}
@@ -422,17 +378,13 @@ export const WidgetTree: React.FC = () => {
             <>
               <button
                 onClick={() => {
-                  if (activeTab === 'faceplates') {
-                    createWidget('Novo Faceplate', contextMenu.nodeId, true);
-                  } else {
-                    createWidget('Novo Widget', contextMenu.nodeId, false);
-                  }
+                  createWidget('Novo Widget', contextMenu.nodeId);
                   closeContextMenu();
                 }}
                 className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium"
               >
                 <FilePlus className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Adicionar {activeTab === 'faceplates' ? 'Faceplate' : 'Widget'}</span>
+                <span>Adicionar Widget</span>
               </button>
 
               <button
@@ -494,7 +446,7 @@ export const WidgetTree: React.FC = () => {
 
               <button
                 onClick={() => {
-                  if (window.confirm(`Excluir ${activeTab === 'faceplates' ? 'faceplate' : 'widget'} "${contextMenu.nodeName}"?`)) {
+                  if (window.confirm(`Excluir widget "${contextMenu.nodeName}"?`)) {
                     deleteWidget(contextMenu.nodeId!);
                   }
                   closeContextMenu();
@@ -502,7 +454,7 @@ export const WidgetTree: React.FC = () => {
                 className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-950/50 text-red-600 dark:text-red-400"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Excluir {activeTab === 'faceplates' ? 'Faceplate' : 'Widget'}</span>
+                <span>Excluir Widget</span>
               </button>
             </>
           )}

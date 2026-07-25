@@ -55,11 +55,24 @@ interface ChartData {
 
 const CHART_PADDING = { top: 24, right: 16, bottom: 48, left: 56 };
 
-function TrendChart({ data, from, to }: { data: ChartData[]; from: Date; to: Date }) {
+interface TrendChartProps {
+  data: ChartData[];
+  from: Date;
+  to: Date;
+  calculatedFrom: Date;
+  calculatedTo: Date;
+  onViewRangeChange: (from: Date | null, to: Date | null) => void;
+}
+
+function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeChange }: TrendChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 320 });
   const [tooltip, setTooltip] = useState<{ x: number; y: number; items: { label: string; value: string; color: string }[] } | null>(null);
+
+  // Pan State
+  const [isPanning, setIsPanning] = useState(false);
+  const panRef = useRef<{ startX: number; fromMs: number; toMs: number } | null>(null);
 
   // Resize observer
   useEffect(() => {
@@ -132,29 +145,70 @@ function TrendChart({ data, from, to }: { data: ChartData[]; from: Date; to: Dat
     });
   }, [fromMs, timeRange, xScale]);
 
-  // Tooltip on mouse move
+  // Mouse pan handlers
+  const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (e.button !== 0) return; // only left click
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const mx = e.clientX - rect.left;
+    if (mx < CHART_PADDING.left) return; // don't drag if clicking Y labels
+
+    setIsPanning(true);
+    panRef.current = {
+      startX: e.clientX,
+      fromMs: from.getTime(),
+      toMs: to.getTime(),
+    };
+    setTooltip(null);
+  };
+
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
     const mx = e.clientX - rect.left;
 
-    const items = data.map(({ variable, samples }) => {
-      const mouseTs = fromMs + ((mx - CHART_PADDING.left) / innerW) * timeRange;
-      // Find nearest sample
-      let nearest: HistorySample | null = null;
-      let minDist = Infinity;
-      samples.forEach((s) => {
-        const dist = Math.abs(new Date(s.timestamp).getTime() - mouseTs);
-        if (dist < minDist) { minDist = dist; nearest = s; }
+    if (isPanning && panRef.current) {
+      const { startX, fromMs, toMs } = panRef.current;
+      const dx = e.clientX - startX;
+      // drag speed is ratio of time window width
+      const timeDelta = -((dx / innerW) * (toMs - fromMs));
+      const newFrom = new Date(fromMs + timeDelta);
+      const newTo = new Date(toMs + timeDelta);
+      onViewRangeChange(newFrom, newTo);
+    } else {
+      // Normal hover tooltip
+      const items = data.map(({ variable, samples }) => {
+        const mouseTs = fromMs + ((mx - CHART_PADDING.left) / innerW) * timeRange;
+        let nearest: HistorySample | null = null;
+        let minDist = Infinity;
+        samples.forEach((s) => {
+          const dist = Math.abs(new Date(s.timestamp).getTime() - mouseTs);
+          if (dist < minDist) { minDist = dist; nearest = s; }
+        });
+        return {
+          label: `${variable.objectName}.${variable.propertyName}`,
+          value: nearest != null ? `${(nearest as HistorySample).value}${variable.unit ? ' ' + variable.unit : ''}` : '—',
+          color: CURVE_COLORS[variable.colorIndex % CURVE_COLORS.length],
+        };
       });
-      return {
-        label: `${variable.objectName}.${variable.propertyName}`,
-        value: nearest != null ? `${(nearest as HistorySample).value}${variable.unit ? ' ' + variable.unit : ''}` : '—',
-        color: CURVE_COLORS[variable.colorIndex % CURVE_COLORS.length],
-      };
-    });
 
-    setTooltip({ x: mx, y: 40, items });
+      setTooltip({ x: mx, y: 40, items });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+    panRef.current = null;
+  };
+
+  const handleZoom = (factor: number) => {
+    const mid = (fromMs + toMs) / 2;
+    const duration = toMs - fromMs;
+    const newDuration = duration * factor;
+    onViewRangeChange(
+      new Date(mid - newDuration / 2),
+      new Date(mid + newDuration / 2)
+    );
   };
 
   if (data.length === 0 || data.every((d) => d.samples.length === 0)) {
@@ -169,14 +223,49 @@ function TrendChart({ data, from, to }: { data: ChartData[]; from: Date; to: Dat
     );
   }
 
+  const isOverridden = from.getTime() !== calculatedFrom.getTime() || to.getTime() !== calculatedTo.getTime();
+
   return (
-    <div ref={containerRef} className="relative w-full h-full" onMouseLeave={() => setTooltip(null)}>
+    <div
+      ref={containerRef}
+      className="relative w-full h-full"
+      onMouseLeave={() => { setTooltip(null); handleMouseUp(); }}
+    >
+      {/* Zoom & Reset Overlay Buttons */}
+      <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 px-1.5 py-1 rounded-lg shadow-sm z-30 select-none">
+        <button
+          onClick={() => handleZoom(0.75)}
+          className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded font-bold text-[10px] text-slate-700 dark:text-slate-350 cursor-pointer transition-colors"
+          title="Zoom In (Aproximar)"
+        >
+          Zoom +
+        </button>
+        <button
+          onClick={() => handleZoom(1.33)}
+          className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded font-bold text-[10px] text-slate-700 dark:text-slate-350 cursor-pointer transition-colors"
+          title="Zoom Out (Afastar)"
+        >
+          Zoom -
+        </button>
+        {isOverridden && (
+          <button
+            onClick={() => onViewRangeChange(null, null)}
+            className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-sky-600 dark:text-sky-400 rounded font-bold text-[10px] cursor-pointer transition-colors border border-sky-200/50 dark:border-sky-900/50"
+            title="Restaurar visualização automática tempo real"
+          >
+            Auto-Scroll
+          </button>
+        )}
+      </div>
+
       <svg
         ref={svgRef}
         width={size.width}
         height={size.height}
-        className="absolute inset-0"
+        className={cn("absolute inset-0 select-none", isPanning ? "cursor-grabbing" : "cursor-grab")}
+        onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
       >
         {/* Grid lines */}
         {yTicks.map(({ y, val }, i) => (
@@ -246,7 +335,7 @@ function TrendChart({ data, from, to }: { data: ChartData[]; from: Date; to: Dat
         ))}
 
         {/* Tooltip vertical line */}
-        {tooltip && (
+        {tooltip && !isPanning && (
           <line
             x1={tooltip.x} y1={CHART_PADDING.top}
             x2={tooltip.x} y2={size.height - CHART_PADDING.bottom}
@@ -256,7 +345,7 @@ function TrendChart({ data, from, to }: { data: ChartData[]; from: Date; to: Dat
       </svg>
 
       {/* Tooltip card */}
-      {tooltip && (
+      {tooltip && !isPanning && (
         <div
           className="absolute pointer-events-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-3 z-20 min-w-[160px]"
           style={{ left: tooltip.x + 12, top: tooltip.y }}
@@ -291,6 +380,10 @@ export const HistorianPage: React.FC = () => {
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
 
+  // View window overrides (for pan & zoom)
+  const [viewFrom, setViewFrom] = useState<Date | null>(null);
+  const [viewTo, setViewTo] = useState<Date | null>(null);
+
   // View mode
   const [view, setView] = useState<'chart' | 'table'>('chart');
   const [tablePage, setTablePage] = useState(1);
@@ -304,11 +397,14 @@ export const HistorianPage: React.FC = () => {
   useEffect(() => { setRefreshTick((n) => n + 1); }, [simulationTickCount]);
 
   // Determine time range
-  const { from, to } = useMemo(() => {
+  const calculatedRange = useMemo(() => {
     const cf = customFrom ? new Date(customFrom) : undefined;
     const ct = customTo ? new Date(customTo) : undefined;
     return getPeriodRange(period, cf, ct);
   }, [period, customFrom, customTo, simulationTickCount]); // eslint-disable-line
+
+  const from = viewFrom ?? calculatedRange.from;
+  const to = viewTo ?? calculatedRange.to;
 
   const historianObjects = useMemo(() => {
     return objects.map((obj) => {
@@ -546,7 +642,11 @@ export const HistorianPage: React.FC = () => {
                 return (
                   <button
                     key={p}
-                    onClick={() => setPeriod(p)}
+                    onClick={() => {
+                      setPeriod(p);
+                      setViewFrom(null);
+                      setViewTo(null);
+                    }}
                     className={cn(
                       'px-3 py-1 rounded-md transition-colors',
                       period === p
@@ -567,14 +667,22 @@ export const HistorianPage: React.FC = () => {
                 <input
                   type="datetime-local"
                   value={customFrom}
-                  onChange={(e) => setCustomFrom(e.target.value)}
+                  onChange={(e) => {
+                    setCustomFrom(e.target.value);
+                    setViewFrom(null);
+                    setViewTo(null);
+                  }}
                   className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-violet-500 text-xs"
                 />
                 <span className="text-slate-400">até</span>
                 <input
                   type="datetime-local"
                   value={customTo}
-                  onChange={(e) => setCustomTo(e.target.value)}
+                  onChange={(e) => {
+                    setCustomTo(e.target.value);
+                    setViewFrom(null);
+                    setViewTo(null);
+                  }}
                   className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-violet-500 text-xs"
                 />
               </div>
@@ -664,7 +772,17 @@ export const HistorianPage: React.FC = () => {
                 /* Chart area */
                 <div className="flex-1 overflow-hidden p-4">
                   <div className="w-full h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-                    <TrendChart data={chartData} from={from} to={to} />
+                    <TrendChart
+                      data={chartData}
+                      from={from}
+                      to={to}
+                      calculatedFrom={calculatedRange.from}
+                      calculatedTo={calculatedRange.to}
+                      onViewRangeChange={(newFrom, newTo) => {
+                        setViewFrom(newFrom);
+                        setViewTo(newTo);
+                      }}
+                    />
                   </div>
 
                   {/* Legend */}

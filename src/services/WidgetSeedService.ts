@@ -5,6 +5,11 @@ import { widgetFolderRepo } from '../repository/WidgetFolderRepository';
 
 export class WidgetSeedService {
   public seedIfEmpty(): void {
+    // Check if the system has already been seeded. If so, do not re-seed even if empty.
+    if (localStorage.getItem('archestra_db_is_seeded_v1') === 'true') {
+      return;
+    }
+
     const existingWidgets = widgetRepo.getAll();
     if (existingWidgets.length > 0) {
       return; // Already populated

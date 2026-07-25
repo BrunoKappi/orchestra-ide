@@ -531,7 +531,7 @@ export const PropertyBrowserPage: React.FC = () => {
                       onChange={(e) => setHasHistoryFilter(e.target.checked)}
                       className="rounded border-slate-350 accent-sky-500 w-3.5 h-3.5"
                     />
-                    <span>Com Histórico (Storyn)</span>
+                    <span>Com Histórico (Historian)</span>
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer font-medium hover:text-slate-850 dark:hover:text-slate-200">
                     <input
@@ -721,7 +721,7 @@ export const PropertyBrowserPage: React.FC = () => {
                                       )}
                                       {/* History */}
                                       {prop.hasHistory && (
-                                        <span title="Histórico (Storyn) Ativo">
+                                        <span title="Histórico (Historian) Ativo">
                                           <TrendingUp className="w-3.5 h-3.5 text-indigo-500" />
                                         </span>
                                       )}
@@ -930,7 +930,7 @@ export const PropertyBrowserPage: React.FC = () => {
                   <div className="p-4 rounded-xl border border-indigo-100 dark:border-indigo-950/40 bg-indigo-50/20 dark:bg-indigo-950/10 space-y-2.5">
                     <h4 className="font-bold text-[10px] text-indigo-500 uppercase tracking-wider flex items-center gap-1.5">
                       <TrendingUp className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>Configurações do Storyn</span>
+                      <span>Configurações do Historian</span>
                     </h4>
                     <div className="bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/30 p-3 rounded-lg grid grid-cols-2 gap-y-2 gap-x-4 text-[11px]">
                       <div>
@@ -949,7 +949,7 @@ export const PropertyBrowserPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/30 dark:bg-slate-900/10 text-slate-400 italic">
-                    Histórico do Storyn não configurado.
+                    Histórico do Historian não configurado.
                   </div>
                 )}
 

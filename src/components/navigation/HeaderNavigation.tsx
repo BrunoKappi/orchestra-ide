@@ -212,7 +212,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onImportClic
             }
           >
             <TrendingUp className="w-3.5 h-3.5 text-violet-500" />
-            <span>Storyn</span>
+            <span>Historian</span>
           </NavLink>
         </nav>
       </div>
