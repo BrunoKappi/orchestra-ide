@@ -169,7 +169,17 @@ export const WidgetThumbnail: React.FC<{ widget: WidgetEntity; className?: strin
               </g>
             );
           case 'image':
-            return (
+            return elem.imageUri ? (
+              <image
+                key={elem.id}
+                href={elem.imageUri}
+                x={elem.x}
+                y={elem.y}
+                width={elem.width}
+                height={elem.height}
+                preserveAspectRatio="none"
+              />
+            ) : (
               <rect
                 key={elem.id}
                 x={elem.x}

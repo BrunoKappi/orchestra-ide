@@ -288,7 +288,20 @@ export const WidgetInspectorPanel: React.FC = () => {
                               <FormField label="Tipo da Dinâmica">
                                 <select
                                   value={rule.type}
-                                  onChange={(e) => updateElementDynamic(selectedElement.id, rule.id, { type: e.target.value as any, config: {} })}
+                                  onChange={(e) => {
+                                    const newType = e.target.value as any;
+                                    const newConfig: any = {};
+                                    if (newType === 'fill_level') {
+                                      newConfig.fillLevel = {
+                                        minValue: 0,
+                                        maxValue: 100,
+                                        fillColor: selectedElement.fill || '#0ea5e9',
+                                        emptyColor: 'transparent',
+                                        direction: 'bottom-up',
+                                      };
+                                    }
+                                    updateElementDynamic(selectedElement.id, rule.id, { type: newType, config: newConfig });
+                                  }}
                                   className={inputCls}
                                 >
                                   <option value="fill">Fill Color (Cor de Preenchimento)</option>
@@ -301,7 +314,22 @@ export const WidgetInspectorPanel: React.FC = () => {
                               <FormField label="Variável de Origem">
                                 <select
                                   value={rule.variableId}
-                                  onChange={(e) => updateElementDynamic(selectedElement.id, rule.id, { variableId: e.target.value, config: {} })}
+                                  onChange={(e) => {
+                                    const updates: any = { variableId: e.target.value };
+                                    if (rule.type === 'fill_level' && (!rule.config || !rule.config.fillLevel)) {
+                                      updates.config = {
+                                        ...rule.config,
+                                        fillLevel: {
+                                          minValue: 0,
+                                          maxValue: 100,
+                                          fillColor: selectedElement.fill || '#0ea5e9',
+                                          emptyColor: 'transparent',
+                                          direction: 'bottom-up',
+                                        }
+                                      };
+                                    }
+                                    updateElementDynamic(selectedElement.id, rule.id, updates);
+                                  }}
                                   className={inputCls}
                                 >
                                   <option value="">Selecione uma variável...</option>

@@ -66,7 +66,7 @@ interface ScreenStoreState {
   // Element Actions
   selectElement: (elementId: string | null) => void;
   addElement: (type: ScreenElementType, x: number, y: number) => void;
-  addWidgetInstance: (objectId: string, widgetId: string, x: number, y: number) => void;
+  addWidgetInstance: (objectId: string | undefined, widgetId: string, x: number, y: number) => void;
   addVariableRef: (objectId: string, propertyName: string, x: number, y: number) => void;
   addImageElement: (imageUri: string, x: number, y: number) => void;
   addLineElement: (fromX: number, fromY: number, toX: number, toY: number) => void;
@@ -314,7 +314,7 @@ export const useScreenStore = create<ScreenStoreState>()(
 
     deleteFolder(id) {
       // Recursively collect and delete children
-      const { nodes, screens } = get();
+      const { nodes } = get();
       const childNodes = nodes.filter((n) => n.parentFolderId === id);
       childNodes.forEach((n) => {
         if (n.type === 'screen') get().deleteScreen(n.targetId);
@@ -340,7 +340,7 @@ export const useScreenStore = create<ScreenStoreState>()(
     selectElement: (elementId) => set((s) => { s.selectedElementId = elementId; }),
 
     addElement(type, x, y) {
-      const { selectedScreen, snapToGrid, isGridEnabled, zoom } = get();
+      const { selectedScreen, snapToGrid, isGridEnabled } = get();
       if (!selectedScreen) return;
 
       const snap = (v: number, grid: number) =>
@@ -367,7 +367,6 @@ export const useScreenStore = create<ScreenStoreState>()(
         y: snappedY,
         zIndex: selectedScreen.elements.length,
         rotation: 0,
-        bindings: [],
         ...defaults,
       } as ScreenElement;
 
@@ -391,7 +390,7 @@ export const useScreenStore = create<ScreenStoreState>()(
         height: 150,
         zIndex: selectedScreen.elements.length,
         rotation: 0,
-        objectId,
+        objectId: objectId || undefined,
         widgetId,
       };
       set((s) => {

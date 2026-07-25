@@ -8,7 +8,9 @@ import { deploymentRepo } from '../repository/DeploymentRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { widgetRepo } from '../repository/WidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
+import { alarmRepo } from '../repository/AlarmRepository';
 import { widgetSeedService } from './WidgetSeedService';
+
 
 export class SeedService {
   public seedInitialDataIfNeeded(force: boolean = false): void {
@@ -24,6 +26,8 @@ export class SeedService {
     deploymentRepo.saveAllNodes([]);
     associatedWidgetRepo.saveAll([]);
     mockConfigRepo.saveAll([]);
+    alarmRepo.clear();
+
 
     const now = new Date().toISOString();
 
@@ -49,6 +53,73 @@ export class SeedService {
     ];
 
     tankProps.forEach((p) => {
+      let alarmConfig: any = undefined;
+
+      if (p.name === 'Level') {
+        alarmConfig = {
+          enabled: true,
+          rules: [
+            {
+              id: uuidv4(),
+              type: 'H',
+              enabled: true,
+              blocked: false,
+              compareValue: '80.0',
+              severity: 'high',
+              priority: 70,
+              message: 'Nível do Tanque Alto (> 80%)',
+              color: '#f97316',
+              icon: 'AlertTriangle',
+              activationDelay: 2,
+              returnDelay: 1,
+              hysteresis: 2.0,
+              requireAck: true,
+              historical: true,
+            },
+            {
+              id: uuidv4(),
+              type: 'HH',
+              enabled: true,
+              blocked: false,
+              compareValue: '90.0',
+              severity: 'critical',
+              priority: 95,
+              message: 'Nível do Tanque Crítico (> 90%)',
+              color: '#ef4444',
+              icon: 'ShieldAlert',
+              activationDelay: 0,
+              returnDelay: 1,
+              hysteresis: 1.0,
+              requireAck: true,
+              historical: true,
+            }
+          ]
+        };
+      } else if (p.name === 'Temperature') {
+        alarmConfig = {
+          enabled: true,
+          rules: [
+            {
+              id: uuidv4(),
+              type: 'H',
+              enabled: true,
+              blocked: false,
+              compareValue: '60.0',
+              severity: 'medium',
+              priority: 50,
+              message: 'Temperatura do Tanque Alta (> 60°C)',
+              color: '#eab308',
+              icon: 'AlertCircle',
+              activationDelay: 3,
+              returnDelay: 2,
+              hysteresis: 3.0,
+              requireAck: true,
+              historical: true,
+            }
+          ]
+        };
+      }
+
       propertyRepo.save({
         id: uuidv4(),
         targetId: tankTemplateId,
@@ -57,10 +128,12 @@ export class SeedService {
         dataType: p.dataType as any,
         defaultValue: p.defaultValue,
         description: p.description,
+        alarmConfig,
         createdAt: now,
         updatedAt: now,
       });
     });
+
 
     // Tank Template Default Mock Configurations
     mockConfigRepo.save({

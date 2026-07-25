@@ -15,6 +15,9 @@ import type {
   MergedAssociatedWidget,
   MockConfig,
   MergedMockConfig,
+  AlarmEvent,
+  PropertyAlarmConfig,
+  PropertyHistoryConfig,
 } from '../types/domain';
 import { templateRepo } from '../repository/TemplateRepository';
 import { objectRepo } from '../repository/ObjectRepository';
@@ -23,10 +26,13 @@ import { scriptRepo } from '../repository/ScriptRepository';
 import { deploymentRepo } from '../repository/DeploymentRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
+import { alarmRepo } from '../repository/AlarmRepository';
 import { inheritanceService } from '../services/InheritanceService';
 import { exportImportService } from '../services/ExportImportService';
 import { seedService } from '../services/SeedService';
 import { mockSimulationService } from '../services/MockSimulationService';
+import { AlarmEngine } from '../services/AlarmEngine';
+import { historyEngine } from '../services/HistoryEngine';
 import { STORAGE_KEYS } from '../repository/storageKey';
 
 interface ObjectModelStoreState {
@@ -71,6 +77,16 @@ interface ObjectModelStoreState {
   exportImportMode: 'export' | 'import';
   exportPayload: string;
 
+  // Alarm modal & state
+  isAlarmConfigModalOpen: boolean;
+  editingAlarmProperty: MergedProperty | null;
+  alarmEvents: AlarmEvent[];
+
+  // History modal state
+  isHistoryConfigModalOpen: boolean;
+  editingHistoryProperty: MergedProperty | null;
+
+
   // Actions
   init: () => void;
   setActiveSidebarTab: (tab: 'derivation' | 'deployment') => void;
@@ -89,6 +105,8 @@ interface ObjectModelStoreState {
   saveMockConfig: (configData: Partial<MockConfig> & { propertyName: string; targetId?: string; targetType?: EntityType }) => void;
   deleteMockConfig: (propertyName: string, targetId?: string) => void;
   toggleMockConfigEnabled: (propertyName: string, targetId?: string, targetType?: EntityType) => void;
+  updateSimulatedValue: (key: string, value: string) => void;
+
 
   // Entity CRUD
   createRootTemplate: (name: string, description?: string) => string;
@@ -137,6 +155,18 @@ interface ObjectModelStoreState {
   closeExportImportModal: () => void;
   importJsonPayload: (jsonString: string) => boolean;
 
+  // Alarm Actions
+  openAlarmConfigModal: (property: MergedProperty) => void;
+  closeAlarmConfigModal: () => void;
+  saveAlarmConfig: (propertyName: string, config: PropertyAlarmConfig, targetId?: string, targetType?: EntityType) => void;
+  acknowledgeAlarms: (ids: string[], username?: string) => void;
+  clearAlarmHistory: () => void;
+
+  // History Actions
+  openHistoryConfigModal: (property: MergedProperty) => void;
+  closeHistoryConfigModal: () => void;
+  saveHistoryConfig: (propertyName: string, config: PropertyHistoryConfig, targetId?: string, targetType?: EntityType) => void;
+
   // System
   resetAllData: () => void;
   refreshData: () => void;
@@ -179,8 +209,17 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     exportImportMode: 'export',
     exportPayload: '',
 
+    isAlarmConfigModalOpen: false,
+    editingAlarmProperty: null,
+    alarmEvents: [],
+
+    isHistoryConfigModalOpen: false,
+    editingHistoryProperty: null,
+
+
     init: () => {
       seedService.seedInitialDataIfNeeded();
+      historyEngine.init();
       get().refreshData();
 
       // Load stored simulator settings from localStorage
@@ -218,12 +257,25 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       const objects = objectRepo.getAll();
       const folders = deploymentRepo.getFolders();
       const nodes = deploymentRepo.getNodes();
+      const alarmEvents = alarmRepo.getAll();
 
       set((state) => {
         state.templates = templates;
         state.objects = objects;
         state.deploymentFolders = folders;
         state.deploymentNodes = nodes;
+        state.alarmEvents = alarmEvents;
+
+        // Ensure all properties of all objects are initialized in simulatedValues
+        objects.forEach((obj) => {
+          const props = inheritanceService.getMergedProperties(obj.id, 'instance');
+          props.forEach((prop) => {
+            const key = `${obj.id}:${prop.name}`;
+            if (state.simulatedValues[key] === undefined) {
+              state.simulatedValues[key] = prop.defaultValue;
+            }
+          });
+        });
       });
 
       const currentSel = get().selectedEntity;
@@ -255,14 +307,6 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         const assocs = inheritanceService.getMergedAssociatedWidgets(id, 'template');
         const mockConfigs = inheritanceService.getMergedMockConfigs(id, 'template', props);
 
-        const initialValues: Record<string, string> = {};
-        const initialHist: Record<string, number[]> = {};
-        props.forEach((p) => {
-          initialValues[p.name] = p.defaultValue;
-          const num = parseFloat(p.defaultValue);
-          initialHist[p.name] = isNaN(num) ? [] : [num];
-        });
-
         set((state) => {
           state.selectedEntity = { id, type: 'template' };
           state.selectedTemplate = template;
@@ -271,8 +315,16 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           state.mergedScripts = scripts;
           state.mergedAssociatedWidgets = assocs;
           state.mergedMockConfigs = mockConfigs;
-          state.simulatedValues = initialValues;
-          state.historyValues = initialHist;
+
+          props.forEach((p) => {
+            if (state.simulatedValues[p.name] === undefined) {
+              state.simulatedValues[p.name] = p.defaultValue;
+            }
+            const num = parseFloat(state.simulatedValues[p.name]);
+            if (!isNaN(num) && !state.historyValues[p.name]) {
+              state.historyValues[p.name] = [num];
+            }
+          });
         });
       } else {
         const obj = objectRepo.getById(id);
@@ -280,14 +332,6 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         const scripts = inheritanceService.getMergedScripts(id, 'instance');
         const assocs = inheritanceService.getMergedAssociatedWidgets(id, 'instance');
         const mockConfigs = inheritanceService.getMergedMockConfigs(id, 'instance', props);
-
-        const initialValues: Record<string, string> = {};
-        const initialHist: Record<string, number[]> = {};
-        props.forEach((p) => {
-          initialValues[p.name] = p.defaultValue;
-          const num = parseFloat(p.defaultValue);
-          initialHist[p.name] = isNaN(num) ? [] : [num];
-        });
 
         set((state) => {
           state.selectedEntity = { id, type: 'instance' };
@@ -297,8 +341,22 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           state.mergedScripts = scripts;
           state.mergedAssociatedWidgets = assocs;
           state.mergedMockConfigs = mockConfigs;
-          state.simulatedValues = initialValues;
-          state.historyValues = initialHist;
+
+          props.forEach((p) => {
+            const key = `${id}:${p.name}`;
+            if (state.simulatedValues[key] === undefined) {
+              state.simulatedValues[key] = p.defaultValue;
+            }
+            state.simulatedValues[p.name] = state.simulatedValues[key];
+
+            const num = parseFloat(state.simulatedValues[key]);
+            if (!isNaN(num)) {
+              if (!state.historyValues[key]) {
+                state.historyValues[key] = [num];
+              }
+              state.historyValues[p.name] = state.historyValues[key];
+            }
+          });
         });
       }
     },
@@ -372,18 +430,32 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
                 nextHistory[prop.name] = hist;
               }
             }
+
+            // Record in HistoryEngine if enabled
+            if (prop.historyConfig?.enabled) {
+              historyEngine.record(obj.id, prop.id, newVal, prop.historyConfig, 'simulation');
+            }
           } else {
             if (nextValues[key] === undefined) {
               nextValues[key] = prop.defaultValue;
+            }
+            // Maintain backwards compatibility for single selected entity
+            if (selectedEntity?.id === obj.id) {
+              nextValues[prop.name] = nextValues[key];
             }
           }
         });
       });
 
+      // Evaluate alarms
+      AlarmEngine.evaluate(nextValues, objects, inheritanceService.getMergedProperties.bind(inheritanceService));
+      const alarmEvents = alarmRepo.getAll();
+
       set((state) => {
         state.simulationTickCount = nextTick;
         state.simulatedValues = nextValues;
         state.historyValues = nextHistory;
+        state.alarmEvents = alarmEvents;
       });
     },
 
@@ -469,6 +541,193 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         });
       }
       get().refreshData();
+    },
+
+    updateSimulatedValue: (key, value) => {
+      // Record in HistoryEngine for runtime updates
+      const parts = key.split(':');
+      if (parts.length === 2) {
+        const [objectId, propName] = parts;
+        const obj = objectRepo.getById(objectId);
+        if (obj) {
+          const props = inheritanceService.getMergedProperties(objectId, 'instance');
+          const prop = props.find((p) => p.name === propName);
+          if (prop?.historyConfig?.enabled) {
+            historyEngine.record(objectId, prop.id, value, prop.historyConfig, 'runtime');
+          }
+        }
+      }
+
+      set((state) => {
+        state.simulatedValues[key] = value;
+        const num = parseFloat(value);
+        if (!isNaN(num)) {
+          if (!state.historyValues[key]) {
+            state.historyValues[key] = [];
+          }
+          state.historyValues[key].push(num);
+          if (state.historyValues[key].length > 15) {
+            state.historyValues[key].shift();
+          }
+        }
+
+        // SelectedEntity mapping fallback
+        if (parts.length === 2 && state.selectedEntity?.id === parts[0]) {
+          const num2 = parseFloat(value);
+          state.simulatedValues[parts[1]] = value;
+          if (!isNaN(num2)) {
+            if (!state.historyValues[parts[1]]) {
+              state.historyValues[parts[1]] = [];
+            }
+            state.historyValues[parts[1]].push(num2);
+            if (state.historyValues[parts[1]].length > 15) {
+              state.historyValues[parts[1]].shift();
+            }
+          }
+        }
+
+        // Re-evaluate alarms instantly on manual update
+        AlarmEngine.evaluate(state.simulatedValues, state.objects, inheritanceService.getMergedProperties.bind(inheritanceService));
+        state.alarmEvents = alarmRepo.getAll();
+      });
+    },
+
+
+    openAlarmConfigModal: (property) => set((state) => {
+      state.isAlarmConfigModalOpen = true;
+      state.editingAlarmProperty = property;
+    }),
+
+    closeAlarmConfigModal: () => set((state) => {
+      state.isAlarmConfigModalOpen = false;
+      state.editingAlarmProperty = null;
+    }),
+
+    saveAlarmConfig: (propertyName, configData, targetId, targetType) => {
+      const activeId = targetId || get().selectedEntity?.id;
+      const activeType = targetType || get().selectedEntity?.type;
+      if (!activeId || !activeType) return;
+
+      const properties = propertyRepo.getByTargetId(activeId);
+      const prop = properties.find((p) => p.name === propertyName);
+
+      if (prop) {
+        prop.alarmConfig = configData;
+        prop.updatedAt = new Date().toISOString();
+        propertyRepo.save(prop);
+      } else {
+        const mergedProps = inheritanceService.getMergedProperties(activeId, activeType);
+        const inheritedProp = mergedProps.find((p) => p.name === propertyName);
+        if (inheritedProp) {
+          const now = new Date().toISOString();
+          propertyRepo.save({
+            id: uuidv4(),
+            targetId: activeId,
+            targetType: activeType,
+            name: inheritedProp.name,
+            dataType: inheritedProp.dataType,
+            defaultValue: inheritedProp.defaultValue,
+            description: inheritedProp.description,
+            alarmConfig: configData,
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+      }
+
+      get().closeAlarmConfigModal();
+      get().refreshData();
+    },
+
+    openHistoryConfigModal: (property) => set((state) => {
+      state.isHistoryConfigModalOpen = true;
+      state.editingHistoryProperty = property;
+    }),
+
+    closeHistoryConfigModal: () => set((state) => {
+      state.isHistoryConfigModalOpen = false;
+      state.editingHistoryProperty = null;
+    }),
+
+    saveHistoryConfig: (propertyName, configData, targetId, targetType) => {
+      const activeId = targetId || get().selectedEntity?.id;
+      const activeType = targetType || get().selectedEntity?.type;
+      if (!activeId || !activeType) return;
+
+      const properties = propertyRepo.getByTargetId(activeId);
+      const prop = properties.find((p) => p.name === propertyName);
+
+      if (prop) {
+        prop.historyConfig = configData;
+        prop.updatedAt = new Date().toISOString();
+        propertyRepo.save(prop);
+      } else {
+        const mergedProps = inheritanceService.getMergedProperties(activeId, activeType);
+        const inheritedProp = mergedProps.find((p) => p.name === propertyName);
+        if (inheritedProp) {
+          const now = new Date().toISOString();
+          propertyRepo.save({
+            id: uuidv4(),
+            targetId: activeId,
+            targetType: activeType,
+            name: inheritedProp.name,
+            dataType: inheritedProp.dataType,
+            defaultValue: inheritedProp.defaultValue,
+            description: inheritedProp.description,
+            historyConfig: configData,
+            createdAt: now,
+            updatedAt: now,
+          });
+        }
+      }
+
+      get().closeHistoryConfigModal();
+      get().refreshData();
+    },
+
+    acknowledgeAlarms: (ids, username = 'Operator') => {
+      const all = alarmRepo.getAll();
+      const now = new Date().toISOString();
+      let changed = false;
+
+      const updated = all.map((evt) => {
+        if (ids.includes(evt.id)) {
+          if (evt.status === 'Active Unacknowledged') {
+            changed = true;
+            return {
+              ...evt,
+              status: 'Active Acknowledged' as const,
+              acknowledgedAt: now,
+              ackedBy: username,
+            };
+          } else if (evt.status === 'Cleared Unacknowledged') {
+            changed = true;
+            return {
+              ...evt,
+              status: 'Cleared Acknowledged' as const,
+              acknowledgedAt: now,
+              ackedBy: username,
+            };
+          }
+        }
+        return evt;
+      });
+
+      if (changed) {
+        alarmRepo.saveAll(updated);
+        set((state) => {
+          state.alarmEvents = updated;
+        });
+      }
+    },
+
+    clearAlarmHistory: () => {
+      const all = alarmRepo.getAll();
+      const unresolved = all.filter((evt) => evt.status !== 'Cleared Acknowledged');
+      alarmRepo.saveAll(unresolved);
+      set((state) => {
+        state.alarmEvents = unresolved;
+      });
     },
 
     // Entity Operations

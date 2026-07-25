@@ -2,13 +2,10 @@ import React, { useState, useEffect } from "react";
 import {
   Boxes,
   Box,
-  Copy,
-  Check,
   Edit2,
   ListFilter,
   Code,
   Layers,
-  Activity,
 } from "lucide-react";
 import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { PropertiesTable } from "./PropertiesTable";
@@ -18,7 +15,10 @@ import { PropertyModal } from "./PropertyModal";
 import { ScriptModal } from "./ScriptModal";
 import { ExportImportModal } from "./ExportImportModal";
 import { MockConfigModal } from "./MockConfigModal";
+import { AlarmConfigModal } from "./AlarmConfigModal";
+import { HistoryConfigModal } from "./HistoryConfigModal";
 import { cn } from "../../utils/cn";
+
 
 export const CentralEditor: React.FC = () => {
   const {
@@ -31,7 +31,6 @@ export const CentralEditor: React.FC = () => {
     updateEntityDetails,
   } = useObjectModelStore();
 
-  const [copiedId, setCopiedId] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
 
@@ -80,11 +79,7 @@ export const CentralEditor: React.FC = () => {
     originTemplateName = originT ? originT.name : "Unknown Template";
   }
 
-  const handleCopyId = () => {
-    navigator.clipboard.writeText(currentEntity.id);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  };
+
 
   const handleSaveName = () => {
     if (nameVal.trim() && nameVal.trim() !== currentEntity.name) {
@@ -270,6 +265,8 @@ export const CentralEditor: React.FC = () => {
       <ScriptModal />
       <ExportImportModal />
       <MockConfigModal />
+      <AlarmConfigModal />
+      <HistoryConfigModal />
     </div>
   );
 };

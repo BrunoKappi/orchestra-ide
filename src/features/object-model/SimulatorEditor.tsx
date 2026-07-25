@@ -14,19 +14,15 @@ import {
   Clock,
   ToggleLeft,
   List,
-  CheckCircle2,
-  AlertCircle,
   HelpCircle,
 } from 'lucide-react';
 import { useObjectModelStore } from '../../store/useObjectModelStore';
-import type { MergedProperty, MergedMockConfig } from '../../types/domain';
+import type { MergedMockConfig } from '../../types/domain';
 import { cn } from '../../utils/cn';
 
 export const SimulatorEditor: React.FC = () => {
   const {
     selectedEntity,
-    selectedTemplate,
-    selectedObject,
     mergedProperties,
     mergedMockConfigs,
     isSimulating,
@@ -75,7 +71,7 @@ export const SimulatorEditor: React.FC = () => {
     setPrevValues(simulatedValues);
   }, [simulatedValues]);
 
-  const entityName = selectedTemplate ? selectedTemplate.name : selectedObject ? selectedObject.name : 'Unknown';
+
   const isTemplate = selectedEntity?.type === 'template';
 
   const filteredProperties = mergedProperties.filter((p) =>

@@ -75,6 +75,7 @@ export const DeploymentTree: React.FC = () => {
   const toggleFolder = (key: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedFolders((prev) => ({ ...prev, [key]: !prev[key] }));
+    selectEntity(null);
   };
 
   const handleContextMenu = (e: React.MouseEvent, node: DeploymentTreeNode | null) => {
@@ -219,7 +220,10 @@ export const DeploymentTree: React.FC = () => {
         draggable
         onDragStart={() => onDragStart(node.targetId)}
         onDragEnd={onDragEnd}
-        onClick={() => selectEntity(node.targetId, 'instance')}
+        onClick={(e) => {
+          e.stopPropagation();
+          selectEntity(node.targetId, 'instance');
+        }}
         onContextMenu={(e) => handleContextMenu(e, node)}
         style={{ paddingLeft: `${depth * 14 + 8}px` }}
         className={cn(
@@ -337,6 +341,7 @@ export const DeploymentTree: React.FC = () => {
           onClick={(e) => {
             e.stopPropagation();
             setExpandedFolders((prev) => ({ ...prev, '__unassigned__': !prev['__unassigned__'] }));
+            selectEntity(null);
           }}
           className={cn(
             'flex items-center gap-1.5 py-1.5 px-3 rounded-md text-xs font-semibold cursor-pointer transition-all duration-150 mb-1',
@@ -396,7 +401,10 @@ export const DeploymentTree: React.FC = () => {
                     draggable
                     onDragStart={() => onDragStart(obj.id)}
                     onDragEnd={onDragEnd}
-                    onClick={() => selectEntity(obj.id, 'instance')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      selectEntity(obj.id, 'instance');
+                    }}
                     onContextMenu={(e) => handleContextMenu(e, nodeObj)}
                     style={{ paddingLeft: '22px' }}
                     className={cn(
@@ -442,6 +450,7 @@ export const DeploymentTree: React.FC = () => {
             handleContextMenu(e, null);
           }
         }}
+        onClick={() => selectEntity(null)}
         className="flex-1 overflow-y-auto p-1.5 space-y-0.5"
       >
         {/* Unassigned pseudo-folder always at top */}

@@ -1,4 +1,4 @@
-import type { DataType, EntityType, PropertyEntity } from '../types/domain';
+import type { EntityType, PropertyEntity } from '../types/domain';
 import type { MockConfig, MockPresetType } from '../types/mock';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,7 +41,7 @@ export class MockSimulationService {
         const max = params.max ?? 100;
         const step = params.step ?? 1;
         const decimals = params.decimals ?? 0;
-        const range = Math.max(1, max - min);
+
         const currentNum = currentValue ? parseFloat(currentValue) : min;
         let nextVal = currentNum + step;
         if (nextVal > max) {

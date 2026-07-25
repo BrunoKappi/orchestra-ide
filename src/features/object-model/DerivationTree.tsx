@@ -166,7 +166,8 @@ export const DerivationTree: React.FC = () => {
     return (
       <div key={node.id} className="select-none">
         <div
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             const type = node.type === 'instance' ? 'instance' : 'template';
             selectEntity(node.entityId, type);
           }}
@@ -261,6 +262,7 @@ export const DerivationTree: React.FC = () => {
       <div
         data-tree-content="true"
         onContextMenu={(e) => handleContextMenu(e, null)}
+        onClick={() => selectEntity(null)}
         className="flex-1 overflow-y-auto p-1.5 space-y-0.5"
       >
         {treeNodes.length > 0 ? (

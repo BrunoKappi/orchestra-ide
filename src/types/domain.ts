@@ -43,6 +43,30 @@ export interface ObjectEntity {
   updatedAt: string;
 }
 
+export interface PropertyHistoryConfig {
+  enabled: boolean;
+  /** 'interval' = fixed sampling period; 'on_change' = record on every value change */
+  collectionMode: 'interval' | 'on_change';
+  intervalMs: number;       // minimum 1000 ms
+  retentionMs: number;      // e.g. 86400000 = 24 h
+  maxSamples: number;       // e.g. 10000
+  deadband: number;         // minimum change magnitude to record a new sample
+  compression: boolean;
+  engineeringUnit: string;
+  notes: string;
+}
+
+export type SampleQuality = 'Good' | 'Bad' | 'Uncertain';
+
+export interface HistorySample {
+  timestamp: string;        // ISO 8601
+  value: string;
+  quality: SampleQuality;
+  source: 'simulation' | 'runtime' | 'manual';
+  objectId: string;
+  propertyId: string;
+}
+
 export interface PropertyEntity {
   id: string;
   targetId: string;
@@ -51,6 +75,8 @@ export interface PropertyEntity {
   dataType: DataType;
   defaultValue: string;
   description: string;
+  alarmConfig?: PropertyAlarmConfig;
+  historyConfig?: PropertyHistoryConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -342,6 +368,12 @@ export interface ScreenElement {
   // Widget instance binding
   objectId?: string;
   widgetId?: string;
+  mappings?: {
+    [widgetPropId: string]: {
+      type: 'property' | 'fixed';
+      value: string;
+    };
+  };
 
   // Variable display
   propertyName?: string;
@@ -421,4 +453,68 @@ export interface ScreenTreeNode {
   children: ScreenTreeNode[];
   screenDetail?: ScreenEntity;
 }
+
+// ----------------------------------------------------------------------------
+// SCADA Alarm System Types
+// ----------------------------------------------------------------------------
+
+export type AlarmConditionType =
+  | 'HH'
+  | 'H'
+  | 'L'
+  | 'LL'
+  | 'Equal'
+  | 'NotEqual'
+  | 'BitTrue'
+  | 'BitFalse'
+  | 'TextMatch';
+
+export interface AlarmRule {
+  id: string;
+  type: AlarmConditionType;
+  enabled: boolean;
+  blocked: boolean;
+  compareValue: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  priority: number;
+  message: string;
+  color: string;
+  icon: string;
+  activationDelay: number; // in seconds
+  returnDelay: number;     // in seconds
+  hysteresis: number;
+  requireAck: boolean;
+  historical: boolean;
+}
+
+export interface PropertyAlarmConfig {
+  enabled: boolean;
+  rules: AlarmRule[];
+}
+
+export interface AlarmEvent {
+  id: string;
+  ruleId: string;
+  objectId: string;
+  objectName: string;
+  propertyName: string;
+  currentValue: string;
+  configuredValue: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  priority: number;
+  message: string;
+  color: string;
+  icon: string;
+  activatedAt: string;
+  acknowledgedAt: string | null;
+  clearedAt: string | null;
+  ackedBy: string | null;
+  durationMs: number | null;
+  status:
+    | 'Active Unacknowledged'
+    | 'Active Acknowledged'
+    | 'Cleared Unacknowledged'
+    | 'Cleared Acknowledged';
+}
+
 
