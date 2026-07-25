@@ -1,0 +1,274 @@
+# =========================
+# Dependencies
+# =========================
+
+node_modules/
+**/node_modules/
+jspm_packages/
+bower_components/
+
+# =========================
+# Monorepo workspaces
+# =========================
+
+/backend/node_modules/
+/frontend/node_modules/
+/apps/**/node_modules/
+/packages/**/node_modules/
+
+# =========================
+# Build Output
+# =========================
+
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vercel/
+.netlify/
+
+backend/dist/
+backend/build/
+backend/out/
+
+frontend/dist/
+frontend/build/
+frontend/out/
+frontend/.next/
+frontend/.nuxt/
+
+apps/**/dist/
+apps/**/build/
+packages/**/dist/
+packages/**/build/
+
+# =========================
+# Coverage
+# =========================
+
+coverage/
+.nyc_output/
+**/coverage/
+**/.nyc_output/
+
+# =========================
+# Cache
+# =========================
+
+.cache/
+.parcel-cache/
+.vite/
+.turbo/
+.eslintcache
+
+**/.cache/
+**/.parcel-cache/
+**/.vite/
+**/.turbo/
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+**/*.log
+
+# =========================
+# Lock Files (monorepo warning zone)
+# =========================
+
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# =========================
+# Environment Files
+# =========================
+
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# =========================
+# Git
+# =========================
+
+.git/
+.gitignore
+**/.git/
+
+# =========================
+# IDE
+# =========================
+
+.vscode/
+.idea/
+*.suo
+*.user
+*.tmp
+
+# =========================
+# Generated Files
+# =========================
+
+*.generated.*
+generated/
+codegen/
+**/generated/
+**/codegen/
+
+# =========================
+# Firebase Local
+# =========================
+
+.firebase/
+firebase-debug.log
+.firestore/
+
+# =========================
+# Database Dumps
+# =========================
+
+*.sql
+*.bak
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+
+# =========================
+# Uploads and Temp Storage
+# =========================
+
+uploads/
+storage/
+temp/
+tmp/
+**/uploads/
+**/storage/
+**/temp/
+**/tmp/
+
+# =========================
+# Assets (runtime uploads)
+# =========================
+
+public/videos/
+public/audio/
+public/uploads/
+
+assets/videos/
+assets/audio/
+
+# =========================
+# Images / Design Files
+# =========================
+
+*.psd
+*.ai
+*.xcf
+*.tiff
+
+# =========================
+# Documentation
+# =========================
+
+docs/archive/
+docs/generated/
+**/docs/generated/
+
+# =========================
+# Reports
+# =========================
+
+reports/
+exports/
+backups/
+analytics/
+
+# =========================
+# Test Artifacts
+# =========================
+
+playwright-report/
+test-results/
+cypress/videos/
+cypress/screenshots/
+
+**/playwright-report/
+**/test-results/
+**/cypress/videos/
+**/cypress/screenshots/
+
+# =========================
+# Binary Files
+# =========================
+
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+*.mp3
+*.wav
+*.flac
+
+*.exe
+*.dll
+*.iso
+
+# =========================
+# Large Data / ML
+# =========================
+
+data/
+datasets/
+seed-data/
+fixtures/large/
+
+models/
+checkpoints/
+
+**/data/
+**/datasets/
+**/models/
+**/checkpoints/
+
+# =========================
+# Local Development
+# =========================
+
+local/
+sandbox/
+**/local/
+**/sandbox/
+
+# =========================
+# Build artifacts
+# =========================
+
+*.map
+*.min.js
+*.bundle.js
+
+# =========================
+# Storybook
+# =========================
+
+storybook-static/
+**/storybook-static/
