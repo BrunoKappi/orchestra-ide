@@ -9,6 +9,8 @@ export type DataType =
   | 'Object';
 
 export * from './mock';
+export * from './flow';
+import type { FlowchartEntity } from './flow';
 
 
 export type ScriptTrigger =
@@ -166,6 +168,7 @@ export interface ExportDataPayload {
   deploymentFolders?: DeploymentFolderEntity[];
   deploymentNodes?: DeploymentNodeEntity[];
   associatedWidgets?: AssociatedWidgetEntity[];
+  flowcharts?: FlowchartEntity[];
 }
 
 export interface AssociatedWidgetEntity {

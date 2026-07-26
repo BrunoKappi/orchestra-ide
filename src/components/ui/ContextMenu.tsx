@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
 
 export interface ContextMenuItem {
-  label: string;
+  label?: string;
   icon?: React.ReactNode;
-  action: () => void;
+  action?: () => void;
   danger?: boolean;
   disabled?: boolean;
   divider?: boolean;
@@ -50,16 +50,19 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }
         'fixed z-50 min-w-[200px] rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 shadow-xl text-slate-800 dark:text-slate-200 text-xs font-medium animate-in fade-in-80 zoom-in-95 duration-100 select-none'
       )}
     >
-      {items.map((item, idx) => (
-        <React.Fragment key={idx}>
-          {item.divider && (
-            <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
-          )}
+      {items.map((item, idx) => {
+        if (item.divider) {
+          return (
+            <div key={idx} className="my-1 border-t border-slate-100 dark:border-slate-800" />
+          );
+        }
+        return (
           <button
+            key={idx}
             disabled={item.disabled}
             onClick={(e) => {
               e.stopPropagation();
-              if (!item.disabled) {
+              if (!item.disabled && item.action) {
                 item.action();
                 onClose();
               }
@@ -76,8 +79,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }
             {item.icon && <span className="text-slate-400 dark:text-slate-500 shrink-0">{item.icon}</span>}
             <span className="flex-1 truncate">{item.label}</span>
           </button>
-        </React.Fragment>
-      ))}
+        );
+      })}
     </div>
   );
 };

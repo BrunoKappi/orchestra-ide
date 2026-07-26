@@ -9,6 +9,7 @@ import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { widgetRepo } from '../repository/WidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
 import { alarmRepo } from '../repository/AlarmRepository';
+import { flowchartRepo } from '../repository/FlowchartRepository';
 import { widgetSeedService } from './WidgetSeedService';
 
 
@@ -455,6 +456,234 @@ me.Vibration = 0.0;`,
         updatedAt: now,
       });
     }
+
+    // Seed Sample Flowcharts
+    flowchartRepo.saveAll([
+      {
+        id: uuidv4(),
+        name: 'Controle de Bombeamento e Nível da Planta',
+        description: 'Fluxograma global de automação para controle de transferência de fluido entre tanques de processo.',
+        category: 'Automação de Produção',
+        tags: ['Bombeamento', 'Nível', 'Nível Alto', 'Batelada'],
+        version: '1.0.0',
+        author: 'Engenharia de Automação',
+        contextType: 'global',
+        targetId: null,
+        folderId: null,
+        bpmnXml: `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1" name="Início da Batelada">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_ReadLevel" name="Ler Propriedade: Nível Tanque">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_Compare" name="Nível > 80%?">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_High</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Normal</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_StartPump" name="Escrever Propriedade: Ligar Bomba">
+      <bpmn:incoming>Flow_High</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Event_Delay" name="Aguardar 5s">
+      <bpmn:incoming>Flow_Normal</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="EndEvent_1" name="Fim da Sequência">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_ReadLevel" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_ReadLevel" targetRef="Gateway_Compare" />
+    <bpmn:sequenceFlow id="Flow_High" name="Sim" sourceRef="Gateway_Compare" targetRef="Task_StartPump" />
+    <bpmn:sequenceFlow id="Flow_Normal" name="Não" sourceRef="Gateway_Compare" targetRef="Event_Delay" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_StartPump" targetRef="EndEvent_1" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Event_Delay" targetRef="EndEvent_1" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="160" y="120" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ReadLevel" bpmnElement="Task_ReadLevel">
+        <dc:Bounds x="250" y="98" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Compare" bpmnElement="Gateway_Compare" isMarkerVisible="true">
+        <dc:Bounds x="465" y="113" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_StartPump" bpmnElement="Task_StartPump">
+        <dc:Bounds x="570" y="40" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Event_Delay" bpmnElement="Event_Delay">
+        <dc:Bounds x="630" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_1" bpmnElement="EndEvent_1">
+        <dc:Bounds x="800" y="120" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow_1" bpmnElement="Flow_1">
+        <di:waypoint x="196" y="138" />
+        <di:waypoint x="250" y="138" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_2" bpmnElement="Flow_2">
+        <di:waypoint x="410" y="138" />
+        <di:waypoint x="465" y="138" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_High" bpmnElement="Flow_High">
+        <di:waypoint x="490" y="113" />
+        <di:waypoint x="490" y="80" />
+        <di:waypoint x="570" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Normal" bpmnElement="Flow_Normal">
+        <di:waypoint x="490" y="163" />
+        <di:waypoint x="490" y="210" />
+        <di:waypoint x="630" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3">
+        <di:waypoint x="730" y="80" />
+        <di:waypoint x="818" y="80" />
+        <di:waypoint x="818" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_4" bpmnElement="Flow_4">
+        <di:waypoint x="666" y="210" />
+        <di:waypoint x="818" y="210" />
+        <di:waypoint x="818" y="156" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`,
+        nodeMetadata: {
+          Task_ReadLevel: {
+            id: 'Task_ReadLevel',
+            name: 'Ler Propriedade: Nível Tanque',
+            isIndustrialNode: true,
+            industrialType: 'read_property',
+            targetPropertyName: 'me.Level',
+          },
+          Gateway_Compare: {
+            id: 'Gateway_Compare',
+            name: 'Nível > 80%?',
+            isIndustrialNode: true,
+            industrialType: 'compare_variable',
+            expression: {
+              logic: 'AND',
+              conditions: [
+                {
+                  id: 'c1',
+                  leftOperand: 'me.Level',
+                  leftOperandType: 'property',
+                  operator: 'GreaterThan',
+                  rightOperand: '80.0',
+                  rightOperandType: 'constant',
+                },
+              ],
+            },
+          },
+          Task_StartPump: {
+            id: 'Task_StartPump',
+            name: 'Escrever Propriedade: Ligar Bomba',
+            isIndustrialNode: true,
+            industrialType: 'write_property',
+            targetPropertyName: 'PUMP_001.Status',
+            assignment: {
+              targetProperty: 'PUMP_001.Status',
+              sourceType: 'constant',
+              sourceValue: 'true',
+            },
+          },
+          Event_Delay: {
+            id: 'Event_Delay',
+            name: 'Aguardar 5s',
+            isIndustrialNode: true,
+            industrialType: 'delay',
+            durationMs: 5000,
+          },
+        },
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: uuidv4(),
+        name: 'Procedimento de Drenagem e Segurança do Tanque',
+        description: 'Fluxograma específico do modelo Tank Template para rotina de drenagem automática quando alarmes são acionados.',
+        category: 'Procedimento Operacional',
+        tags: ['Segurança', 'Tanque', 'Drenagem', 'Alarme'],
+        version: '1.0.0',
+        author: 'Sistemas Industriais',
+        contextType: 'template',
+        targetId: tankTemplateId,
+        folderId: null,
+        bpmnXml: `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_2" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_2" isExecutable="false">
+    <bpmn:startEvent id="Start_Alarm" name="Evento Alarme Nível HH">
+      <bpmn:outgoing>Flow_A1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_Ack" name="Reconhecer Alarme">
+      <bpmn:incoming>Flow_A1</bpmn:incoming>
+      <bpmn:outgoing>Flow_A2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_ScriptDrain" name="Executar Script: Iniciar Drenagem">
+      <bpmn:incoming>Flow_A2</bpmn:incoming>
+      <bpmn:outgoing>Flow_A3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Drain" name="Drenagem Concluída">
+      <bpmn:incoming>Flow_A3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_A1" sourceRef="Start_Alarm" targetRef="Task_Ack" />
+    <bpmn:sequenceFlow id="Flow_A2" sourceRef="Task_Ack" targetRef="Task_ScriptDrain" />
+    <bpmn:sequenceFlow id="Flow_A3" sourceRef="Task_ScriptDrain" targetRef="End_Drain" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_2">
+    <bpmndi:BPMNPlane id="BPMNPlane_2" bpmnElement="Process_2">
+      <bpmndi:BPMNShape id="Shape_Start_Alarm" bpmnElement="Start_Alarm">
+        <dc:Bounds x="160" y="120" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Ack" bpmnElement="Task_Ack">
+        <dc:Bounds x="250" y="98" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_ScriptDrain" bpmnElement="Task_ScriptDrain">
+        <dc:Bounds x="460" y="98" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End_Drain" bpmnElement="End_Drain">
+        <dc:Bounds x="690" y="120" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_Flow_A1" bpmnElement="Flow_A1">
+        <di:waypoint x="196" y="138" />
+        <di:waypoint x="250" y="138" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_A2" bpmnElement="Flow_A2">
+        <di:waypoint x="410" y="138" />
+        <di:waypoint x="460" y="138" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_A3" bpmnElement="Flow_A3">
+        <di:waypoint x="640" y="138" />
+        <di:waypoint x="690" y="138" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`,
+        nodeMetadata: {
+          Task_Ack: {
+            id: 'Task_Ack',
+            name: 'Reconhecer Alarme',
+            isIndustrialNode: true,
+            industrialType: 'ack_alarm',
+          },
+          Task_ScriptDrain: {
+            id: 'Task_ScriptDrain',
+            name: 'Executar Script: Iniciar Drenagem',
+            isIndustrialNode: true,
+            industrialType: 'execute_script',
+          },
+        },
+        createdAt: now,
+        updatedAt: now,
+      },
+    ]);
 
     localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
   }

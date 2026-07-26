@@ -40,7 +40,7 @@ import { STORAGE_KEYS } from '../repository/storageKey';
 interface ObjectModelStoreState {
   // Navigation & Theme
   activeSidebarTab: 'derivation' | 'deployment';
-  activeEditorTab: 'properties' | 'scripts' | 'graphics';
+  activeEditorTab: 'properties' | 'scripts' | 'graphics' | 'flows';
   theme: 'light' | 'dark';
   searchQuery: string;
 
@@ -93,7 +93,7 @@ interface ObjectModelStoreState {
   // Actions
   init: () => void;
   setActiveSidebarTab: (tab: 'derivation' | 'deployment') => void;
-  setActiveEditorTab: (tab: 'properties' | 'scripts' | 'graphics') => void;
+  setActiveEditorTab: (tab: 'properties' | 'scripts' | 'graphics' | 'flows') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
   setSearchQuery: (query: string) => void;

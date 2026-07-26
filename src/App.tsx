@@ -10,6 +10,8 @@ import { DatabasePage } from './pages/DatabasePage';
 import { AlarmViewerPage } from './pages/AlarmViewerPage';
 import { HistorianPage } from './pages/HistorianPage';
 import { PropertyBrowserPage } from './pages/PropertyBrowserPage';
+import { FlowsPage } from './pages/FlowsPage';
+import { FlowDesignerModal } from './features/flow-designer/FlowDesignerModal';
 
 const setFavicon = (emoji: string) => {
   const link = (document.querySelector("link[rel~='icon']") as HTMLLinkElement) || document.createElement('link');
@@ -36,6 +38,9 @@ export function App() {
     } else if (path === '/widgets') {
       title = 'Widgets - Serrano';
       emoji = '🎨';
+    } else if (path === '/flows' || path === '/fluxos') {
+      title = 'Flow Designer - Serrano';
+      emoji = '🔀';
     } else if (path === '/simulator' || path === '/simulador') {
       title = 'Simulador - Serrano';
       emoji = '⚡';
@@ -64,21 +69,26 @@ export function App() {
   }, [location]);
 
   return (
-    <Routes>
-      <Route path="/" element={<OrchestraPage />} />
-      <Route path="/orchestra" element={<OrchestraPage />} />
-      <Route path="/properties" element={<PropertyBrowserPage />} />
-      <Route path="/widgets" element={<WidgetsPage />} />
-      <Route path="/simulator" element={<SimulatorPage />} />
-      <Route path="/simulador" element={<SimulatorPage />} />
-      <Route path="/screens" element={<ScreenDesignerPage />} />
-      <Route path="/screen/:id" element={<ScreenRuntimePage />} />
-      <Route path="/runtime" element={<RuntimePage />} />
-      <Route path="/alarms" element={<AlarmViewerPage />} />
-      <Route path="/database" element={<DatabasePage />} />
-      <Route path="/historian" element={<HistorianPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<OrchestraPage />} />
+        <Route path="/orchestra" element={<OrchestraPage />} />
+        <Route path="/properties" element={<PropertyBrowserPage />} />
+        <Route path="/widgets" element={<WidgetsPage />} />
+        <Route path="/flows" element={<FlowsPage />} />
+        <Route path="/fluxos" element={<FlowsPage />} />
+        <Route path="/simulator" element={<SimulatorPage />} />
+        <Route path="/simulador" element={<SimulatorPage />} />
+        <Route path="/screens" element={<ScreenDesignerPage />} />
+        <Route path="/screen/:id" element={<ScreenRuntimePage />} />
+        <Route path="/runtime" element={<RuntimePage />} />
+        <Route path="/alarms" element={<AlarmViewerPage />} />
+        <Route path="/database" element={<DatabasePage />} />
+        <Route path="/historian" element={<HistorianPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <FlowDesignerModal />
+    </>
   );
 }
 

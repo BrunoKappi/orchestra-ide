@@ -62,3 +62,109 @@
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(51, 65, 85, 0.8);
 }
+
+/* Custom BPMN Modeler Dark & Light Theme Styling */
+.bjs-container {
+  background-color: #f8fafc !important;
+  font-family: inherit !important;
+}
+
+.dark .bjs-container {
+  background-color: #090d16 !important;
+}
+
+/* Base shape styles in Light Mode */
+.bjs-container .djs-element:not(.djs-connection) .djs-visual rect,
+.bjs-container .djs-element:not(.djs-connection) .djs-visual polygon,
+.bjs-container .djs-element:not(.djs-connection) .djs-visual circle {
+  fill: #ffffff;
+  stroke: #94a3b8; /* slate-400 */
+  stroke-width: 1.5px;
+}
+
+/* Base shape styles in Dark Mode */
+.dark .bjs-container .djs-element:not(.djs-connection) .djs-visual rect,
+.dark .bjs-container .djs-element:not(.djs-connection) .djs-visual polygon,
+.dark .bjs-container .djs-element:not(.djs-connection) .djs-visual circle {
+  fill: #0f172a; /* slate-900 */
+  stroke: #334155; /* slate-700 */
+}
+
+/* Text labels */
+.bjs-container text,
+.bjs-container .djs-label {
+  fill: #0f172a;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+
+.dark .bjs-container text,
+.dark .bjs-container .djs-label {
+  fill: #f1f5f9;
+}
+
+/* Connection Lines in Light Mode */
+.bjs-container .djs-connection .djs-visual path {
+  stroke: #475569 !important; /* slate-600 */
+  stroke-width: 2px !important;
+}
+
+/* Connection Lines in Dark Mode */
+.dark .bjs-container .djs-connection .djs-visual path {
+  stroke: #64748b !important; /* slate-500 */
+}
+
+/* Outlines / Selection Markers */
+.bjs-container .djs-outline {
+  stroke: #0284c7 !important; /* sky-600 */
+  stroke-dasharray: 4 4 !important;
+}
+
+.dark .bjs-container .djs-outline {
+  stroke: #38bdf8 !important; /* sky-400 */
+}
+
+/* Selection boxes */
+.bjs-container .djs-selection-outline {
+  stroke: #0284c7 !important;
+}
+
+.dark .bjs-container .djs-selection-outline {
+  stroke: #38bdf8 !important;
+}
+
+/* Industrial Nodes Marker Colors */
+.bjs-container .djs-element.industrial-node .djs-visual rect {
+  stroke-width: 2px;
+}
+
+.dark .bjs-container .djs-element.industrial-node .djs-visual rect {
+  fill: #111827; /* gray-900 */
+}
+
+/* Specific Node Type Borders (Light & Dark) - Default colors without !important so user colors override them */
+.node-read-property .djs-visual rect { stroke: #0ea5e9; } /* sky */
+.node-write-property .djs-visual rect { stroke: #f59e0b; } /* amber */
+.node-compare-variable .djs-visual polygon { stroke: #10b981; } /* emerald */
+.node-execute-expression .djs-visual rect { stroke: #14b8a6; } /* teal */
+.node-execute-script .djs-visual rect { stroke: #8b5cf6; } /* purple */
+.node-call-flowchart .djs-visual rect { stroke: #6366f1; } /* indigo */
+.node-delay .djs-visual circle { stroke: #3b82f6; } /* blue */
+.node-timer .djs-visual circle { stroke: #06b6d4; } /* cyan */
+.node-wait-alarm .djs-visual circle { stroke: #f43f5e; } /* rose */
+.node-ack-alarm .djs-visual rect { stroke: #ef4444; } /* red */
+.node-query-history .djs-visual rect { stroke: #7c3aed; } /* violet */
+.node-raise-event .djs-visual circle { stroke: #f97316; } /* orange */
+.node-update-widget .djs-visual rect { stroke: #ec4899; } /* pink */
+.node-update-faceplate .djs-visual rect { stroke: #d946ef; } /* fuchsia */
+.node-start-sim .djs-visual rect { stroke: #10b981; }
+.node-stop-sim .djs-visual rect { stroke: #f43f5e; }
+.node-log .djs-visual rect { stroke: #0ea5e9; }
+.node-comment .djs-visual path { stroke: #94a3b8; }
+.node-logical-group .djs-visual rect { stroke: #64748b; stroke-dasharray: 6 3; fill: rgba(100, 116, 139, 0.05); }
+
+/* Overlays Styling */
+.industrial-overlay-badge {
+  transform: translate(50%, -50%);
+  z-index: 10;
+}

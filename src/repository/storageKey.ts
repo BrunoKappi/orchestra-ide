@@ -16,6 +16,9 @@ export const STORAGE_KEYS = {
   SCREEN_FOLDERS: 'archestra_db_screen_folders_v1',
   SCREEN_NODES: 'archestra_db_screen_nodes_v1',
   ALARM_EVENTS: 'archestra_db_alarm_events_v1',
+  FLOWCHARTS: 'archestra_db_flowcharts_v1',
+  FLOWCHART_FOLDERS: 'archestra_db_flowchart_folders_v1',
+  FLOWCHART_NODES: 'archestra_db_flowchart_nodes_v1',
 } as const;
 
 

@@ -6,11 +6,13 @@ import {
   ListFilter,
   Code,
   Layers,
+  Workflow,
 } from "lucide-react";
 import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { PropertiesTable } from "./PropertiesTable";
 import { ScriptsEditor } from "./ScriptsEditor";
 import { AssociatedWidgetsEditor } from "./AssociatedWidgetsEditor";
+import { TemplateFlowsEditor } from "./TemplateFlowsEditor";
 import { PropertyModal } from "./PropertyModal";
 import { ScriptModal } from "./ScriptModal";
 import { ExportImportModal } from "./ExportImportModal";
@@ -247,6 +249,18 @@ export const CentralEditor: React.FC = () => {
           <Layers className="w-4 h-4" />
           <span>Graphics</span>
         </button>
+
+        <button
+          onClick={() => setActiveEditorTab("flows")}
+          className={cn(
+            "flex items-center gap-2 py-3 px-3 border-b-2 font-semibold transition-colors duration-150",
+            activeEditorTab === "flows"
+              ? "border-sky-600 text-sky-600 dark:text-sky-400"
+              : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
+          )}>
+          <Workflow className="w-4 h-4 text-sky-500" />
+          <span>Flows</span>
+        </button>
       </div>
 
       {/* Tab Content Display */}
@@ -255,8 +269,10 @@ export const CentralEditor: React.FC = () => {
           <PropertiesTable />
         ) : activeEditorTab === "scripts" ? (
           <ScriptsEditor />
-        ) : (
+        ) : activeEditorTab === "graphics" ? (
           <AssociatedWidgetsEditor />
+        ) : (
+          <TemplateFlowsEditor />
         )}
       </div>
 

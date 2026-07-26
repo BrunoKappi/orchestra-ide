@@ -7,12 +7,14 @@ import type {
   ScriptEntity,
   TemplateEntity,
   AssociatedWidgetEntity,
+  FlowchartEntity,
 } from '../types/domain';
 import { objectRepo } from '../repository/ObjectRepository';
 import { propertyRepo } from '../repository/PropertyRepository';
 import { scriptRepo } from '../repository/ScriptRepository';
 import { templateRepo } from '../repository/TemplateRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
+import { flowchartRepo } from '../repository/FlowchartRepository';
 import { inheritanceService } from './InheritanceService';
 
 export class ExportImportService {
@@ -25,6 +27,7 @@ export class ExportImportService {
     const propertiesToExport: PropertyEntity[] = [];
     const scriptsToExport: ScriptEntity[] = [];
     const associatedWidgetsToExport: AssociatedWidgetEntity[] = [];
+    const flowchartsToExport: FlowchartEntity[] = [];
 
     if (targetType === 'template') {
       const rootTemplate = templateRepo.getById(targetId);
@@ -41,6 +44,9 @@ export class ExportImportService {
           scriptsToExport.push(...scriptRepo.getByTargetId(t.id));
           associatedWidgetsToExport.push(...associatedWidgetRepo.getByTargetId(t.id));
 
+          // Get flowcharts
+          flowchartsToExport.push(...flowchartRepo.getByTarget(t.id));
+
           // Get child templates
           const childTemplates = templateRepo
             .getAll()
@@ -55,6 +61,7 @@ export class ExportImportService {
               propertiesToExport.push(...propertyRepo.getByTargetId(inst.id));
               scriptsToExport.push(...scriptRepo.getByTargetId(inst.id));
               associatedWidgetsToExport.push(...associatedWidgetRepo.getByTargetId(inst.id));
+              flowchartsToExport.push(...flowchartRepo.getByTarget(inst.id));
             }
           });
         }
@@ -68,6 +75,7 @@ export class ExportImportService {
           propertiesToExport.push(...propertyRepo.getByTargetId(t.id));
           scriptsToExport.push(...scriptRepo.getByTargetId(t.id));
           associatedWidgetsToExport.push(...associatedWidgetRepo.getByTargetId(t.id));
+          flowchartsToExport.push(...flowchartRepo.getByTarget(t.id));
         }
       });
 
@@ -82,6 +90,7 @@ export class ExportImportService {
         properties: propertiesToExport,
         scripts: scriptsToExport,
         associatedWidgets: associatedWidgetsToExport,
+        flowcharts: flowchartsToExport,
       };
     } else {
       const obj = objectRepo.getById(targetId);
@@ -91,6 +100,7 @@ export class ExportImportService {
       propertiesToExport.push(...propertyRepo.getByTargetId(obj.id));
       scriptsToExport.push(...scriptRepo.getByTargetId(obj.id));
       associatedWidgetsToExport.push(...associatedWidgetRepo.getByTargetId(obj.id));
+      flowchartsToExport.push(...flowchartRepo.getByTarget(obj.id));
 
       // Collect origin template chain
       const ancestry = inheritanceService.getTemplateAncestryChain(obj.templateId);
@@ -100,6 +110,7 @@ export class ExportImportService {
           propertiesToExport.push(...propertyRepo.getByTargetId(t.id));
           scriptsToExport.push(...scriptRepo.getByTargetId(t.id));
           associatedWidgetsToExport.push(...associatedWidgetRepo.getByTargetId(t.id));
+          flowchartsToExport.push(...flowchartRepo.getByTarget(t.id));
         }
       });
 
@@ -112,6 +123,7 @@ export class ExportImportService {
         properties: propertiesToExport,
         scripts: scriptsToExport,
         associatedWidgets: associatedWidgetsToExport,
+        flowcharts: flowchartsToExport,
       };
     }
   }
@@ -219,6 +231,19 @@ export class ExportImportService {
       associatedWidgetRepo.save({
         ...aw,
         id: newAssocId,
+        targetId: newTargetId,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    // Save flowcharts
+    for (const fc of payload.flowcharts || []) {
+      const newTargetId = fc.targetId ? idMap.get(fc.targetId) || fc.targetId : null;
+      const newFcId = uuidv4();
+
+      flowchartRepo.create({
+        ...fc,
+        id: newFcId,
         targetId: newTargetId,
         updatedAt: new Date().toISOString(),
       });
