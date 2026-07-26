@@ -80,6 +80,7 @@ interface FlowStoreState {
 
   // Actions
   init: () => void;
+  clearAllData: () => void;
   openDesigner: (flowchartId: string) => void;
   closeDesigner: () => void;
   createFlowchart: (
@@ -332,6 +333,21 @@ export const useFlowStore = create<FlowStoreState>()(
         state.flowcharts = allFlows;
         state.folders = allFolders;
         state.nodes = allNodes;
+      });
+    },
+
+    clearAllData: () => {
+      flowchartRepo.saveAll([]);
+      flowchartRepo.saveFolders([]);
+      flowchartRepo.saveNodes([]);
+      set((state) => {
+        state.flowcharts = [];
+        state.folders = [];
+        state.nodes = [];
+        state.activeFlowchart = null;
+        state.selectedNodeId = null;
+        state.selectedNodeMeta = null;
+        state.problems = [];
       });
     },
 

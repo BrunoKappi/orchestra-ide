@@ -1,16 +1,16 @@
 # Graph Report - MVP 2  (2026-07-26)
 
 ## Corpus Check
-- 92 files · ~90,847 words
+- 92 files · ~91,303 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 518 nodes · 1535 edges · 21 communities (16 shown, 5 thin omitted)
+- 518 nodes · 1549 edges · 25 communities (21 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e051117e`
+- Built from commit: `c5f5591e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -35,6 +35,9 @@
 - [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `useObjectModelStore` - 64 edges
@@ -46,13 +49,13 @@
 7. `STORAGE_KEYS` - 17 edges
 8. `ObjectModelStoreState` - 17 edges
 9. `AssociatedWidgetEntity` - 16 edges
-10. `EntityType` - 15 edges
+10. `useFlowStore` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `PropertySelectorModal()` --calls--> `useObjectModelStore`  [EXTRACTED]
   src/features/flow-designer/NodePropertyInspector.tsx → src/store/useObjectModelStore.ts
-- `WidgetInstanceRenderer()` --calls--> `useWidgetStore`  [EXTRACTED]
-  src/features/screen-designer/ScreenCanvasEditor.tsx → src/store/useWidgetStore.ts
+- `ToolButton()` --calls--> `cn()`  [EXTRACTED]
+  src/features/widget-editor/WidgetCanvasEditor.tsx → src/utils/cn.ts
 - `DataTypeBadge()` --calls--> `cn()`  [EXTRACTED]
   src/features/widget-editor/WidgetInspectorPanel.tsx → src/utils/cn.ts
 - `TabButton()` --calls--> `cn()`  [EXTRACTED]
@@ -63,7 +66,7 @@
 ## Import Cycles
 - 3-file cycle: `src/features/widget-editor/Dynamics/FillDynamicEditor.tsx -> src/features/widget-editor/WidgetInspectorPanel.tsx -> src/features/widget-editor/Dynamics/StrokeDynamicEditor.tsx -> src/features/widget-editor/Dynamics/FillDynamicEditor.tsx`
 
-## Communities (21 total, 5 thin omitted)
+## Communities (25 total, 4 thin omitted)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.16
@@ -79,19 +82,19 @@ Nodes (3): DeploymentRepository, DeploymentFolderEntity, DeploymentNodeEntity
 
 ### Community 4 - "Community 4"
 Cohesion: 0.17
-Nodes (15): widgetFolderRepo, WidgetFolderRepository, widgetRepo, WidgetRepository, WidgetSeedService, InspectorTabType, ToolType, WidgetStoreState (+7 more)
+Nodes (14): widgetFolderRepo, WidgetFolderRepository, WidgetRepository, WidgetSeedService, InspectorTabType, ToolType, WidgetStoreState, WidgetCustomPropertyDataType (+6 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (24): ScreenLayout(), screenFolderRepo, screenRepo, ScreenCanvasEditor(), WidgetInstanceRenderer(), ScreenElementInspector(), ExplorerTab, ScreenExplorerPanel() (+16 more)
+Cohesion: 0.16
+Nodes (15): screenFolderRepo, ContextMenuState, RenameState, ScreenStoreState, ScreenToolType, AlarmConditionType, FillLevelConfig, PropertyAlarmConfig (+7 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.29
-Nodes (5): MockConfigRepository, MockSimulationService, MockConfig, MockConfigParams, MockPresetType
+Cohesion: 0.31
+Nodes (9): ScreenLayout(), ScreenCanvasEditor(), WidgetInstanceRenderer(), ScreenElementInspector(), ExplorerTab, ScreenExplorerPanel(), ScreenTree(), useScreenStore (+1 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.12
@@ -102,41 +105,57 @@ Cohesion: 0.09
 Nodes (30): BpmnCanvas(), BpmnCanvasProps, COLOR_MAP, ICON_MAP, FlowDesignerModal(), INDUSTRIAL_NODES, IndustrialNodeDef, IndustrialPaletteSidebarProps (+22 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.09
-Nodes (31): WidgetMappingModalProps, ObjectPropertySimRow, alarmRepo, associatedWidgetRepo, deploymentRepo, flowchartRepo, mockConfigRepo, objectRepo (+23 more)
+Cohesion: 0.10
+Nodes (32): WidgetMappingModalProps, ObjectPropertySimRow, alarmRepo, associatedWidgetRepo, deploymentRepo, flowchartRepo, mockConfigRepo, MockConfigRepository (+24 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.11
-Nodes (14): CHART_PADDING, ChartData, CURVE_COLORS, PeriodPreset, SelectedVariable, TrendChart(), TrendChartProps, historyEngine (+6 more)
+Cohesion: 0.10
+Nodes (16): DEFAULT_CONFIG, msToHours(), CHART_PADDING, ChartData, CURVE_COLORS, PeriodPreset, SelectedVariable, TrendChart() (+8 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.33
 Nodes (5): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema
 
 ### Community 15 - "Community 15"
-Cohesion: 0.06
-Nodes (56): IndustrialPaletteSidebar(), IDELayout(), WidgetLayout(), HeaderNavigation(), HeaderNavigationProps, AlarmConfigModal(), AssociatedWidgetsEditor(), WidgetThumbnail() (+48 more)
+Cohesion: 0.08
+Nodes (46): IndustrialPaletteSidebar(), IDELayout(), HeaderNavigation(), HeaderNavigationProps, AlarmConfigModal(), AssociatedWidgetsEditor(), WidgetThumbnail(), CentralEditor() (+38 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.17
-Nodes (13): RuntimeWidgetInstance(), ScreenRuntimePage(), AssociatedWidgetRepository, AssociatedWidgetEntity, extractPropertyName(), FillLevelStyle, resolveColorDynamic(), resolveCustomPropValue() (+5 more)
+Cohesion: 0.33
+Nodes (3): AssociatedWidgetRepository, PropertyBrowserService, AssociatedWidgetEntity
 
 ### Community 18 - "Community 18"
-Cohesion: 0.24
-Nodes (11): DeploymentTree(), DerivationTree(), DeploymentTreeNode, DerivationTreeNode, ContextMenu(), ContextMenuItem, ContextMenuProps, ResizableSplitPane() (+3 more)
+Cohesion: 0.13
+Nodes (12): WidgetLayout(), buildTree(), WidgetBindingProperty, WidgetTreeNode, ResizableSplitPane(), ResizableSplitPaneProps, ToolButton(), ToolButtonProps (+4 more)
+
+### Community 20 - "Community 20"
+Cohesion: 0.19
+Nodes (6): AlarmRepository, ObjectRepository, AlarmEngine, AlarmEvent, AlarmRule, ObjectEntity
+
+### Community 21 - "Community 21"
+Cohesion: 0.33
+Nodes (9): extractPropertyName(), FillLevelStyle, resolveColorDynamic(), resolveCustomPropValue(), ResolvedWidgetElementStyle, resolveFillLevelDynamic(), resolveVisibilityDynamic(), resolveWidgetElementStyle() (+1 more)
+
+### Community 22 - "Community 22"
+Cohesion: 0.25
+Nodes (3): RuntimeWidgetInstance(), ScreenRuntimePage(), screenRepo
+
+### Community 23 - "Community 23"
+Cohesion: 0.29
+Nodes (6): ALL_TRIGGERS, EXPRESSION_TRIGGERS, LOOP_TRIGGERS, ScriptFormData, TRIGGER_LABELS, ScriptTrigger
 
 ## Knowledge Gaps
 - **120 isolated node(s):** `$schema`, `plugins`, `react/rules-of-hooks`, `react/only-export-components`, `name` (+115 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useObjectModelStore` connect `Community 15` to `Community 6`, `Community 9`, `Community 10`, `Community 11`, `Community 16`, `Community 18`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Why does `cn()` connect `Community 15` to `Community 1`, `Community 6`, `Community 9`, `Community 10`, `Community 11`, `Community 18`?**
-  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `useObjectModelStore` connect `Community 15` to `Community 7`, `Community 9`, `Community 10`, `Community 11`, `Community 22`, `Community 23`, `Community 24`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Community 15` to `Community 1`, `Community 6`, `Community 7`, `Community 9`, `Community 11`, `Community 18`, `Community 24`?**
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
 - **Why does `AlarmEvent` connect `Community 20` to `Community 10`, `Community 6`, `Community 15`?**
   _High betweenness centrality (0.016) - this node is a cross-community bridge._
 - **What connects `$schema`, `plugins`, `react/rules-of-hooks` to the rest of the system?**
@@ -145,5 +164,5 @@ _Questions this graph is uniquely positioned to answer:_
   _Cohesion score 0.05405405405405406 - nodes in this community are weakly interconnected._
 - **Should `Community 5` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
-- **Should `Community 6` be split into smaller, more focused modules?**
-  _Cohesion score 0.08325624421831637 - nodes in this community are weakly interconnected._
+- **Should `Community 8` be split into smaller, more focused modules?**
+  _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._

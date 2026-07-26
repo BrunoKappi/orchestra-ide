@@ -38,6 +38,7 @@ interface ScreenStoreState {
 
   // Global Actions
   init: () => void;
+  clearAllData: () => void;
   setSearchQuery: (q: string) => void;
   setActiveTool: (tool: ScreenToolType) => void;
   setIsGridEnabled: (v: boolean) => void;
@@ -147,6 +148,21 @@ export const useScreenStore = create<ScreenStoreState>()(
         s.screens = screens;
         s.folders = folders;
         s.nodes = nodes;
+      });
+    },
+
+    clearAllData() {
+      screenRepo.saveAll([]);
+      screenFolderRepo.saveAllFolders([]);
+      screenFolderRepo.saveAllNodes([]);
+      set((s) => {
+        s.screens = [];
+        s.folders = [];
+        s.nodes = [];
+        s.selectedScreenId = null;
+        s.selectedScreen = null;
+        s.selectedElementId = null;
+        s.hasUnsavedChanges = false;
       });
     },
 

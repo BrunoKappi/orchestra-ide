@@ -50,6 +50,7 @@ interface WidgetStoreState {
 
   // Global Actions
   init: () => void;
+  clearAllData: () => void;
   setSearchQuery: (query: string) => void;
   setActiveTool: (tool: ToolType) => void;
   setInspectorTab: (tab: InspectorTabType) => void;
@@ -98,7 +99,7 @@ interface WidgetStoreState {
   updateCustomProperty: (propId: string, updates: Partial<WidgetCustomProperty>) => void;
   deleteCustomProperty: (propId: string) => void;
 
-  // Dynamic Animation Binding Actions
+  // Dynamic Binding Actions
   addElementBinding: (
     elementId: string,
     binding: Omit<WidgetElementBinding, 'id'>
@@ -163,6 +164,22 @@ export const useWidgetStore = create<WidgetStoreState>()(
         if (state.selectedWidgetId) {
           state.selectedWidget = widgets.find((w) => w.id === state.selectedWidgetId) || null;
         }
+      });
+    },
+
+    clearAllData: () => {
+      widgetRepo.saveAll([]);
+      widgetFolderRepo.saveFolders([]);
+      widgetFolderRepo.saveNodes([]);
+      
+      set((state) => {
+        state.widgets = [];
+        state.folders = [];
+        state.nodes = [];
+        state.selectedWidgetId = null;
+        state.selectedWidget = null;
+        state.selectedElementId = null;
+        state.hasUnsavedChanges = false;
       });
     },
 

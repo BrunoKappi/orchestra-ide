@@ -28,6 +28,10 @@ import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
 import { alarmRepo } from '../repository/AlarmRepository';
 import { screenRepo } from '../repository/ScreenRepository';
+import { screenFolderRepo } from '../repository/ScreenFolderRepository';
+import { flowchartRepo } from '../repository/FlowchartRepository';
+import { widgetRepo } from '../repository/WidgetRepository';
+import { widgetFolderRepo } from '../repository/WidgetFolderRepository';
 import { inheritanceService } from '../services/InheritanceService';
 import { exportImportService } from '../services/ExportImportService';
 import { seedService } from '../services/SeedService';
@@ -172,6 +176,7 @@ interface ObjectModelStoreState {
 
   // System
   resetAllData: () => void;
+  clearAllData: () => void;
   refreshData: () => void;
 }
 
@@ -1248,6 +1253,56 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     resetAllData: () => {
       seedService.seedInitialDataIfNeeded(true);
       get().init();
+    },
+
+    clearAllData: () => {
+      // 1. Clear database repos
+      templateRepo.saveAll([]);
+      objectRepo.saveAll([]);
+      propertyRepo.saveAll([]);
+      scriptRepo.saveAll([]);
+      deploymentRepo.saveAllFolders([]);
+      deploymentRepo.saveAllNodes([]);
+      associatedWidgetRepo.saveAll([]);
+      mockConfigRepo.saveAll([]);
+      alarmRepo.clear();
+      widgetRepo.saveAll([]);
+      widgetFolderRepo.saveFolders([]);
+      widgetFolderRepo.saveNodes([]);
+      screenRepo.saveAll([]);
+      screenFolderRepo.saveAllFolders([]);
+      screenFolderRepo.saveAllNodes([]);
+      flowchartRepo.saveAll([]);
+      flowchartRepo.saveFolders([]);
+      flowchartRepo.saveNodes([]);
+
+      // 2. Set seeded to true so that it does not auto-seed on init
+      localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
+
+      // 3. Clear store state
+      set((state) => {
+        state.templates = [];
+        state.objects = [];
+        state.deploymentFolders = [];
+        state.deploymentNodes = [];
+        state.selectedEntity = null;
+        state.selectedTemplate = null;
+        state.selectedObject = null;
+        state.mergedProperties = [];
+        state.mergedScripts = [];
+        state.mergedAssociatedWidgets = [];
+        state.mergedMockConfigs = [];
+        state.simulatedValues = {};
+        state.historyValues = {};
+        state.alarmEvents = [];
+      });
+
+      // 4. Rebuild search index
+      try {
+        propertyBrowserService.rebuildIndex([], [], [], [], []);
+      } catch (err) {
+        console.error(err);
+      }
     },
 
     associateWidget: (widgetId) => {

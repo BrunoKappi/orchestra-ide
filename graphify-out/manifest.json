@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "src/components/navigation/HeaderNavigation.tsx": {
-    "mtime": 1785022163.1134322,
-    "ast_hash": "77df12469c3b1fbde8f4a44fea0ecc72",
+    "mtime": 1785084337.5642745,
+    "ast_hash": "09ab609b1ae006aae45a6fd4a745dbd2",
     "semantic_hash": ""
   },
   "src/components/ui/ContextMenu.tsx": {
@@ -235,14 +235,14 @@
     "semantic_hash": ""
   },
   "src/store/useObjectModelStore.ts": {
-    "mtime": 1785022135.6450133,
-    "ast_hash": "dce2235b54c5785dfa1749afce33dcff",
+    "mtime": 1785084197.979376,
+    "ast_hash": "525ae3b6c8271bdb7533f0823c04966e",
     "semantic_hash": ""
   },
   "src/store/useWidgetStore.ts": {
-    "mtime": 1785015805.0265846,
-    "ast_hash": "9d6b37b6ab8c37c41f0e16d8e90fcfee",
-    "semantic_hash": "9d6b37b6ab8c37c41f0e16d8e90fcfee"
+    "mtime": 1785084154.140359,
+    "ast_hash": "5eac416f518df374b68f5faecf8f1ca7",
+    "semantic_hash": ""
   },
   "src/types/domain.ts": {
     "mtime": 1785022006.9587195,
@@ -335,8 +335,8 @@
     "semantic_hash": ""
   },
   "src/store/useScreenStore.ts": {
-    "mtime": 1785002261.7801201,
-    "ast_hash": "5482089ed0bef881d33c3a5ca9da875c",
+    "mtime": 1785084164.101477,
+    "ast_hash": "72fc4344fb0d3b59838417b252db6833",
     "semantic_hash": ""
   },
   "src/utils/widgetDynamics.ts": {
@@ -445,8 +445,8 @@
     "semantic_hash": ""
   },
   "src/store/useFlowStore.ts": {
-    "mtime": 1785082054.3305533,
-    "ast_hash": "730ce711601a3e1c65a9e2bd2be55ac8",
+    "mtime": 1785084176.597705,
+    "ast_hash": "e61f86573c7d0afd67f1433e39c61a36",
     "semantic_hash": ""
   },
   "src/types/bpmn-js.d.ts": {
