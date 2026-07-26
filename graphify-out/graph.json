@@ -430,7 +430,7 @@
       "label": "HeaderNavigationProps",
       "file_type": "code",
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
-      "source_location": "L13",
+      "source_location": "L30",
       "id": "navigation_headernavigation_headernavigationprops",
       "community": 15,
       "norm_label": "headernavigationprops"
@@ -439,7 +439,7 @@
       "label": "HeaderNavigation()",
       "file_type": "code",
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
-      "source_location": "L17",
+      "source_location": "L34",
       "id": "navigation_headernavigation_headernavigation",
       "community": 15,
       "norm_label": "headernavigation()"
@@ -5432,9 +5432,9 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "navigation_headernavigation",
-      "target": "store_useflowstore",
-      "confidence_score": 1.0
+      "target": "store_useflowstore"
     },
     {
       "relation": "imports",
@@ -5443,9 +5443,9 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "navigation_headernavigation",
-      "target": "store_useflowstore_useflowstore",
-      "confidence_score": 1.0
+      "target": "store_useflowstore_useflowstore"
     },
     {
       "relation": "imports_from",
@@ -5476,9 +5476,9 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "navigation_headernavigation",
-      "target": "store_usescreenstore",
-      "confidence_score": 1.0
+      "target": "store_usescreenstore"
     },
     {
       "relation": "imports",
@@ -5487,9 +5487,9 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "navigation_headernavigation",
-      "target": "store_usescreenstore_usescreenstore",
-      "confidence_score": 1.0
+      "target": "store_usescreenstore_usescreenstore"
     },
     {
       "relation": "imports_from",
@@ -5520,9 +5520,9 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "navigation_headernavigation",
-      "target": "ui_modal",
-      "confidence_score": 1.0
+      "target": "ui_modal"
     },
     {
       "relation": "imports",
@@ -5531,9 +5531,9 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "navigation_headernavigation",
-      "target": "ui_modal_modal",
-      "confidence_score": 1.0
+      "target": "ui_modal_modal"
     },
     {
       "relation": "imports_from",
@@ -14046,9 +14046,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_flowchartrepository",
-      "confidence_score": 1.0
+      "target": "repository_flowchartrepository"
     },
     {
       "relation": "imports",
@@ -14090,9 +14090,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_flowchartrepository_flowchartrepo",
-      "confidence_score": 1.0
+      "target": "repository_flowchartrepository_flowchartrepo"
     },
     {
       "relation": "contains",
@@ -15381,9 +15381,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_screenfolderrepository",
-      "confidence_score": 1.0
+      "target": "repository_screenfolderrepository"
     },
     {
       "relation": "imports_from",
@@ -15403,9 +15403,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_screenfolderrepository_screenfolderrepo",
-      "confidence_score": 1.0
+      "target": "repository_screenfolderrepository_screenfolderrepo"
     },
     {
       "relation": "imports",
@@ -16420,9 +16420,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_widgetfolderrepository",
-      "confidence_score": 1.0
+      "target": "repository_widgetfolderrepository"
     },
     {
       "relation": "imports_from",
@@ -16601,9 +16601,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_widgetfolderrepository_widgetfolderrepo",
-      "confidence_score": 1.0
+      "target": "repository_widgetfolderrepository_widgetfolderrepo"
     },
     {
       "relation": "imports",
@@ -16770,9 +16770,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_widgetrepository",
-      "confidence_score": 1.0
+      "target": "repository_widgetrepository"
     },
     {
       "relation": "imports_from",
@@ -16952,9 +16952,9 @@
       "source_file": "src/store/useObjectModelStore.ts",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
-      "target": "repository_widgetrepository_widgetrepo",
-      "confidence_score": 1.0
+      "target": "repository_widgetrepository_widgetrepo"
     },
     {
       "relation": "imports",
@@ -21212,5 +21212,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c5f5591efa3be8341e85cfdc9c5eb285f2051fd7"
+  "built_at_commit": "2d216f795944384e2a287d367c22580e96b53ee7"
 }

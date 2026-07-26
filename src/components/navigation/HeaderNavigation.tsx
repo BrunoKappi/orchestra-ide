@@ -37,10 +37,8 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   const {
     theme,
     toggleTheme,
-    init: initObjectModel,
     alarmEvents,
   } = useObjectModelStore();
-  const { init: initWidgets } = useWidgetStore();
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("archestra_navbar_collapsed") === "true";
