@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useOmmStore } from '../../store/useOmmStore';
-import type { OmmEquipment, OmmMovement, OmmAlarm, OmmProduct } from '../../types';
+import type { OmmEquipment } from '../../types';
 import {
-  X, Play, Pause, RotateCcw, Clock, Save, UploadCloud, Eye, Table, LayoutGrid,
-  TrendingUp, TrendingDown, Thermometer, Gauge, Activity, AlertTriangle, ChevronRight,
-  TrendingDown as TrendFlat, ArrowRight, ArrowLeft, RefreshCw, Zap, ShieldAlert, ArrowUpRight, ArrowDownRight
+  X, Play, Pause, RotateCcw, Clock, Save, UploadCloud, Table, LayoutGrid,
+  TrendingUp, TrendingDown, Thermometer, Gauge, Activity,
+  Zap, ShieldAlert
 } from 'lucide-react';
-import { alarmRepo, equipmentRepo, movementRepo, productRepo } from '../../repository';
+
 
 interface SimulatorModalProps {
   isOpen: boolean;
@@ -713,7 +713,6 @@ export const SimulatorModal: React.FC<SimulatorModalProps> = ({ isOpen, onClose 
                           // Calculations for TTF (time to full) and TTE (time to empty)
                           let timeEstimateText = 'Estável';
                           let estimateColor = 'text-slate-400';
-                          let isOverflowWarning = false;
 
                           if (trends.net > 0 && eq.capacity > 0) {
                             const remVol = eq.capacity - eq.currentVolume;
@@ -722,7 +721,6 @@ export const SimulatorModal: React.FC<SimulatorModalProps> = ({ isOpen, onClose 
                               timeEstimateText = `Cheio em ${(ttfHrs * 60).toFixed(0)}min`;
                               estimateColor = 'text-amber-400';
                               if (eq.currentLevel >= 90) {
-                                isOverflowWarning = true;
                                 timeEstimateText = 'Risco de Transbordo!';
                                 estimateColor = 'text-rose-500 animate-pulse font-bold';
                               }
