@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   Cpu,
   Shapes,
@@ -49,6 +49,105 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   const activeUnackCount = (alarmEvents || []).filter(
     (evt) => evt.status === "Active Unacknowledged",
   ).length;
+
+  const location = useLocation();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const navItems = [
+    {
+      to: "/",
+      label: "Orquestra IDE",
+      icon: Cpu,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/properties",
+      label: "Property Browser",
+      icon: Search,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/widgets",
+      label: "Widgets",
+      icon: Shapes,
+      colorClass: "text-emerald-500",
+      activeTextClass: "text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      to: "/flows",
+      label: "Fluxogramas",
+      icon: Workflow,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/simulator",
+      label: "Simulador",
+      icon: Activity,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/screens",
+      label: "Telas",
+      icon: Monitor,
+      colorClass: "text-violet-500",
+      activeTextClass: "text-violet-600 dark:text-violet-400",
+    },
+    {
+      to: "/runtime",
+      label: "Runtime",
+      icon: Zap,
+      colorClass: "text-amber-500",
+      activeTextClass: "text-amber-600 dark:text-amber-400",
+    },
+    {
+      to: "/alarms",
+      label: "Alarmes",
+      icon: Bell,
+      colorClass: "text-rose-500",
+      activeTextClass: "text-rose-600 dark:text-rose-455",
+      badge: activeUnackCount > 0 ? activeUnackCount : undefined,
+      animate: activeUnackCount > 0 ? "animate-bounce" : undefined,
+    },
+    {
+      to: "/database",
+      label: "Banco de Dados",
+      icon: Database,
+      colorClass: "text-cyan-500",
+      activeTextClass: "text-cyan-600 dark:text-cyan-400",
+    },
+    {
+      to: "/historian",
+      label: "Historian",
+      icon: TrendingUp,
+      colorClass: "text-violet-500",
+      activeTextClass: "text-violet-600 dark:text-violet-400",
+    },
+  ];
+
+  const currentPath = location.pathname;
+  const activeItem = navItems.find((item) => {
+    if (item.to === "/") {
+      return currentPath === "/";
+    }
+    return currentPath.startsWith(item.to);
+  }) || navItems[0];
 
   useEffect(() => {
     if (theme === "dark") {
@@ -107,158 +206,57 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
           </span>
         </div>
         {/* Navigation Route Switches */}
-        <nav className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-lg border border-slate-200/80 dark:border-slate-700/50 text-xs">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Cpu className="w-3.5 h-3.5 text-sky-500" />
-            <span>Orquestra IDE</span>
-          </NavLink>
-
-          <NavLink
-            to="/properties"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Search className="w-3.5 h-3.5 text-sky-500" />
-            <span>Property Browser</span>
-          </NavLink>
-
-          <NavLink
-            to="/widgets"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Shapes className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Widgets</span>
-          </NavLink>
-
-          <NavLink
-            to="/flows"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Workflow className="w-3.5 h-3.5 text-sky-500" />
-            <span>Fluxogramas</span>
-          </NavLink>
-
-          <NavLink
-            to="/simulator"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Activity className="w-3.5 h-3.5 text-sky-500" />
-            <span>Simulador</span>
-          </NavLink>
-
-          <NavLink
-            to="/screens"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-violet-600 dark:text-violet-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Monitor className="w-3.5 h-3.5 text-violet-500" />
-            <span>Telas</span>
-          </NavLink>
-
-          <NavLink
-            to="/runtime"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Zap className="w-3.5 h-3.5 text-amber-500" />
-            <span>Runtime</span>
-          </NavLink>
-
-          <NavLink
-            to="/alarms"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-455 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Bell
-              className={cn(
-                "w-3.5 h-3.5 text-rose-500",
-                activeUnackCount > 0 && "animate-bounce",
+        <div ref={dropdownRef} className="relative z-50">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[180px] bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/70 dark:hover:bg-slate-700/80 rounded-lg border border-slate-200/80 dark:border-slate-700/50 text-xs font-semibold text-slate-700 dark:text-slate-250 transition-all select-none cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <activeItem.icon className={cn("w-4 h-4", activeItem.colorClass, activeItem.animate)} />
+              <span>{activeItem.label}</span>
+              {activeItem.badge !== undefined && (
+                <span className="px-1.5 py-0.1 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold animate-pulse">
+                  {activeItem.badge}
+                </span>
               )}
-            />
-            <span>Alarmes</span>
-            {activeUnackCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.1 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold select-none shrink-0 animate-pulse">
-                {activeUnackCount}
-              </span>
-            )}
-          </NavLink>
+            </div>
+            <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+          </button>
 
-          <NavLink
-            to="/database"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <Database className="w-3.5 h-3.5 text-cyan-500" />
-            <span>Banco de Dados</span>
-          </NavLink>
-
-          <NavLink
-            to="/historian"
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-1 rounded-md font-semibold transition-all duration-150",
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-violet-600 dark:text-violet-400 shadow-xs"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-              )
-            }>
-            <TrendingUp className="w-3.5 h-3.5 text-violet-500" />
-            <span>Historian</span>
-          </NavLink>
-        </nav>
+          {isDropdownOpen && (
+            <div className="absolute left-0 mt-1.5 min-w-[200px] max-h-[350px] overflow-y-auto bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-lg py-1 z-50 animate-in fade-in-50 slide-in-from-top-1 duration-100">
+              {navItems.map((item) => {
+                const isActive = item.to === "/" ? currentPath === "/" : currentPath.startsWith(item.to);
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === "/"}
+                    onClick={() => setIsDropdownOpen(false)}
+                    className={
+                      cn(
+                        "flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60",
+                        isActive
+                          ? "bg-sky-50/50 dark:bg-sky-950/20 text-sky-600 dark:text-sky-400"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                      )
+                    }
+                  >
+                    <div className="flex items-center gap-2">
+                      <item.icon className={cn("w-3.5 h-3.5", isActive ? item.colorClass : "text-slate-400 dark:text-slate-500", item.animate)} />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge !== undefined && (
+                      <span className="px-1.5 py-0.1 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold shrink-0">
+                        {item.badge}
+                      </span>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Global Actions */}
