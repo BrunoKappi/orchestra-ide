@@ -244,6 +244,19 @@ export interface OmmEquipment {
   notes: string;
   createdAt: string;
   updatedAt: string;
+  
+  // Simulator extensions
+  flowIn?: number;          // m³/h
+  flowOut?: number;         // m³/h
+  simMode?: 'manual' | 'auto';
+  autoConfig?: {
+    level?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+    temperature?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+    pressure?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+    density?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+    flowIn?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+    flowOut?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+  };
 }
 
 export interface OmmAlignment {
@@ -433,6 +446,64 @@ export interface OmmKpiMetrics {
   nextCutoffAt: string;
 }
 
+
+// ---------------------------------------------------------------------------
+// Auxiliary Entities
+// ---------------------------------------------------------------------------
+
+export interface OmmUserGroup {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OmmMovementTypeConfig {
+  id: string;
+  code: string;
+  name: string;
+  color: string;
+  description: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OmmPriorityConfig {
+  id: string;
+  code: string;
+  name: string;
+  color: string;
+  level: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OmmMeasurementMethodConfig {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OmmEngUnitConfig {
+  id: string;
+  code: string;
+  name: string;
+  symbol: string;
+  dimension: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ---------------------------------------------------------------------------
 // Store State Interface
 // ---------------------------------------------------------------------------
@@ -446,6 +517,11 @@ export interface OmmStoreState {
   equipments: OmmEquipment[];
   alignments: OmmAlignment[];
   operators: OmmOperator[];
+  userGroups: OmmUserGroup[];
+  movementTypes: OmmMovementTypeConfig[];
+  priorities: OmmPriorityConfig[];
+  measurementMethods: OmmMeasurementMethodConfig[];
+  engUnits: OmmEngUnitConfig[];
   events: OmmEvent[];
   alarms: OmmAlarm[];
   auditLog: OmmAuditEntry[];
@@ -468,6 +544,7 @@ export interface OmmStoreState {
   // Dialog states
   isOrderDialogOpen: boolean;
   isMovementDialogOpen: boolean;
+  isSimulatorModalOpen: boolean;
   editingOrderId: string | null;
   editingMovementId: string | null;
 }

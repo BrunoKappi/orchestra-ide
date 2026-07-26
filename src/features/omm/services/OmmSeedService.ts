@@ -7,6 +7,11 @@ import type {
   OmmOperator,
   OmmOrder,
   OmmMovement,
+  OmmUserGroup,
+  OmmMovementTypeConfig,
+  OmmPriorityConfig,
+  OmmMeasurementMethodConfig,
+  OmmEngUnitConfig,
   OmmSimulatorState,
 } from '../types';
 import {
@@ -15,6 +20,11 @@ import {
   equipmentRepo,
   alignmentRepo,
   operatorRepo,
+  userGroupRepo,
+  movementTypeRepo,
+  priorityRepo,
+  measurementMethodRepo,
+  engUnitRepo,
   orderRepo,
   movementRepo,
   simStateRepo,
@@ -519,9 +529,44 @@ export function seedOmmData(): void {
     allMovements.push(...movs);
   }
 
-  // Persist
+  // Persist core
   orderRepo.saveAll(allOrders);
   movementRepo.saveAll(allMovements);
+
+  // Seed auxiliary configurations
+  const seededUserGroups: OmmUserGroup[] = [
+    { id: uuid(), code: 'ADMIN', name: 'Administradores', description: 'Acesso total ao sistema', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'OPS', name: 'Operadores', description: 'Acesso a movimentações e planta', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'SUP', name: 'Supervisores', description: 'Acesso a validação de Cut-off e cadastros', active: true, createdAt: now(), updatedAt: now() },
+  ];
+  const seededMovementTypes: OmmMovementTypeConfig[] = [
+    { id: uuid(), code: 'Transfer', name: 'Transferência Interna', color: '#3b82f6', description: 'Movimentação entre tanques', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'Receipt', name: 'Recebimento', color: '#10b981', description: 'Recebimento de matéria-prima', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'Dispatch', name: 'Expedição', color: '#f59e0b', description: 'Envio para carregamento', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'Internal', name: 'Movimento Interno', color: '#8b5cf6', description: 'Movimento sem alinhamento fixo', active: true, createdAt: now(), updatedAt: now() },
+  ];
+  const seededPriorities: OmmPriorityConfig[] = [
+    { id: uuid(), code: 'Low', name: 'Baixa', color: '#64748b', level: 1, active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'Normal', name: 'Normal', color: '#3b82f6', level: 2, active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'High', name: 'Alta', color: '#f59e0b', level: 3, active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'Critical', name: 'Crítica', color: '#ef4444', level: 4, active: true, createdAt: now(), updatedAt: now() },
+  ];
+  const seededMeasurementMethods: OmmMeasurementMethodConfig[] = [
+    { id: uuid(), code: 'FlowMeter', name: 'Medidor de Vazão', description: 'Medição contínua via medidor de vazão', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'TankGauging', name: 'Telemetria de Tanque', description: 'Medição automática por nível do tanque', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'Manual', name: 'Medição Manual', description: 'Medição por trena/régua', active: true, createdAt: now(), updatedAt: now() },
+  ];
+  const seededEngUnits: OmmEngUnitConfig[] = [
+    { id: uuid(), code: 'M3', name: 'Metro Cúbico', symbol: 'm³', dimension: 'Volume', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'TON', name: 'Tonelada', symbol: 't', dimension: 'Massa', active: true, createdAt: now(), updatedAt: now() },
+    { id: uuid(), code: 'LIT', name: 'Litro', symbol: 'L', dimension: 'Volume', active: true, createdAt: now(), updatedAt: now() },
+  ];
+
+  userGroupRepo.saveAll(seededUserGroups);
+  movementTypeRepo.saveAll(seededMovementTypes);
+  priorityRepo.saveAll(seededPriorities);
+  measurementMethodRepo.saveAll(seededMeasurementMethods);
+  engUnitRepo.saveAll(seededEngUnits);
 
   // Simulator state
   const simState: OmmSimulatorState = {

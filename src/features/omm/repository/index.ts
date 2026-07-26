@@ -7,6 +7,11 @@ import type {
   OmmEquipment,
   OmmAlignment,
   OmmOperator,
+  OmmUserGroup,
+  OmmMovementTypeConfig,
+  OmmPriorityConfig,
+  OmmMeasurementMethodConfig,
+  OmmEngUnitConfig,
   OmmEvent,
   OmmAlarm,
   OmmAuditEntry,
@@ -36,6 +41,11 @@ export const areaRepo = new BaseRepository<OmmArea>(`${NS}_areas`);
 export const equipmentRepo = new BaseRepository<OmmEquipment>(`${NS}_equipments`);
 export const alignmentRepo = new BaseRepository<OmmAlignment>(`${NS}_alignments`);
 export const operatorRepo = new BaseRepository<OmmOperator>(`${NS}_operators`);
+export const userGroupRepo = new BaseRepository<OmmUserGroup>(`${NS}_user_groups`);
+export const movementTypeRepo = new BaseRepository<OmmMovementTypeConfig>(`${NS}_movement_types`);
+export const priorityRepo = new BaseRepository<OmmPriorityConfig>(`${NS}_priorities`);
+export const measurementMethodRepo = new BaseRepository<OmmMeasurementMethodConfig>(`${NS}_measurement_methods`);
+export const engUnitRepo = new BaseRepository<OmmEngUnitConfig>(`${NS}_eng_units`);
 export const eventRepo = new BaseRepository<OmmEvent>(`${NS}_events`);
 export const alarmRepo = new BaseRepository<OmmAlarm>(`${NS}_alarms`);
 export const auditRepo = new BaseRepository<OmmAuditEntry>(`${NS}_audit`);
@@ -63,6 +73,11 @@ export function clearAllOmmData(): void {
   equipmentRepo.clear();
   alignmentRepo.clear();
   operatorRepo.clear();
+  userGroupRepo.clear();
+  movementTypeRepo.clear();
+  priorityRepo.clear();
+  measurementMethodRepo.clear();
+  engUnitRepo.clear();
   eventRepo.clear();
   alarmRepo.clear();
   auditRepo.clear();
