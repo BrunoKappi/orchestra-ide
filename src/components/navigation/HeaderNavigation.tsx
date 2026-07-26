@@ -18,6 +18,7 @@ import {
   Search,
   Workflow,
   AlertTriangle,
+  ArrowLeftRight,
 } from "lucide-react";
 
 import { useObjectModelStore } from "../../store/useObjectModelStore";
@@ -138,6 +139,13 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
       icon: TrendingUp,
       colorClass: "text-violet-500",
       activeTextClass: "text-violet-600 dark:text-violet-400",
+    },
+    {
+      to: "/omm",
+      label: "OMM",
+      icon: ArrowLeftRight,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
     },
   ];
 

@@ -12,6 +12,7 @@ import { HistorianPage } from './pages/HistorianPage';
 import { PropertyBrowserPage } from './pages/PropertyBrowserPage';
 import { FlowsPage } from './pages/FlowsPage';
 import { FlowDesignerModal } from './features/flow-designer/FlowDesignerModal';
+import { OmmPage } from './pages/OmmPage';
 
 const setFavicon = (emoji: string) => {
   const link = (document.querySelector("link[rel~='icon']") as HTMLLinkElement) || document.createElement('link');
@@ -62,6 +63,9 @@ export function App() {
     } else if (path === '/historian') {
       title = 'Historian - Serrano';
       emoji = '📈';
+    } else if (path.startsWith('/omm')) {
+      title = 'OMM - Order Movement Manager';
+      emoji = '🔄';
     }
 
     document.title = title;
@@ -85,6 +89,8 @@ export function App() {
         <Route path="/alarms" element={<AlarmViewerPage />} />
         <Route path="/database" element={<DatabasePage />} />
         <Route path="/historian" element={<HistorianPage />} />
+        <Route path="/omm" element={<OmmPage />} />
+        <Route path="/omm/*" element={<OmmPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowDesignerModal />

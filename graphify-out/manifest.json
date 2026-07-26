@@ -10,13 +10,13 @@
     "semantic_hash": ""
   },
   "src/App.tsx": {
-    "mtime": 1785079061.803234,
-    "ast_hash": "2d7b259b761508ac503fe8c55be6b836",
+    "mtime": 1785089600.0315928,
+    "ast_hash": "0aae1655ed158b384d93c4d72bf59fa5",
     "semantic_hash": ""
   },
   "src/components/navigation/HeaderNavigation.tsx": {
-    "mtime": 1785084606.637932,
-    "ast_hash": "bd770d8d22b8a62124fc385ae828e805",
+    "mtime": 1785089611.3512847,
+    "ast_hash": "7a4a6f74014742bde228168178a2d8fa",
     "semantic_hash": ""
   },
   "src/components/ui/ContextMenu.tsx": {
@@ -457,6 +457,141 @@
   "src/types/flow.ts": {
     "mtime": 1785080863.5435803,
     "ast_hash": "4d8b07191f118e6668fd5cdabc1f0d95",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/OmmLayout.tsx": {
+    "mtime": 1785090704.004722,
+    "ast_hash": "fc3e61b0d950864c267ee673d694b5f9",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/admin/AdminPanel.tsx": {
+    "mtime": 1785089543.028314,
+    "ast_hash": "f3566e425fabbc6e2a30c6f375b1cdc0",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/DetailPanel.tsx": {
+    "mtime": 1785090543.014883,
+    "ast_hash": "296681e1a4bc5335d15f260d545e94ef",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/AlarmsTab.tsx": {
+    "mtime": 1785089987.2568,
+    "ast_hash": "d743afe39f594e00916f0713de92795e",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/AuditTab.tsx": {
+    "mtime": 1785090119.4977188,
+    "ast_hash": "d0968f39aeccc78d93a0c66359d05473",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/CapturedTab.tsx": {
+    "mtime": 1785089180.3668692,
+    "ast_hash": "25534d80443befdac5acf2962082f48d",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/EquipmentsTab.tsx": {
+    "mtime": 1785090547.4549131,
+    "ast_hash": "6d30110b612b9ada582988442bf65627",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/GeneralTab.tsx": {
+    "mtime": 1785090687.6309912,
+    "ast_hash": "1a5a6475c916a40cb6a20f75a9d642ac",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/HistoryTab.tsx": {
+    "mtime": 1785090692.203186,
+    "ast_hash": "ddd713d9975d074387dc1a76801cad5c",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/SimulationTab.tsx": {
+    "mtime": 1785089224.7853737,
+    "ast_hash": "f4d1772df4dd1e6a8c7c686b7f9eaf5b",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/detail/tabs/TrendsTab.tsx": {
+    "mtime": 1785089979.0020683,
+    "ast_hash": "7920ef503ef052abfa163bc0a298e650",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/layout/OmmKpiHeader.tsx": {
+    "mtime": 1785089873.329033,
+    "ast_hash": "61384a37d8ea5a04ec7ded7dd2b160d5",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/layout/OmmToolbar.tsx": {
+    "mtime": 1785090792.8139012,
+    "ast_hash": "32eab801e9c3fd61a8f130bdc8ac8e02",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/table/MovementTable.tsx": {
+    "mtime": 1785090724.2213268,
+    "ast_hash": "bd8fde502ef76064bf8f7dcf7b7d6a6d",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/table/columnDefs.tsx": {
+    "mtime": 1785090708.9531825,
+    "ast_hash": "632865de565026b1e690c4bfd96909c4",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/ui/OmmBadges.tsx": {
+    "mtime": 1785090125.7409294,
+    "ast_hash": "4a9a5319c2662ba5b998b25cc7b16785",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/views/CutoffHistory.tsx": {
+    "mtime": 1785089499.9838965,
+    "ast_hash": "5eb44a87ea88ca9e271a3f0905962d32",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/views/InventoryDashboard.tsx": {
+    "mtime": 1785090797.911924,
+    "ast_hash": "327af8e33aebfc49b348b7f191e28b54",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/views/MovementTimeline.tsx": {
+    "mtime": 1785090742.0665445,
+    "ast_hash": "b8bf91e644de9ff8e1b3c9e73f7029b3",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/views/PlantOverview.tsx": {
+    "mtime": 1785090065.5102322,
+    "ast_hash": "ef5d54dd672cab6f13dcefac3b9cb8d0",
+    "semantic_hash": ""
+  },
+  "src/features/omm/repository/BaseRepository.ts": {
+    "mtime": 1785090682.7186522,
+    "ast_hash": "f1b48a98de690a06a4f13fe59d8f1be8",
+    "semantic_hash": ""
+  },
+  "src/features/omm/repository/index.ts": {
+    "mtime": 1785090498.6726427,
+    "ast_hash": "66a592eed7d0c8c9de76c3122f14c48f",
+    "semantic_hash": ""
+  },
+  "src/features/omm/services/OmmSeedService.ts": {
+    "mtime": 1785090763.2506678,
+    "ast_hash": "fa801c618ee185514f2d1932e84439f2",
+    "semantic_hash": ""
+  },
+  "src/features/omm/services/OmmSimulationEngine.ts": {
+    "mtime": 1785090767.6746507,
+    "ast_hash": "819baa6e3cf2f7c6f128e2d552901323",
+    "semantic_hash": ""
+  },
+  "src/features/omm/store/useOmmStore.ts": {
+    "mtime": 1785090773.2922657,
+    "ast_hash": "ed55e33746145a3f11e727661e772ab6",
+    "semantic_hash": ""
+  },
+  "src/features/omm/types/index.ts": {
+    "mtime": 1785088627.731213,
+    "ast_hash": "82b5594c68fa2987b745e5960ba5d206",
+    "semantic_hash": ""
+  },
+  "src/pages/OmmPage.tsx": {
+    "mtime": 1785089587.6643062,
+    "ast_hash": "7f9906929d1628f5c8bb1dcd23466d45",
     "semantic_hash": ""
   }
 }
