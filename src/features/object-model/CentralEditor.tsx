@@ -7,6 +7,7 @@ import {
   Code,
   Layers,
   Workflow,
+  Trash2,
 } from "lucide-react";
 import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { PropertiesTable } from "./PropertiesTable";
@@ -31,6 +32,7 @@ export const CentralEditor: React.FC = () => {
     activeEditorTab,
     setActiveEditorTab,
     updateEntityDetails,
+    deleteEntity,
   } = useObjectModelStore();
 
   const [isEditingName, setIsEditingName] = useState(false);
@@ -208,6 +210,20 @@ export const CentralEditor: React.FC = () => {
                 {originTemplateName}
               </span>
             </div>
+            
+            {/* Excluir Option */}
+            <button
+              onClick={() => {
+                if (confirm(`Tem certeza que deseja excluir ${isTemplate ? 'o template' : 'o objeto'} "${currentEntity.name}"?`)) {
+                  deleteEntity(currentEntity.id, selectedEntity.type);
+                }
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 dark:border-rose-900/50 transition-all duration-150 text-[11px] font-semibold"
+              title={`Excluir ${isTemplate ? 'Template' : 'Objeto'}`}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Excluir {isTemplate ? 'Template' : 'Objeto'}</span>
+            </button>
           </div>
         </div>
       </div>

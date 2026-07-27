@@ -80,6 +80,7 @@ export interface PropertyEntity {
   category?: string;
   alarmConfig?: PropertyAlarmConfig;
   historyConfig?: PropertyHistoryConfig;
+  opcTagPath?: string;
   createdAt: string;
   updatedAt: string;
 }

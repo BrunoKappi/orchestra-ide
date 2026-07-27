@@ -77,6 +77,7 @@ export interface FlowNodeMetadata {
   // Specific node configurations
   expression?: FlowExpression;
   assignment?: FlowAssignment;
+  targetObjectId?: string;
   targetPropertyId?: string;
   targetPropertyName?: string;
   targetScriptId?: string;

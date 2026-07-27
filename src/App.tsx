@@ -13,6 +13,12 @@ import { PropertyBrowserPage } from './pages/PropertyBrowserPage';
 import { FlowsPage } from './pages/FlowsPage';
 import { FlowDesignerModal } from './features/flow-designer/FlowDesignerModal';
 import { OmmPage } from './pages/OmmPage';
+import { KpiDashboardPage } from './pages/KpiDashboardPage';
+import { EventEnginePage } from './pages/EventEnginePage';
+import { OpcBrowserPage } from './pages/OpcBrowserPage';
+import { SecurityPage } from './pages/SecurityPage';
+
+import { useObjectModelStore } from './store/useObjectModelStore';
 
 const setFavicon = (emoji: string) => {
   const link = (document.querySelector("link[rel~='icon']") as HTMLLinkElement) || document.createElement('link');
@@ -24,6 +30,15 @@ const setFavicon = (emoji: string) => {
 
 export function App() {
   const location = useLocation();
+  const { theme } = useObjectModelStore();
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   useEffect(() => {
     const path = location.pathname;
@@ -63,9 +78,18 @@ export function App() {
     } else if (path === '/historian') {
       title = 'Historian - Serrano';
       emoji = '📈';
+    } else if (path === '/kpi-dashboard') {
+      title = 'KPI Dashboard - Serrano';
+      emoji = '📊';
     } else if (path.startsWith('/omm')) {
       title = 'OMM - Order Movement Manager';
       emoji = '🔄';
+    } else if (path === '/opc-browser') {
+      title = 'OPC Network Browser - Serrano';
+      emoji = '🌐';
+    } else if (path === '/security') {
+      title = 'Segurança & Acessos - Serrano';
+      emoji = '🛡️';
     }
 
     document.title = title;
@@ -89,8 +113,12 @@ export function App() {
         <Route path="/alarms" element={<AlarmViewerPage />} />
         <Route path="/database" element={<DatabasePage />} />
         <Route path="/historian" element={<HistorianPage />} />
+        <Route path="/kpi-dashboard" element={<KpiDashboardPage />} />
+        <Route path="/events" element={<EventEnginePage />} />
         <Route path="/omm" element={<OmmPage />} />
         <Route path="/omm/*" element={<OmmPage />} />
+        <Route path="/opc-browser" element={<OpcBrowserPage />} />
+        <Route path="/security" element={<SecurityPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowDesignerModal />

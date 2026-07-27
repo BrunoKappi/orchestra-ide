@@ -33,6 +33,7 @@ export const DeploymentTree: React.FC = () => {
     removeNodeFromDeployment,
     deployObject,
     undeployObject,
+    deleteEntity,
   } = useObjectModelStore();
 
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
@@ -204,6 +205,16 @@ export const DeploymentTree: React.FC = () => {
           if (deployNode) removeNodeFromDeployment(deployNode.id);
         },
       },
+      {
+        label: 'Excluir Objeto',
+        icon: <Trash2 className="w-3.5 h-3.5 text-rose-600" />,
+        danger: true,
+        action: () => {
+          if (confirm(`Tem certeza que deseja excluir permanentemente o objeto "${node.name}"?`)) {
+            deleteEntity(node.targetId, 'instance');
+          }
+        },
+      },
     ];
   };
 
@@ -249,6 +260,20 @@ export const DeploymentTree: React.FC = () => {
             {node.templateName}
           </span>
         )}
+
+        {/* Delete action button on hover */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (confirm(`Tem certeza que deseja excluir permanentemente o objeto "${node.name}"?`)) {
+              deleteEntity(node.targetId, 'instance');
+            }
+          }}
+          className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-rose-500 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 shrink-0 transition-opacity"
+          title="Excluir Objeto"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       </div>
     );
   };

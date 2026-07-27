@@ -12,15 +12,17 @@ import {
   Minus,
   Image as ImageIcon,
   Activity,
+  Network
 } from 'lucide-react';
 import { inheritanceService } from '../../services/InheritanceService';
 import { useObjectModelStore } from '../../store/useObjectModelStore';
 import { useWidgetStore } from '../../store/useWidgetStore';
 import { useScreenStore } from '../../store/useScreenStore';
+import { useOpcStore } from '../../store/useOpcStore';
 import { propertyRepo } from '../../repository/PropertyRepository';
 import { cn } from '../../utils/cn';
 
-type ExplorerTab = 'widgets' | 'generic-widgets' | 'variables' | 'tools';
+type ExplorerTab = 'widgets' | 'generic-widgets' | 'variables' | 'tools' | 'opc-tags';
 
 export const ScreenExplorerPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ExplorerTab>('widgets');
@@ -29,6 +31,7 @@ export const ScreenExplorerPanel: React.FC = () => {
 
   const { objects, templates } = useObjectModelStore();
   const { widgets } = useWidgetStore();
+  const { nodes: opcNodes } = useOpcStore();
   const {
     selectedScreen,
     addWidgetInstance,
@@ -38,6 +41,7 @@ export const ScreenExplorerPanel: React.FC = () => {
   } = useScreenStore();
 
   const deployedObjects = objects.filter((o) => o.isDeployed !== false);
+  const opcTags = opcNodes.filter((n) => n.type === 'tag');
 
   const toggleObject = (objectId: string) => {
     setExpandedObjects((prev) => {
@@ -160,7 +164,7 @@ export const ScreenExplorerPanel: React.FC = () => {
             >
               <Activity className="w-4 h-4 text-violet-500 shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="truncate font-semibold text-slate-800 dark:text-slate-200">{w.name}</p>
+                <p className="truncate font-semibold text-slate-850 dark:text-slate-200">{w.name}</p>
                 {w.description && (
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">{w.description}</p>
                 )}
@@ -247,6 +251,47 @@ export const ScreenExplorerPanel: React.FC = () => {
     </div>
   );
 
+  // ─── OPC Tags Tab ──────────────────────────────────────────────────────────
+  const renderOpcTagsTab = () => (
+    <div className="flex-1 overflow-y-auto">
+      {opcTags.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+          <Network className="w-8 h-8 text-slate-400 dark:text-slate-600 mb-2" />
+          <p className="text-xs text-slate-500 font-medium">Nenhuma tag OPC cadastrada</p>
+        </div>
+      ) : (
+        opcTags
+          .filter((t) => t.path.toLowerCase().includes(search.toLowerCase()) || t.name.toLowerCase().includes(search.toLowerCase()))
+          .map((tag) => (
+            <div
+              key={tag.id}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData('screen/variable-ref', JSON.stringify({
+                  objectId: 'OPC_VIRTUAL',
+                  propertyName: tag.path
+                }));
+                e.dataTransfer.effectAllowed = 'copy';
+              }}
+              onClick={() => {
+                if (!selectedScreen) return;
+                addVariableRef('OPC_VIRTUAL', tag.path, 60, 60);
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 hover:bg-sky-50 dark:hover:bg-sky-900/20 text-xs text-slate-600 dark:text-slate-405 hover:text-sky-700 dark:hover:text-sky-300 cursor-pointer rounded-lg border border-transparent hover:border-sky-500/20 transition-all font-medium"
+              title={`${tag.dataType} · Clique ou arraste para adicionar`}
+            >
+              <Network className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <span className="truncate block font-semibold text-slate-800 dark:text-slate-200">{tag.name}</span>
+                <span className="text-[9px] text-slate-400 truncate block font-mono">{tag.path}</span>
+              </div>
+              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono shrink-0 bg-slate-100 dark:bg-slate-800 px-1 rounded">{tag.dataType}</span>
+            </div>
+          ))
+      )}
+    </div>
+  );
+
   // ─── Tools Tab ──────────────────────────────────────────────────────────────
   const renderToolsTab = () => {
     const shapeTools = [
@@ -310,18 +355,19 @@ export const ScreenExplorerPanel: React.FC = () => {
         <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Explorer de Recursos</p>
 
         {/* Tabs */}
-        <div className="flex gap-0.5 bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg mb-2">
+        <div className="flex gap-0.5 bg-slate-100 dark:bg-slate-800/60 p-0.5 rounded-lg mb-2 overflow-x-auto">
           {([
             { id: 'widgets', label: 'Widgets', icon: Activity },
             { id: 'generic-widgets', label: 'Genéricos', icon: Boxes },
-            { id: 'variables', label: 'Variáveis', icon: Variable },
+            { id: 'variables', label: 'Vars', icon: Variable },
+            { id: 'opc-tags', label: 'OPC', icon: Network },
             { id: 'tools', label: 'Formas', icon: Square },
           ] as const).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex-1 flex items-center justify-center gap-1 py-1 rounded-md text-[10px] font-semibold transition-colors',
+                'flex-1 flex items-center justify-center gap-1 py-1 px-1.5 rounded-md text-[10px] font-semibold transition-colors shrink-0',
                 activeTab === tab.id
                   ? 'bg-violet-600 text-white shadow-xs'
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -353,9 +399,9 @@ export const ScreenExplorerPanel: React.FC = () => {
         {activeTab === 'widgets' && renderWidgetsTab()}
         {activeTab === 'generic-widgets' && renderGenericWidgetsTab()}
         {activeTab === 'variables' && renderVariablesTab()}
+        {activeTab === 'opc-tags' && renderOpcTagsTab()}
         {activeTab === 'tools' && renderToolsTab()}
       </div>
     </div>
   );
 };
-

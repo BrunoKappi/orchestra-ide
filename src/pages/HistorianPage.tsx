@@ -620,7 +620,37 @@ export const HistorianPage: React.FC = () => {
         </aside>
 
         {/* ── Main Content ──────────────────────────────────────────────── */}
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main
+          className="flex-1 flex flex-col overflow-hidden"
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            const raw = e.dataTransfer.getData('opc/tag-ref');
+            if (raw) {
+              try {
+                const tag = JSON.parse(raw);
+                setSelectedVars((prev) => {
+                  const exists = prev.find((v) => v.objectId === 'OPC_VIRTUAL' && v.propertyId === tag.path);
+                  if (exists) return prev;
+                  const ci = colorCounterRef.current++ % CURVE_COLORS.length;
+                  return [...prev, {
+                    objectId: 'OPC_VIRTUAL',
+                    objectName: 'OPC Network',
+                    propertyId: tag.path,
+                    propertyName: tag.name,
+                    unit: tag.engineeringUnit || '',
+                    colorIndex: ci
+                  }];
+                });
+              } catch (err) {
+                console.error('Falha ao processar drop de tag OPC no Historian:', err);
+              }
+            }
+          }}
+        >
 
           {/* Top toolbar */}
           <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 flex-wrap">

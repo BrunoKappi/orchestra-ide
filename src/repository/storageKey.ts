@@ -19,6 +19,15 @@ export const STORAGE_KEYS = {
   FLOWCHARTS: 'archestra_db_flowcharts_v1',
   FLOWCHART_FOLDERS: 'archestra_db_flowchart_folders_v1',
   FLOWCHART_NODES: 'archestra_db_flowchart_nodes_v1',
+  EVENT_CONFIGS: 'archestra_db_event_configs_v1',
+  EVENT_HISTORY: 'archestra_db_event_history_v1',
+  OPC_NODES: 'archestra_db_opc_nodes_v1',
+  SECURITY_USERS: 'archestra_db_security_users_v1',
+  SECURITY_GROUPS: 'archestra_db_security_groups_v1',
+  SECURITY_PROFILES: 'archestra_db_security_profiles_v1',
+  SECURITY_ROLES: 'archestra_db_security_roles_v1',
+  SECURITY_PERMISSION_CONFIGS: 'archestra_db_security_permission_configs_v1',
+  SECURITY_AUDIT_LOGS: 'archestra_db_security_audit_logs_v1',
 } as const;
 
 

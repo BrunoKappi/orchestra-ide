@@ -672,10 +672,10 @@ export const BpmnCanvas: React.FC<BpmnCanvasProps> = ({ bpmnXml, onXmlChange }) 
       onDrop={(e) => {
         e.preventDefault();
         const dataStr = e.dataTransfer.getData('application/react-flow-node');
-        if (!dataStr || !modelerRef.current) return;
+        const opcDataStr = e.dataTransfer.getData('opc/tag-ref');
+        if ((!dataStr && !opcDataStr) || !modelerRef.current) return;
         
         try {
-          const { type, label, extraMetadata } = JSON.parse(dataStr);
           const rect = containerRef.current!.getBoundingClientRect();
           const canvasModule = modelerRef.current.get('canvas');
           const viewbox = canvasModule.viewbox();
@@ -686,7 +686,21 @@ export const BpmnCanvas: React.FC<BpmnCanvasProps> = ({ bpmnXml, onXmlChange }) 
           const x = (clientX - viewbox.x) / viewbox.scale;
           const y = (clientY - viewbox.y) / viewbox.scale;
           
-          useFlowStore.getState().addIndustrialNodeAtCoords(type, label, { x, y }, extraMetadata);
+          if (opcDataStr) {
+            const tag = JSON.parse(opcDataStr);
+            useFlowStore.getState().addIndustrialNodeAtCoords(
+              'read_property',
+              `OPC: ${tag.name}`,
+              { x, y },
+              {
+                targetObjectId: 'OPC_VIRTUAL',
+                targetPropertyName: tag.path
+              }
+            );
+          } else if (dataStr) {
+            const { type, label, extraMetadata } = JSON.parse(dataStr);
+            useFlowStore.getState().addIndustrialNodeAtCoords(type, label, { x, y }, extraMetadata);
+          }
         } catch (err) {
           console.error('Failed to parse dropped data:', err);
         }

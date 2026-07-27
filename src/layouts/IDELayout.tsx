@@ -17,7 +17,6 @@ export const IDELayout: React.FC = () => {
     setSearchQuery,
     templates,
     objects,
-    openImportModal,
     init,
   } = useObjectModelStore();
 
@@ -95,7 +94,7 @@ export const IDELayout: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
       {/* Shared Header Navigation */}
-      <HeaderNavigation onImportClick={openImportModal} />
+      <HeaderNavigation />
 
 
       {/* Main IDE Workspace */}

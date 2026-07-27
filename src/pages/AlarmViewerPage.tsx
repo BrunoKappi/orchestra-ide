@@ -28,8 +28,7 @@ export const AlarmViewerPage: React.FC = () => {
     alarmEvents,
     objects,
     acknowledgeAlarms,
-    clearAlarmHistory,
-    openImportModal
+    clearAlarmHistory
   } = useObjectModelStore();
 
   // Search & Filter State
@@ -322,7 +321,7 @@ export const AlarmViewerPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
-      <HeaderNavigation onImportClick={openImportModal} />
+      <HeaderNavigation />
 
       {/* Main Content Pane */}
       <div className="flex-1 flex overflow-hidden p-6 gap-6">

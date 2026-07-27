@@ -11,6 +11,7 @@ const propertySchema = z.object({
   dataType: z.enum(['String', 'Boolean', 'Integer', 'Float', 'Date', 'Enum', 'Array', 'Object']),
   defaultValue: z.string(),
   description: z.string(),
+  opcTagPath: z.string().optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -35,6 +36,7 @@ export const PropertyModal: React.FC = () => {
       dataType: 'String',
       defaultValue: '',
       description: '',
+      opcTagPath: '',
     },
   });
 
@@ -45,6 +47,7 @@ export const PropertyModal: React.FC = () => {
         dataType: editingProperty.dataType as DataType,
         defaultValue: editingProperty.defaultValue,
         description: editingProperty.description,
+        opcTagPath: editingProperty.opcTagPath || '',
       });
     } else {
       reset({
@@ -52,12 +55,13 @@ export const PropertyModal: React.FC = () => {
         dataType: 'String',
         defaultValue: '',
         description: '',
+        opcTagPath: '',
       });
     }
   }, [editingProperty, reset, isPropertyModalOpen]);
 
   const onSubmit = (data: PropertyFormData) => {
-    saveProperty(data as { name: string; dataType: DataType; defaultValue: string; description: string });
+    saveProperty(data as { name: string; dataType: DataType; defaultValue: string; description: string; opcTagPath?: string });
   };
 
   const isEditingInherited = editingProperty?.isInherited;
@@ -127,6 +131,19 @@ export const PropertyModal: React.FC = () => {
             type="text"
             {...register('defaultValue')}
             placeholder="e.g. 25.0 or TANK-001"
+            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-sky-500 font-mono"
+          />
+        </div>
+
+        {/* OPC Tag Path */}
+        <div>
+          <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">
+            OPC Tag Binding (Caminho OPC)
+          </label>
+          <input
+            type="text"
+            {...register('opcTagPath')}
+            placeholder="e.g. OPC_UA_Refinery.Boiler_Area.PLC_Boiler_01.TE_101"
             className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-sky-500 font-mono"
           />
         </div>

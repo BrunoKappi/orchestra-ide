@@ -40,6 +40,9 @@ import { AlarmEngine } from '../services/AlarmEngine';
 import { historyEngine } from '../services/HistoryEngine';
 import { propertyBrowserService } from '../services/PropertyBrowserService';
 import { STORAGE_KEYS } from '../repository/storageKey';
+import type { ActiveEventState } from '../types/event';
+import { EventEngine } from '../services/EventEngine';
+import { useOpcStore } from './useOpcStore';
 
 interface ObjectModelStoreState {
   // Navigation & Theme
@@ -87,6 +90,8 @@ interface ObjectModelStoreState {
   isAlarmConfigModalOpen: boolean;
   editingAlarmProperty: MergedProperty | null;
   alarmEvents: AlarmEvent[];
+  activeEvents: ActiveEventState[];
+  evaluateEvents: () => void;
 
   // History modal state
   isHistoryConfigModalOpen: boolean;
@@ -128,9 +133,10 @@ interface ObjectModelStoreState {
   openAddPropertyModal: () => void;
   openEditPropertyModal: (property: MergedProperty) => void;
   closePropertyModal: () => void;
-  saveProperty: (data: { name: string; dataType: DataType; defaultValue: string; description: string; category?: string }) => void;
+  saveProperty: (data: { name: string; dataType: DataType; defaultValue: string; description: string; category?: string; opcTagPath?: string }) => void;
   deleteProperty: (propertyId: string) => void;
   duplicateProperty: (property: MergedProperty) => void;
+  bindOpcTagToProperty: (propertyId: string, opcTagPath: string) => void;
 
   // Script Actions
   openAddScriptModal: () => void;
@@ -220,6 +226,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     isAlarmConfigModalOpen: false,
     editingAlarmProperty: null,
     alarmEvents: [],
+    activeEvents: [],
 
     isHistoryConfigModalOpen: false,
     editingHistoryProperty: null,
@@ -277,6 +284,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         state.deploymentFolders = folders;
         state.deploymentNodes = nodes;
         state.alarmEvents = alarmEvents;
+        state.activeEvents = EventEngine.getActiveStates();
 
         // Ensure all properties of all objects are initialized in simulatedValues
         objects.forEach((obj) => {
@@ -417,6 +425,27 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       const nextValues: Record<string, string> = { ...simulatedValues };
       const nextHistory: Record<string, number[]> = { ...historyValues };
 
+      // Copia todas as tags OPC UA/DA para simulatedValues para compatibilidade com Telas e Widgets
+      const opcNodes = useOpcStore.getState().nodes;
+      opcNodes.forEach((n) => {
+        if (n.type === 'tag') {
+          const newVal = n.value ?? '0';
+          nextValues[`OPC_VIRTUAL:${n.path}`] = newVal;
+          // Grava histórico para tags OPC no Historian
+          historyEngine.record('OPC_VIRTUAL', n.path, newVal, {
+            enabled: true,
+            collectionMode: 'on_change',
+            intervalMs: 1000,
+            retentionMs: 3600000,
+            maxSamples: 1000,
+            deadband: 0,
+            compression: false,
+            engineeringUnit: n.engineeringUnit || '',
+            notes: ''
+          }, 'simulation');
+        }
+      });
+
       // Iterate through all objects, simulating ONLY DEPLOYED objects
       objects.forEach((obj) => {
         const isDeployed = obj.isDeployed !== false; // Default to true if not explicitly set false
@@ -427,6 +456,35 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
         props.forEach((prop) => {
           const key = `${obj.id}:${prop.name}`;
+
+          // OPC Tag Binding
+          if (prop.opcTagPath) {
+            const opcNodes = useOpcStore.getState().nodes;
+            const opcNode = opcNodes.find((n) => n.path === prop.opcTagPath && n.type === 'tag');
+            if (opcNode) {
+              const newVal = opcNode.value ?? prop.defaultValue;
+              nextValues[key] = newVal;
+              if (selectedEntity?.id === obj.id) {
+                nextValues[prop.name] = newVal;
+              }
+              const num = parseFloat(newVal);
+              if (!isNaN(num)) {
+                const histKey = key;
+                const hist = nextHistory[histKey] ? [...nextHistory[histKey]] : [];
+                hist.push(num);
+                if (hist.length > 15) hist.shift();
+                nextHistory[histKey] = hist;
+                if (selectedEntity?.id === obj.id) {
+                  nextHistory[prop.name] = hist;
+                }
+              }
+              if (prop.historyConfig?.enabled) {
+                historyEngine.record(obj.id, prop.id, newVal, prop.historyConfig, 'simulation');
+              }
+              return; // Ignora simulação normal/mock
+            }
+          }
+
           const mockConfig = mockConfigs.find((c) => c.propertyName === prop.name);
 
           if (mockConfig && mockConfig.enabled) {
@@ -476,11 +534,20 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       AlarmEngine.evaluate(nextValues, objects, inheritanceService.getMergedProperties.bind(inheritanceService));
       const alarmEvents = alarmRepo.getAll();
 
+      const activeEvents = EventEngine.evaluate(
+        nextValues,
+        objects,
+        alarmEvents,
+        nextTick,
+        get().simulationSpeedMs
+      );
+
       set((state) => {
         state.simulationTickCount = nextTick;
         state.simulatedValues = nextValues;
         state.historyValues = nextHistory;
         state.alarmEvents = alarmEvents;
+        state.activeEvents = activeEvents;
       });
     },
 
@@ -614,6 +681,29 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         // Re-evaluate alarms instantly on manual update
         AlarmEngine.evaluate(state.simulatedValues, state.objects, inheritanceService.getMergedProperties.bind(inheritanceService));
         state.alarmEvents = alarmRepo.getAll();
+
+        const activeEvents = EventEngine.evaluate(
+          state.simulatedValues,
+          state.objects,
+          state.alarmEvents,
+          state.simulationTickCount,
+          state.simulationSpeedMs
+        );
+        state.activeEvents = activeEvents;
+      });
+    },
+
+    evaluateEvents: () => {
+      const { simulatedValues, objects, alarmEvents, simulationTickCount, simulationSpeedMs } = get();
+      const activeEvents = EventEngine.evaluate(
+        simulatedValues,
+        objects,
+        alarmEvents,
+        simulationTickCount,
+        simulationSpeedMs
+      );
+      set((state) => {
+        state.activeEvents = activeEvents;
       });
     },
 
@@ -934,6 +1024,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           defaultValue: data.defaultValue,
           description: data.description,
           category: data.category,
+          opcTagPath: data.opcTagPath,
           createdAt: editing.createdAt,
           updatedAt: now,
         });
@@ -947,6 +1038,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           defaultValue: data.defaultValue,
           description: data.description,
           category: data.category,
+          opcTagPath: data.opcTagPath,
           createdAt: now,
           updatedAt: now,
         });
@@ -980,6 +1072,15 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         updatedAt: now,
       });
       get().refreshData();
+    },
+
+    bindOpcTagToProperty: (propertyId, opcTagPath) => {
+      const prop = propertyRepo.getById(propertyId);
+      if (prop) {
+        prop.opcTagPath = opcTagPath;
+        propertyRepo.save(prop);
+        get().refreshData();
+      }
     },
 
     // Script Actions

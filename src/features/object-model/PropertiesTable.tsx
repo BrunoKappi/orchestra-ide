@@ -11,6 +11,7 @@ import {
   Bell,
   BellRing,
   TrendingUp,
+  Link,
 } from 'lucide-react';
 import { useObjectModelStore } from '../../store/useObjectModelStore';
 import { cn } from '../../utils/cn';
@@ -25,6 +26,7 @@ export const PropertiesTable: React.FC = () => {
     duplicateProperty,
     openAlarmConfigModal,
     openHistoryConfigModal,
+    bindOpcTagToProperty,
   } = useObjectModelStore();
 
   const [search, setSearch] = useState('');
@@ -114,6 +116,22 @@ export const PropertiesTable: React.FC = () => {
               filteredProperties.map((prop) => (
                 <tr
                   key={prop.id}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const raw = e.dataTransfer.getData('opc/tag-ref');
+                    if (raw) {
+                      try {
+                        const tag = JSON.parse(raw);
+                        bindOpcTagToProperty(prop.id, tag.path);
+                      } catch (err) {
+                        console.error('Falha ao processar drop de tag OPC:', err);
+                      }
+                    }
+                  }}
                   className="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                 >
                   {/* Property Name & Description */}
@@ -139,6 +157,13 @@ export const PropertiesTable: React.FC = () => {
                     {prop.description && (
                       <div className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">
                         {prop.description}
+                      </div>
+                    )}
+
+                    {prop.opcTagPath && (
+                      <div className="flex items-center gap-1 mt-1 text-[10px] text-sky-600 dark:text-sky-400 font-mono">
+                        <Link className="w-3 h-3 text-sky-500 shrink-0" />
+                        <span className="truncate max-w-xs">{prop.opcTagPath}</span>
                       </div>
                     )}
                   </td>

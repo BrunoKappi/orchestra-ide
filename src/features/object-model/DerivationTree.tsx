@@ -232,6 +232,21 @@ export const DerivationTree: React.FC = () => {
               ? 'Derived'
               : 'Instance'}
           </span>
+
+          {/* Delete action button on hover */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (confirm(`Tem certeza que deseja excluir ${node.type === 'instance' ? 'o objeto' : 'o template'} "${node.name}"?`)) {
+                const type = node.type === 'instance' ? 'instance' : 'template';
+                deleteEntity(node.entityId, type);
+              }
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-rose-500 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 shrink-0 transition-opacity"
+            title="Excluir"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         {/* Child items */}
