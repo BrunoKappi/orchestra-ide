@@ -11,12 +11,15 @@ import { AlarmViewerPage } from './pages/AlarmViewerPage';
 import { HistorianPage } from './pages/HistorianPage';
 import { PropertyBrowserPage } from './pages/PropertyBrowserPage';
 import { FlowsPage } from './pages/FlowsPage';
+import { FlowsV2Page } from './pages/FlowsV2Page';
 import { FlowDesignerModal } from './features/flow-designer/FlowDesignerModal';
+import { FlowV2EditorModal } from './features/flow-v2/components/FlowV2EditorModal';
 import { OmmPage } from './pages/OmmPage';
 import { KpiDashboardPage } from './pages/KpiDashboardPage';
 import { EventEnginePage } from './pages/EventEnginePage';
 import { OpcBrowserPage } from './pages/OpcBrowserPage';
 import { SecurityPage } from './pages/SecurityPage';
+import { ConnectivityStudioPage } from './pages/ConnectivityStudioPage';
 
 import { useObjectModelStore } from './store/useObjectModelStore';
 
@@ -90,6 +93,9 @@ export function App() {
     } else if (path === '/security') {
       title = 'Segurança & Acessos - Serrano';
       emoji = '🛡️';
+    } else if (path === '/connectivity') {
+      title = 'Connectivity Studio - Serrano';
+      emoji = '🔌';
     }
 
     document.title = title;
@@ -105,6 +111,8 @@ export function App() {
         <Route path="/widgets" element={<WidgetsPage />} />
         <Route path="/flows" element={<FlowsPage />} />
         <Route path="/fluxos" element={<FlowsPage />} />
+        <Route path="/flows-v2" element={<FlowsV2Page />} />
+        <Route path="/fluxogramas-2" element={<FlowsV2Page />} />
         <Route path="/simulator" element={<SimulatorPage />} />
         <Route path="/simulador" element={<SimulatorPage />} />
         <Route path="/screens" element={<ScreenDesignerPage />} />
@@ -119,9 +127,11 @@ export function App() {
         <Route path="/omm/*" element={<OmmPage />} />
         <Route path="/opc-browser" element={<OpcBrowserPage />} />
         <Route path="/security" element={<SecurityPage />} />
+        <Route path="/connectivity" element={<ConnectivityStudioPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowDesignerModal />
+      <FlowV2EditorModal />
     </>
   );
 }

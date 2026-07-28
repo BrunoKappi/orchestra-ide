@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
     "@tanstack/react-table": "^8.21.3",
+    "@xyflow/react": "^12.11.2",
     "bpmn-js": "^18.22.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.21",

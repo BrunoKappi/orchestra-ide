@@ -16,6 +16,7 @@ import {
   TrendingUp,
   Search,
   Workflow,
+  GitFork,
   AlertTriangle,
   ArrowLeftRight,
   Network,
@@ -93,6 +94,14 @@ export const HeaderNavigation = () => {
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
     {
+      to: "/flows-v2",
+      label: "Fluxogramas 2",
+      icon: GitFork,
+      colorClass: "text-emerald-500",
+      activeTextClass: "text-emerald-600 dark:text-emerald-400",
+      badge: "XYFlow",
+    },
+    {
       to: "/simulator",
       label: "Simulador",
       icon: Activity,
@@ -163,6 +172,13 @@ export const HeaderNavigation = () => {
       icon: Network,
       colorClass: "text-sky-455",
       activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/connectivity",
+      label: "Connectivity Studio",
+      icon: Network,
+      colorClass: "text-emerald-500",
+      activeTextClass: "text-emerald-600 dark:text-emerald-400",
     },
     {
       to: "/security",

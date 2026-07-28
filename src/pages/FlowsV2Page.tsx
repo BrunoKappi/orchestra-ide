@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import {
   Workflow,
-  GitFork,
   Plus,
   Search,
   Copy,
@@ -14,16 +12,18 @@ import {
   Box,
   Globe,
   Layers,
+  GitFork,
 } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
 import { useFlowStore } from '../store/useFlowStore';
 import { cn } from '../utils/cn';
 
-export const FlowsPage: React.FC = () => {
+export const FlowsV2Page: React.FC = () => {
   const {
     flowcharts,
     init: initFlows,
-    openDesigner,
+    openDesignerV2,
     createFlowchart,
     deleteFlowchart,
     duplicateFlowchart,
@@ -39,17 +39,15 @@ export const FlowsPage: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newFcName, setNewFcName] = useState('');
   const [newFcDesc, setNewFcDesc] = useState('');
-  const [newFcCategory, setNewFcCategory] = useState('Processos da Planta');
-  const [newFcTags, setNewFcTags] = useState('Automação, Batelada');
+  const [newFcCategory, setNewFcCategory] = useState('Processos Industriais');
+  const [newFcTags, setNewFcTags] = useState('XYFlow, Automação, Batelada');
 
   useEffect(() => {
     initFlows();
   }, [initFlows]);
 
-  // Unique categories list
   const categories = Array.from(new Set(flowcharts.map((f) => f.category)));
 
-  // Filtered flowcharts
   const filteredFlowcharts = flowcharts.filter((fc) => {
     const matchesSearch =
       fc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,7 +77,7 @@ export const FlowsPage: React.FC = () => {
     setIsCreateModalOpen(false);
     setNewFcName('');
     setNewFcDesc('');
-    openDesigner(newFc.id);
+    openDesignerV2(newFc.id);
   };
 
   const handleImportFile = () => {
@@ -94,7 +92,7 @@ export const FlowsPage: React.FC = () => {
         const jsonStr = event.target.result;
         const imported = importFlowchartJson(jsonStr);
         if (imported) {
-          openDesigner(imported.id);
+          openDesignerV2(imported.id);
         }
       };
       reader.readAsText(file);
@@ -108,55 +106,61 @@ export const FlowsPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
-      {/* App Header Navigation */}
+      {/* Shared Header Navigation */}
       <HeaderNavigation />
 
-      {/* Global Page Header */}
+      {/* Page Header */}
       <div className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs shrink-0 select-none">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-500 flex items-center justify-center shrink-0">
-              <Workflow className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shrink-0">
+              <GitFork className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                Flow Designer - Fluxogramas BPMN
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                  Fluxogramas 2 (React Flow / XYFlow)
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                  Nova Geração
+                </span>
+              </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Gerenciamento de fluxos globais da planta, procedimentos operacionais, bateladas e automações.
+                Editor visual moderno, minimalista e fluido para automação industrial, bateladas e processos.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <NavLink
-              to="/flows-v2"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 font-semibold text-xs transition-all"
+              to="/flows"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-800/50 hover:bg-slate-200/60 font-semibold text-xs transition-all"
+              title="Alternar para o Editor BPMN Tradicional"
             >
-              <GitFork className="w-4 h-4 text-emerald-500" />
-              <span>Conheça o Fluxogramas 2 (XYFlow)</span>
+              <Workflow className="w-4 h-4 text-sky-500" />
+              <span>Abrir BPMN Tradicional</span>
             </NavLink>
 
             <button
               onClick={handleImportFile}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs transition-all cursor-pointer"
             >
-              <Upload className="w-4 h-4 text-sky-500" />
+              <Upload className="w-4 h-4 text-emerald-500" />
               <span>Importar JSON</span>
             </button>
 
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Novo Fluxograma Global</span>
+              <span>Novo Fluxograma V2</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Workspace Content */}
+      {/* Main Workspace Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Filter & Category Sidebar */}
         <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-5 flex flex-col shrink-0 select-none">
@@ -169,14 +173,14 @@ export const FlowsPage: React.FC = () => {
               <button
                 onClick={() => setSelectedContext('all')}
                 className={cn(
-                  'w-full flex items-center justify-between p-2 rounded-lg text-xs font-semibold transition-all',
+                  'w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-all',
                   selectedContext === 'all'
-                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-sky-500" />
+                  <Layers className="w-4 h-4 text-emerald-500" />
                   <span>Todos</span>
                 </div>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800">
@@ -187,9 +191,9 @@ export const FlowsPage: React.FC = () => {
               <button
                 onClick={() => setSelectedContext('global')}
                 className={cn(
-                  'w-full flex items-center justify-between p-2 rounded-lg text-xs font-semibold transition-all',
+                  'w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-all',
                   selectedContext === 'global'
-                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 )}
               >
@@ -205,9 +209,9 @@ export const FlowsPage: React.FC = () => {
               <button
                 onClick={() => setSelectedContext('template')}
                 className={cn(
-                  'w-full flex items-center justify-between p-2 rounded-lg text-xs font-semibold transition-all',
+                  'w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-all',
                   selectedContext === 'template'
-                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 )}
               >
@@ -223,9 +227,9 @@ export const FlowsPage: React.FC = () => {
               <button
                 onClick={() => setSelectedContext('instance')}
                 className={cn(
-                  'w-full flex items-center justify-between p-2 rounded-lg text-xs font-semibold transition-all',
+                  'w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-all',
                   selectedContext === 'instance'
-                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 )}
               >
@@ -240,7 +244,7 @@ export const FlowsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Categories Section */}
+          {/* Categories */}
           <div className="space-y-2 flex-1 overflow-hidden flex flex-col">
             <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Categorias
@@ -249,7 +253,7 @@ export const FlowsPage: React.FC = () => {
               <button
                 onClick={() => setSelectedCategory(null)}
                 className={cn(
-                  'w-full flex items-center justify-between p-2 rounded-lg text-xs transition-all',
+                  'w-full flex items-center justify-between p-2 rounded-xl text-xs transition-all',
                   !selectedCategory
                     ? 'bg-slate-100 dark:bg-slate-800 font-bold text-slate-900 dark:text-slate-100'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
@@ -263,9 +267,9 @@ export const FlowsPage: React.FC = () => {
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   className={cn(
-                    'w-full flex items-center justify-between p-2 rounded-lg text-xs transition-all',
+                    'w-full flex items-center justify-between p-2 rounded-xl text-xs transition-all',
                     selectedCategory === cat
-                      ? 'bg-slate-100 dark:bg-slate-800 font-bold text-sky-600 dark:text-sky-400'
+                      ? 'bg-slate-100 dark:bg-slate-800 font-bold text-emerald-600 dark:text-emerald-400'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                   )}
                 >
@@ -276,9 +280,9 @@ export const FlowsPage: React.FC = () => {
           </div>
         </aside>
 
-        {/* Central Grid Area */}
+        {/* Central Cards Grid Area */}
         <main className="flex-1 flex flex-col overflow-hidden p-6 bg-slate-50/50 dark:bg-slate-950">
-          {/* Top Search & Controls */}
+          {/* Top Search & Stats Bar */}
           <div className="flex items-center justify-between gap-4 mb-6">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -287,7 +291,7 @@ export const FlowsPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Pesquisar por nome, descrição ou autor..."
-                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none focus:border-sky-500 shadow-xs text-slate-900 dark:text-slate-100"
+                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs outline-none focus:border-emerald-500 shadow-xs text-slate-900 dark:text-slate-100"
               />
             </div>
 
@@ -300,10 +304,10 @@ export const FlowsPage: React.FC = () => {
           <div className="flex-1 overflow-y-auto">
             {filteredFlowcharts.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-400 p-8 text-center">
-                <Workflow className="w-10 h-10 text-slate-300 dark:text-slate-700 mb-2" />
+                <GitFork className="w-10 h-10 text-slate-300 dark:text-slate-700 mb-2" />
                 <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300">Nenhum fluxograma encontrado</h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-xs">
-                  Tente alterar os termos de pesquisa ou o filtro de categoria selecionado.
+                  Crie um novo fluxograma V2 para começar a edição visual no XYFlow.
                 </p>
               </div>
             ) : (
@@ -311,16 +315,16 @@ export const FlowsPage: React.FC = () => {
                 {filteredFlowcharts.map((fc) => (
                   <div
                     key={fc.id}
-                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 hover:border-sky-500/50 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 hover:border-emerald-500/50 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
                   >
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-500 border border-sky-500/20 flex items-center justify-center shrink-0">
-                            <Workflow className="w-5 h-5" />
+                          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center shrink-0 font-bold text-xs">
+                            <GitFork className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate max-w-[170px]">
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate max-w-[170px]">
                               {fc.name}
                             </h3>
                             <span className="text-[10px] text-slate-400">v{fc.version} • {fc.author}</span>
@@ -341,7 +345,7 @@ export const FlowsPage: React.FC = () => {
                           {fc.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[10px] font-mono border border-sky-200/50 dark:border-sky-800/50"
+                              className="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-mono border border-emerald-200/50 dark:border-emerald-800/50"
                             >
                               #{tag}
                             </span>
@@ -374,11 +378,11 @@ export const FlowsPage: React.FC = () => {
                         </button>
 
                         <button
-                          onClick={() => openDesigner(fc.id)}
-                          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer ml-1"
+                          onClick={() => openDesignerV2(fc.id)}
+                          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer ml-1"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Abrir Designer</span>
+                          <span>Abrir Editor XYFlow</span>
                         </button>
                       </div>
                     </div>
@@ -390,12 +394,12 @@ export const FlowsPage: React.FC = () => {
         </main>
       </div>
 
-      {/* Create Global Flowchart Modal */}
+      {/* Modal Criar Fluxograma V2 */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              Criar Fluxograma Global
+              Criar Fluxograma V2 (XYFlow)
             </h3>
 
             <form onSubmit={handleCreateSubmit} className="space-y-3 text-xs">
@@ -406,8 +410,8 @@ export const FlowsPage: React.FC = () => {
                   required
                   value={newFcName}
                   onChange={(e) => setNewFcName(e.target.value)}
-                  placeholder="ex: Sequência de Partida da Batelada"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-sky-500 text-slate-900 dark:text-slate-100"
+                  placeholder="ex: Batelada de Reator de Mistura"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-emerald-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -417,8 +421,8 @@ export const FlowsPage: React.FC = () => {
                   type="text"
                   value={newFcCategory}
                   onChange={(e) => setNewFcCategory(e.target.value)}
-                  placeholder="ex: Automação de Produção"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-sky-500 text-slate-900 dark:text-slate-100"
+                  placeholder="ex: Processos Industriais"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-emerald-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -429,7 +433,7 @@ export const FlowsPage: React.FC = () => {
                   value={newFcTags}
                   onChange={(e) => setNewFcTags(e.target.value)}
                   placeholder="Batelada, Partida, Segurança"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-sky-500 text-slate-900 dark:text-slate-100"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-emerald-500 text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -440,7 +444,7 @@ export const FlowsPage: React.FC = () => {
                   onChange={(e) => setNewFcDesc(e.target.value)}
                   rows={3}
                   placeholder="Descreva a finalidade deste processo..."
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-sky-500 text-slate-900 dark:text-slate-100 resize-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-emerald-500 text-slate-900 dark:text-slate-100 resize-none"
                 />
               </div>
 
@@ -454,9 +458,9 @@ export const FlowsPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-md"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-md"
                 >
-                  Criar e Abrir Designer
+                  Criar e Abrir XYFlow
                 </button>
               </div>
             </form>

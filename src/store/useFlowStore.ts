@@ -45,6 +45,7 @@ interface FlowStoreState {
 
   // Active Flowchart Editor State
   isDesignerOpen: boolean;
+  isDesignerV2Open: boolean;
   activeFlowchart: FlowchartEntity | null;
   selectedNodeId: string | null;
   selectedNodeMeta: FlowNodeMetadata | null;
@@ -83,6 +84,9 @@ interface FlowStoreState {
   clearAllData: () => void;
   openDesigner: (flowchartId: string) => void;
   closeDesigner: () => void;
+  openDesignerV2: (flowchartId: string) => void;
+  closeDesignerV2: () => void;
+  updateActiveXyflowData: (data: any) => void;
   createFlowchart: (
     name: string,
     description: string,
@@ -161,6 +165,7 @@ export const useFlowStore = create<FlowStoreState>()(
     nodes: [],
 
     isDesignerOpen: false,
+    isDesignerV2Open: false,
     activeFlowchart: null,
     selectedNodeId: null,
     selectedNodeMeta: null,
@@ -395,6 +400,55 @@ export const useFlowStore = create<FlowStoreState>()(
         state.problems = [];
         state.modelerInstance = null;
       });
+    },
+
+    openDesignerV2: (flowchartId: string) => {
+      let flows = get().flowcharts;
+      if (!flows || flows.length === 0) {
+        get().init();
+        flows = get().flowcharts;
+      }
+
+      let fc = flows.find((f) => f.id === flowchartId);
+      if (!fc) {
+        const repoFc = flowchartRepo.getById(flowchartId);
+        if (repoFc) {
+          fc = repoFc;
+          set((state) => {
+            if (!state.flowcharts.some((f) => f.id === repoFc.id)) {
+              state.flowcharts.push(repoFc);
+            }
+          });
+        }
+      }
+
+      if (!fc) return;
+
+      set((state) => {
+        state.activeFlowchart = fc;
+        state.isDesignerV2Open = true;
+        state.selectedNodeId = null;
+        state.selectedNodeMeta = null;
+      });
+
+      get().runValidation();
+    },
+
+    closeDesignerV2: () => {
+      set((state) => {
+        state.isDesignerV2Open = false;
+        state.activeFlowchart = null;
+        state.selectedNodeId = null;
+        state.selectedNodeMeta = null;
+        state.problems = [];
+      });
+    },
+
+    updateActiveXyflowData: (data: any) => {
+      const active = get().activeFlowchart;
+      if (!active) return;
+
+      get().updateFlowchart(active.id, { xyflowData: data });
     },
 
     createFlowchart: (name, description, contextType, targetId = null, category = 'Processos', tags = []) => {

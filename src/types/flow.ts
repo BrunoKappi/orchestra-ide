@@ -94,7 +94,21 @@ export interface FlowNodeMetadata {
   raiseEventPayload?: string;
   comments?: string;
   groupColor?: string;
+  comparisonOperator?: string;
+  compareValue?: string;
+  dbTable?: string;
+  sqlQuery?: string;
+  scriptId?: string;
+  scriptCode?: string;
+  eventId?: string;
+  alarmAction?: string;
+  alarmSeverity?: string;
+  userComments?: string;
+  priority?: string;
+  errorPolicy?: string;
 }
+
+import type { FlowV2Data } from './flowV2';
 
 export interface FlowchartEntity {
   id: string;
@@ -113,6 +127,7 @@ export interface FlowchartEntity {
   
   bpmnXml: string;
   nodeMetadata: Record<string, FlowNodeMetadata>; // Keyed by BPMN element ID
+  xyflowData?: FlowV2Data;
 }
 
 export interface FlowchartFolderEntity {

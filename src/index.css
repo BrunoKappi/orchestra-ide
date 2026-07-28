@@ -1,4 +1,19 @@
 @import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+/* Custom XYFlow Animation */
+@keyframes flowAnimation {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-flow {
+  animation: flowAnimation 1s linear infinite;
+}
 
 /* Force class-based dark mode — do NOT use prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));
