@@ -53,13 +53,22 @@ export const CustomFlowNode: React.FC<any> = memo(({ data, selected }) => {
         selected ? 'border-sky-500 ring-2 ring-sky-500/30 shadow-sky-500/10' : 'border-slate-200 dark:border-slate-800'
       }`}
     >
-      {/* Input Handle */}
+      {/* Input Handles */}
       {nodeData?.inputsCount > 0 && (
-        <Handle
-          type="target"
-          position={Position.Left}
-          className="w-3 h-3 bg-sky-500 border-2 border-white dark:border-slate-900 rounded-full"
-        />
+        <>
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="in_left"
+            className="w-3 h-3 bg-sky-500 border-2 border-white dark:border-slate-900 rounded-full"
+          />
+          <Handle
+            type="target"
+            position={Position.Top}
+            id="in_top"
+            className="w-3 h-3 bg-sky-500 border-2 border-white dark:border-slate-900 rounded-full"
+          />
+        </>
       )}
 
       {/* Header bar */}
@@ -96,13 +105,22 @@ export const CustomFlowNode: React.FC<any> = memo(({ data, selected }) => {
         )}
       </div>
 
-      {/* Output Handle */}
+      {/* Output Handles */}
       {nodeData?.outputsCount > 0 && (
-        <Handle
-          type="source"
-          position={Position.Right}
-          className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
-        />
+        <>
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="out_right"
+            className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
+          />
+          <Handle
+            type="source"
+            position={Position.Bottom}
+            id="out_bottom"
+            className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
+          />
+        </>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
 import { useObjectModelStore } from '../store/useObjectModelStore';
 import { UserModal } from '../features/security/components/UserModal';
 import { PermissionMatrixView } from '../features/security/components/PermissionMatrixView';
+import { ActiveDirectoryTab } from '../features/security/components/ActiveDirectoryTab';
 import {
   ShieldAlert,
   Users,
@@ -17,7 +18,8 @@ import {
   Edit2,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  Server
 } from 'lucide-react';
 
 export const SecurityPage: React.FC = () => {
@@ -41,7 +43,7 @@ export const SecurityPage: React.FC = () => {
 
   const theme = useObjectModelStore((s) => s.theme);
 
-  const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'profiles' | 'roles' | 'permissions' | 'audit'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'profiles' | 'roles' | 'permissions' | 'audit' | 'active_directory'>('users');
 
   // Users Table States
   const [searchQuery, setSearchQuery] = useState('');
@@ -388,6 +390,18 @@ export const SecurityPage: React.FC = () => {
             </button>
 
             <div className="hidden md:block my-2 border-t border-slate-200 dark:border-slate-850" />
+
+            <button
+              onClick={() => setActiveTab('active_directory')}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full transition-all cursor-pointer ${
+                activeTab === 'active_directory'
+                  ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <Server className="w-4 h-4 shrink-0 text-sky-500" />
+              <span>Active Directory</span>
+            </button>
 
             <button
               onClick={() => setActiveTab('audit')}
@@ -917,6 +931,11 @@ export const SecurityPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB CONTENT: ACTIVE DIRECTORY */}
+          {activeTab === 'active_directory' && (
+            <ActiveDirectoryTab />
           )}
         </div>
       </main>

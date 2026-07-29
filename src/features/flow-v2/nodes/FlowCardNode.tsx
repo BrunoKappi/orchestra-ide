@@ -174,14 +174,30 @@ export const FlowCardNode = memo(({ data, selected }: NodeProps<any>) => {
       {/* Input Handles */}
       {inputs.map((inp, idx) => {
         const topPos = inputs.length === 1 ? '50%' : `${((idx + 1) * 100) / (inputs.length + 1)}%`;
+        const leftPos = inputs.length === 1 ? '50%' : `${((idx + 1) * 100) / (inputs.length + 1)}%`;
         return (
           <div key={inp.id} className="group/handle">
+            {/* Left Connector */}
             <Handle
               type="target"
               position={Position.Left}
               id={inp.id}
               style={{
                 top: topPos,
+                background: inp.color || '#0ea5e9',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                border: '2px solid white',
+              }}
+            />
+            {/* Top Connector */}
+            <Handle
+              type="target"
+              position={Position.Top}
+              id={`${inp.id}_top`}
+              style={{
+                left: leftPos,
                 background: inp.color || '#0ea5e9',
                 width: 10,
                 height: 10,
@@ -202,14 +218,30 @@ export const FlowCardNode = memo(({ data, selected }: NodeProps<any>) => {
       {/* Output Handles */}
       {outputs.map((out, idx) => {
         const topPos = outputs.length === 1 ? '50%' : `${((idx + 1) * 100) / (outputs.length + 1)}%`;
+        const leftPos = outputs.length === 1 ? '50%' : `${((idx + 1) * 100) / (outputs.length + 1)}%`;
         return (
           <div key={out.id} className="group/handle">
+            {/* Right Connector */}
             <Handle
               type="source"
               position={Position.Right}
               id={out.id}
               style={{
                 top: topPos,
+                background: out.color || '#10b981',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                border: '2px solid white',
+              }}
+            />
+            {/* Bottom Connector */}
+            <Handle
+              type="source"
+              position={Position.Bottom}
+              id={`${out.id}_bottom`}
+              style={{
+                left: leftPos,
                 background: out.color || '#10b981',
                 width: 10,
                 height: 10,
