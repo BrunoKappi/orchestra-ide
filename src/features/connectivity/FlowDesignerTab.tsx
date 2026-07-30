@@ -314,13 +314,14 @@ const FlowDesignerContent: React.FC = () => {
           position,
           data: {
             label: block.label,
-            category: block.category === 'Fontes de Dados' ? 'Banco de Dados' : 'Industrial',
+            category: block.nodeCategory || (block.category === 'Fontes de Dados' ? 'Banco de Dados' : 'Industrial'),
             blockType: block.type,
-            iconName: 'Cpu',
+            iconName: block.iconName || 'Cpu',
             color: block.color || '#0284c7',
             description: block.description || '',
-            inputsCount: 1,
-            outputsCount: 1,
+            inputsCount: block.inputsCount !== undefined ? block.inputsCount : 1,
+            outputsCount: block.outputsCount !== undefined ? block.outputsCount : 1,
+            customOutputs: block.customOutputs || undefined,
             properties: block.defaultProperties || {},
           },
         };

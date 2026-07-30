@@ -396,8 +396,8 @@ export const useWidgetStore = create<WidgetStoreState>()(
     renameFolder: (id, newName) => {
       const folder = get().folders.find((f) => f.id === id);
       if (folder) {
-        folder.name = newName;
-        widgetFolderRepo.saveFolder(folder);
+        const updated = { ...folder, name: newName };
+        widgetFolderRepo.saveFolder(updated);
         get().init();
       }
     },

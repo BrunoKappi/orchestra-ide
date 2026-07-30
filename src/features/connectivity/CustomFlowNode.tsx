@@ -49,7 +49,7 @@ export const CustomFlowNode: React.FC<any> = memo(({ data, selected }) => {
 
   return (
     <div
-      className={`min-w-[200px] rounded-xl bg-white dark:bg-slate-900 border-2 shadow-md transition-all select-none overflow-hidden ${
+      className={`min-w-[200px] rounded-xl bg-white dark:bg-slate-900 border-2 shadow-md transition-all select-none ${
         selected ? 'border-sky-500 ring-2 ring-sky-500/30 shadow-sky-500/10' : 'border-slate-200 dark:border-slate-800'
       }`}
     >
@@ -73,7 +73,7 @@ export const CustomFlowNode: React.FC<any> = memo(({ data, selected }) => {
 
       {/* Header bar */}
       <div
-        className="px-3 py-1.5 flex items-center justify-between text-white font-bold text-xs"
+        className="px-3 py-1.5 flex items-center justify-between text-white font-bold text-xs rounded-t-[10px]"
         style={{ backgroundColor: nodeData?.color || '#0284c7' }}
       >
         <div className="flex items-center gap-1.5 min-w-0">
@@ -106,21 +106,47 @@ export const CustomFlowNode: React.FC<any> = memo(({ data, selected }) => {
       </div>
 
       {/* Output Handles */}
-      {nodeData?.outputsCount > 0 && (
-        <>
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="out_right"
-            className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
-          />
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="out_bottom"
-            className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
-          />
-        </>
+      {nodeData.customOutputs && nodeData.customOutputs.length > 0 ? (
+        <div className="border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 p-1.5 space-y-1">
+          {nodeData.customOutputs.map((out: any) => (
+            <div key={out.id} className="relative flex items-center justify-end text-[9px] font-bold text-slate-500 dark:text-slate-400 h-5 pr-1">
+              <span className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200/50 dark:border-slate-700/50 text-[8px] uppercase tracking-wide mr-1.5">
+                {out.label}
+              </span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={out.id}
+                style={{
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  right: -20,
+                  backgroundColor: out.color || '#10b981',
+                  zIndex: 50,
+                  pointerEvents: 'all',
+                }}
+                className="w-3.5 h-3.5 border-2 border-white dark:border-slate-900 rounded-full hover:scale-125 transition-transform"
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        nodeData?.outputsCount > 0 && (
+          <>
+            <Handle
+              type="source"
+              position={Position.Right}
+              id="out_right"
+              className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
+            />
+            <Handle
+              type="source"
+              position={Position.Bottom}
+              id="out_bottom"
+              className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"
+            />
+          </>
+        )
       )}
     </div>
   );

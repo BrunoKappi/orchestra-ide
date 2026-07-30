@@ -21,6 +21,7 @@ import {
   ArrowLeftRight,
   Network,
   Shield,
+  Sparkles,
 } from "lucide-react";
 
 import { useSecurityStore } from "../../store/useSecurityStore";
@@ -29,6 +30,7 @@ import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { useWidgetStore } from "../../store/useWidgetStore";
 import { useScreenStore } from "../../store/useScreenStore";
 import { useFlowStore } from "../../store/useFlowStore";
+import { useOpcStore } from "../../store/useOpcStore";
 import { Modal } from "../ui/Modal";
 import { cn } from "../../utils/cn";
 
@@ -40,6 +42,7 @@ export const HeaderNavigation = () => {
   });
 
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+  const [isResetMockConfirmOpen, setIsResetMockConfirmOpen] = useState(false);
 
   const activeUnackCount = (alarmEvents || []).filter(
     (evt) => evt.status === "Active Unacknowledged",
@@ -232,6 +235,10 @@ export const HeaderNavigation = () => {
     setIsResetConfirmOpen(true);
   };
 
+  const handleResetMockData = () => {
+    setIsResetMockConfirmOpen(true);
+  };
+
   const executeWipeAllData = () => {
     useObjectModelStore.getState().clearAllData();
     useWidgetStore.getState().clearAllData();
@@ -239,6 +246,15 @@ export const HeaderNavigation = () => {
     useFlowStore.getState().clearAllData();
     useSecurityStore.getState().clearAllData();
     setIsResetConfirmOpen(false);
+  };
+
+  const executeResetMockData = () => {
+    useObjectModelStore.getState().resetMockData();
+    useOpcStore.getState().init();
+    useWidgetStore.getState().init();
+    useScreenStore.getState().init();
+    useFlowStore.getState().init();
+    setIsResetMockConfirmOpen(false);
   };
 
   return (
@@ -333,6 +349,14 @@ export const HeaderNavigation = () => {
         </button>
 
         <button
+          onClick={handleResetMockData}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium transition-colors bg-emerald-50/30 dark:bg-emerald-950/10"
+          title="Reset e Criar Massa de Dados Customizada (Tanques/Esferas)">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Reset/Mock</span>
+        </button>
+
+        <button
           onClick={toggleTheme}
           className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
           title="Toggle Light/Dark Theme">
@@ -395,6 +419,50 @@ export const HeaderNavigation = () => {
               onClick={executeWipeAllData}
               className="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-semibold cursor-pointer transition-colors shadow-sm shadow-rose-500/10 flex items-center gap-1.5">
               Limpar Tudo
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isResetMockConfirmOpen}
+        onClose={() => setIsResetMockConfirmOpen(false)}
+        title="Confirmar Reset e Criação de Mock"
+        subtitle="Esta ação irá recriar a base com Tanques e Esferas">
+        <div className="flex flex-col gap-4 text-slate-700 dark:text-slate-300">
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+            <Sparkles className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <p className="font-semibold text-emerald-800 dark:text-emerald-400">
+                Massa de Dados Customizada
+              </p>
+              <p className="mt-1 text-emerald-700/90 dark:text-emerald-300/80 leading-relaxed">
+                Você irá redefinir o sistema e semear uma nova estrutura contendo:
+              </p>
+              <ul className="list-disc pl-4 mt-1.5 space-y-1 text-[11px] text-emerald-700/80 dark:text-emerald-300/70 font-mono">
+                <li>Templates e Objetos de Tanques e Esferas</li>
+                <li>Simuladores ativos para Nível, Temperatura e Pressão</li>
+                <li>Widgets Premium (Tanque e Esfera) altamente estilizados</li>
+                <li>Tela Sinóptica com interligação e tubulações dinâmicas</li>
+                <li>Tags OPC dedicadas e fluxos de conectividade</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+            Todas as alterações atuais não salvas serão perdidas. A nova base estará configurada para simulação industrial.
+          </p>
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+            <button
+              onClick={() => setIsResetMockConfirmOpen(false)}
+              className="px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors">
+              Cancelar
+            </button>
+            <button
+              onClick={executeResetMockData}
+              className="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold cursor-pointer transition-colors shadow-sm shadow-emerald-500/10 flex items-center gap-1.5">
+              Confirmar e Semear
             </button>
           </div>
         </div>

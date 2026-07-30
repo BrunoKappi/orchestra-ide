@@ -202,24 +202,42 @@ export const WidgetCanvasEditor: React.FC = () => {
     };
   }, [isDragging, isResizing, selectedElementId, selectedWidget, dragOffset, zoom, snapToGrid, gridSize]);
 
-  // Keyboard shortcut to delete shapes
+  // Keyboard shortcut to delete or move shapes
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!selectedElementId) return;
+      if (!selectedElementId || !selectedWidget) return;
       const activeEl = document.activeElement;
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT')) {
-        return; // Avoid deleting while typing
+        return; // Avoid deleting or moving while typing
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
         deleteElement(selectedElementId);
+      } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const selectedElement = selectedWidget.elements.find((el) => el.id === selectedElementId);
+        if (!selectedElement) return;
+
+        let newX = selectedElement.x;
+        let newY = selectedElement.y;
+        let step = e.shiftKey ? 10 : 1;
+        if (snapToGrid) {
+          step = e.shiftKey ? gridSize * 10 : gridSize;
+        }
+
+        if (e.key === 'ArrowUp') newY = Math.max(0, selectedElement.y - step);
+        if (e.key === 'ArrowDown') newY = selectedElement.y + step;
+        if (e.key === 'ArrowLeft') newX = Math.max(0, selectedElement.x - step);
+        if (e.key === 'ArrowRight') newX = selectedElement.x + step;
+
+        updateElement(selectedElementId, { x: newX, y: newY });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedElementId, deleteElement]);
+  }, [selectedElementId, deleteElement, selectedWidget, updateElement, snapToGrid, gridSize]);
 
   // Clipboard Paste Event to allow pasting images directly
   useEffect(() => {
@@ -279,7 +297,6 @@ export const WidgetCanvasEditor: React.FC = () => {
       target.getAttribute('data-canvas-bg') === 'true';
 
     if (activeTool !== 'select' && activeTool !== 'image') {
-      if (!isBackground) return; 
       const coords = getCanvasCoordsFromClient(e.clientX, e.clientY);
       addElement(activeTool, coords.x, coords.y);
     } else {
@@ -290,16 +307,17 @@ export const WidgetCanvasEditor: React.FC = () => {
   };
 
   const handleMouseDownElement = (e: React.MouseEvent, elem: WidgetElement) => {
+    if (activeTool !== 'select') {
+      return;
+    }
     e.stopPropagation();
     selectElement(elem.id);
-    if (activeTool === 'select') {
-      setIsDragging(true);
-      const coords = getCanvasCoordsFromClient(e.clientX, e.clientY);
-      setDragOffset({
-        x: coords.x - elem.x,
-        y: coords.y - elem.y,
-      });
-    }
+    setIsDragging(true);
+    const coords = getCanvasCoordsFromClient(e.clientX, e.clientY);
+    setDragOffset({
+      x: coords.x - elem.x,
+      y: coords.y - elem.y,
+    });
   };
 
   // Image Upload handler

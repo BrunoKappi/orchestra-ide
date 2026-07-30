@@ -35,6 +35,7 @@ import { widgetFolderRepo } from '../repository/WidgetFolderRepository';
 import { inheritanceService } from '../services/InheritanceService';
 import { exportImportService } from '../services/ExportImportService';
 import { seedService } from '../services/SeedService';
+import { mockSeedService } from '../services/MockSeedService';
 import { mockSimulationService } from '../services/MockSimulationService';
 import { AlarmEngine } from '../services/AlarmEngine';
 import { historyEngine } from '../services/HistoryEngine';
@@ -182,6 +183,7 @@ interface ObjectModelStoreState {
 
   // System
   resetAllData: () => void;
+  resetMockData: () => void;
   clearAllData: () => void;
   refreshData: () => void;
 }
@@ -1353,6 +1355,11 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
     resetAllData: () => {
       seedService.seedInitialDataIfNeeded(true);
+      get().init();
+    },
+
+    resetMockData: () => {
+      mockSeedService.seedMockData();
       get().init();
     },
 

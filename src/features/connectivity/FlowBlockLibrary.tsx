@@ -28,22 +28,41 @@ import {
   Wrench,
   Server,
   Layers3,
+  MessageSquare,
 } from 'lucide-react';
 import { useConnectivityStore } from '../../store/useConnectivityStore';
 
 interface BlockDefinition {
   type: string;
   label: string;
-  category: 'Operações Industriais' | 'Fontes de Dados' | 'Lógica & Controle' | 'Protocolos & Formatos' | 'Utilitários';
+  category: 'Entradas & Gatilhos' | 'Respostas & Saídas' | 'Operações Industriais' | 'Fontes de Dados' | 'Lógica & Controle' | 'Protocolos & Formatos' | 'Utilitários';
   icon: any;
   color: string;
   description: string;
   defaultProperties?: Record<string, any>;
   isDataSource?: boolean;
   dataSourceType?: string;
+  inputsCount?: number;
+  outputsCount?: number;
+  customOutputs?: { id: string; label: string; color?: string }[];
+  nodeCategory?: 'Entrada' | 'Transformação' | 'Industrial' | 'Banco de Dados' | 'Comunicação' | 'Utilidades' | 'Saída' | 'Resposta';
+  iconName?: string;
 }
 
 export const INDUSTRIAL_BLOCKS: BlockDefinition[] = [
+  // Entradas & Gatilhos
+  { type: 'http_listener', label: 'REST API (Entrada Webhook)', category: 'Entradas & Gatilhos', icon: Globe, color: '#10b981', description: 'Inicia o fluxo ao receber uma requisição HTTP REST/Webhook.', inputsCount: 0, outputsCount: 1, nodeCategory: 'Entrada', iconName: 'Globe', defaultProperties: { httpMethod: 'POST', httpPath: '/api/v1/trigger', port: 8080 } },
+  { type: 'opc_subscription', label: 'Assinatura OPC UA', category: 'Entradas & Gatilhos', icon: Radio, color: '#059669', description: 'Escuta alterações de tags OPC UA em tempo real.', inputsCount: 0, outputsCount: 1, nodeCategory: 'Entrada', iconName: 'Radio', defaultProperties: { connectionId: '', nodeAddress: '', pollingRateMs: 500 } },
+  { type: 'mqtt_subscription', label: 'Assinatura MQTT', category: 'Entradas & Gatilhos', icon: MessageSquare, color: '#0284c7', description: 'Dispara o fluxo quando mensagens chegam a um tópico MQTT.', inputsCount: 0, outputsCount: 1, nodeCategory: 'Entrada', iconName: 'MessageSquare', defaultProperties: { connectionId: '', mqttTopic: 'sensors/+/telemetry' } },
+  { type: 'cron_trigger', label: 'Agendamento Cron', category: 'Entradas & Gatilhos', icon: Clock, color: '#6366f1', description: 'Executa o fluxo de forma recorrente por expressão cron.', inputsCount: 0, outputsCount: 1, nodeCategory: 'Entrada', iconName: 'Clock', defaultProperties: { cronExpression: '*/5 * * * *', intervalSeconds: 300 } },
+  { type: 'variable_change_trigger', label: 'Mudança de Variável', category: 'Entradas & Gatilhos', icon: Activity, color: '#f59e0b', description: 'Inicia o fluxo quando uma variável global é modificada.', inputsCount: 0, outputsCount: 1, nodeCategory: 'Entrada', iconName: 'Activity', defaultProperties: { targetVariable: '', deadband: 0.1 } },
+  { type: 'system_event_trigger', label: 'Evento de Sistema', category: 'Entradas & Gatilhos', icon: Bell, color: '#ef4444', description: 'Inicia o fluxo com base em eventos de alarme do sistema.', inputsCount: 0, outputsCount: 1, nodeCategory: 'Entrada', iconName: 'Bell', defaultProperties: { eventType: 'AlarmCreated', severity: 'High' } },
+
+  // Respostas & Saídas
+  { type: 'http_response', label: 'Resposta REST API', category: 'Respostas & Saídas', icon: Globe, color: '#10b981', description: 'Envia resposta HTTP (status e payload) para o client solicitante.', inputsCount: 1, outputsCount: 0, nodeCategory: 'Resposta', iconName: 'Globe', defaultProperties: { responseStatus: 200, contentType: 'application/json', responseBody: '{"success": true}' } },
+  { type: 'end_flow', label: 'Finalizar Fluxo', category: 'Respostas & Saídas', icon: Zap, color: '#64748b', description: 'Termina a execução do fluxo corrente imediatamente.', inputsCount: 1, outputsCount: 0, nodeCategory: 'Saída', iconName: 'Zap', defaultProperties: { exitCode: 0, exitReason: 'Fluxo concluído com sucesso' } },
+  { type: 'mqtt_publish', label: 'Publicar MQTT', category: 'Respostas & Saídas', icon: MessageSquare, color: '#0284c7', description: 'Publica payload de saída em broker MQTT externo.', inputsCount: 1, outputsCount: 0, nodeCategory: 'Saída', iconName: 'MessageSquare', defaultProperties: { connectionId: '', mqttTopic: 'sensors/outputs' } },
+
   // Operações Industriais
   { type: 'read_property', label: 'Ler Propriedade', category: 'Operações Industriais', icon: Cpu, color: '#0284c7', description: 'Lê o valor atual de uma propriedade de objeto ou tag industrial.' },
   { type: 'write_property', label: 'Escrever Propriedade', category: 'Operações Industriais', icon: Zap, color: '#0284c7', description: 'Escreve um valor em uma propriedade ou ponto de telemetria.' },
@@ -53,8 +72,8 @@ export const INDUSTRIAL_BLOCKS: BlockDefinition[] = [
   { type: 'find_variables', label: 'Buscar Variáveis', category: 'Operações Industriais', icon: Hash, color: '#0284c7', description: 'Lista variáveis de runtime ou tags de CLP.' },
   { type: 'find_alarms', label: 'Buscar Alarmes', category: 'Operações Industriais', icon: Bell, color: '#eab308', description: 'Consulta alarmes ativos ou histórico de ocorrências.' },
   { type: 'query_historian', label: 'Consultar Histórico', category: 'Operações Industriais', icon: Clock, color: '#6366f1', description: 'Busca séries temporais no banco historiador.' },
-  { type: 'execute_script', label: 'Executar Script', category: 'Operações Industriais', icon: Terminal, color: '#8b5cf6', description: 'Executa código TypeScript/JavaScript no servidor.' },
-  { type: 'execute_flowchart', label: 'Executar Fluxograma', category: 'Operações Industriais', icon: PlayCircle, color: '#8b5cf6', description: 'Dispara um fluxograma de processo do módulo Fluxogramas 2.' },
+  { type: 'execute_script', label: 'Executar Script', category: 'Operações Industriais', icon: Terminal, color: '#8b5cf6', description: 'Executa código TypeScript/JavaScript no servidor.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'execute_flowchart', label: 'Executar Fluxograma', category: 'Operações Industriais', icon: PlayCircle, color: '#8b5cf6', description: 'Dispara um fluxograma de processo do módulo Fluxogramas 2.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
   { type: 'update_faceplate', label: 'Atualizar Faceplate', category: 'Operações Industriais', icon: Sliders, color: '#10b981', description: 'Envia sinal de atualização visual para Faceplate no SCADA.' },
   { type: 'update_widget', label: 'Atualizar Widget', category: 'Operações Industriais', icon: Layers, color: '#10b981', description: 'Atualiza o estado de um Widget no Dashboard.' },
   { type: 'update_kpi', label: 'Atualizar KPI', category: 'Operações Industriais', icon: Activity, color: '#10b981', description: 'Recalcula e persiste valor de um indicador KPI.' },
@@ -67,26 +86,26 @@ export const INDUSTRIAL_BLOCKS: BlockDefinition[] = [
   { type: 'execute_cutoff', label: 'Executar Cut-off', category: 'Operações Industriais', icon: Clock3, color: '#6366f1', description: 'Dispara fechamento de balanço de massa/produção.' },
   { type: 'read_runtime', label: 'Ler Runtime', category: 'Operações Industriais', icon: Cpu, color: '#0284c7', description: 'Lê estado de memória e variáveis de execução.' },
   { type: 'write_runtime', label: 'Escrever Runtime', category: 'Operações Industriais', icon: Cpu, color: '#0284c7', description: 'Atualiza registrador de memória do runtime.' },
-
+ 
   // Protocolos & Formatos
-  { type: 'rest_api', label: 'REST API', category: 'Protocolos & Formatos', icon: Globe, color: '#3b82f6', description: 'Requisição HTTP GET, POST, PUT, DELETE para API externa.' },
-  { type: 'sql_query', label: 'SQL Query', category: 'Protocolos & Formatos', icon: Database, color: '#0284c7', description: 'Executa comando SQL ANSI (Select, Insert, Update).' },
-  { type: 'mqtt_pub_sub', label: 'MQTT Client', category: 'Protocolos & Formatos', icon: Radio, color: '#10b981', description: 'Publica ou assina tópicos em broker MQTT.' },
-  { type: 'opc_ua_client', label: 'OPC UA Client', category: 'Protocolos & Formatos', icon: Cpu, color: '#0284c7', description: 'Leitura/escrita industrial via protocolo OPC UA.' },
-  { type: 'modbus_tcp', label: 'Modbus TCP', category: 'Protocolos & Formatos', icon: Cpu, color: '#f59e0b', description: 'Comunicação Modbus TCP com inversores/CLPs.' },
-  { type: 'csv_parser', label: 'Leitor CSV', category: 'Protocolos & Formatos', icon: FileSpreadsheet, color: '#10b981', description: 'Converte arquivo CSV em objetos JSON.' },
-  { type: 'excel_parser', label: 'Leitor Excel', category: 'Protocolos & Formatos', icon: FileSpreadsheet, color: '#10b981', description: 'Lê planilhas XLSX / XLS.' },
+  { type: 'rest_api', label: 'REST API', category: 'Protocolos & Formatos', icon: Globe, color: '#3b82f6', description: 'Requisição HTTP GET, POST, PUT, DELETE para API externa.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'sql_query', label: 'SQL Query', category: 'Protocolos & Formatos', icon: Database, color: '#0284c7', description: 'Executa comando SQL ANSI (Select, Insert, Update).', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'mqtt_pub_sub', label: 'MQTT Client', category: 'Protocolos & Formatos', icon: Radio, color: '#10b981', description: 'Publica ou assina tópicos em broker MQTT.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'opc_ua_client', label: 'OPC UA Client', category: 'Protocolos & Formatos', icon: Cpu, color: '#0284c7', description: 'Leitura/escrita industrial via protocolo OPC UA.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'modbus_tcp', label: 'Modbus TCP', category: 'Protocolos & Formatos', icon: Cpu, color: '#f59e0b', description: 'Comunicação Modbus TCP com inversores/CLPs.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'csv_parser', label: 'Leitor CSV', category: 'Protocolos & Formatos', icon: FileSpreadsheet, color: '#10b981', description: 'Converte arquivo CSV em objetos JSON.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+  { type: 'excel_parser', label: 'Leitor Excel', category: 'Protocolos & Formatos', icon: FileSpreadsheet, color: '#10b981', description: 'Lê planilhas XLSX / XLS.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
   { type: 'json_transform', label: 'JSON Transform', category: 'Protocolos & Formatos', icon: FileCode, color: '#6366f1', description: 'Mapeia e transforma payloads JSON.' },
-  { type: 'xml_parser', label: 'Leitor XML', category: 'Protocolos & Formatos', icon: FileCode, color: '#6366f1', description: 'Parser de payloads XML para objetos estruturados.' },
-
+  { type: 'xml_parser', label: 'Leitor XML', category: 'Protocolos & Formatos', icon: FileCode, color: '#6366f1', description: 'Parser de payloads XML para objetos estruturados.', customOutputs: [{ id: 'success', label: 'Sucesso', color: '#10b981' }, { id: 'error', label: 'Erro', color: '#ef4444' }] },
+ 
   // Lógica & Controle
   { type: 'expressions', label: 'Expressões Math', category: 'Lógica & Controle', icon: Code, color: '#8b5cf6', description: 'Avalia expressões matemáticas ou fórmulas complexas.' },
-  { type: 'conditions', label: 'Condição (If/Switch)', category: 'Lógica & Controle', icon: GitBranch, color: '#f59e0b', description: 'Bifurca o fluxo com base em regras lógicas.' },
-  { type: 'loop', label: 'Loop (ForEach)', category: 'Lógica & Controle', icon: Repeat, color: '#8b5cf6', description: 'Itera sobre uma coleção de itens.' },
+  { type: 'conditions', label: 'Condição (If/Switch)', category: 'Lógica & Controle', icon: GitBranch, color: '#f59e0b', description: 'Bifurca o fluxo com base em regras lógicas.', customOutputs: [{ id: 'true', label: 'Verdadeiro', color: '#10b981' }, { id: 'false', label: 'Falso', color: '#ef4444' }] },
+  { type: 'loop', label: 'Loop (ForEach)', category: 'Lógica & Controle', icon: Repeat, color: '#8b5cf6', description: 'Itera sobre uma coleção de itens.', customOutputs: [{ id: 'body', label: 'Item (Loop)', color: '#8b5cf6' }, { id: 'done', label: 'Concluído', color: '#3b82f6' }] },
   { type: 'timer_delay', label: 'Temporizador', category: 'Lógica & Controle', icon: Clock3, color: '#eab308', description: 'Aposta atraso ou agendamento cíclico.' },
   { type: 'local_variable', label: 'Variável Local', category: 'Lógica & Controle', icon: Variable, color: '#64748b', description: 'Guarda valor em memória durante a execução do fluxo.' },
   { type: 'global_variable', label: 'Variável Global', category: 'Lógica & Controle', icon: Variable, color: '#64748b', description: 'Lê ou escreve em variável global do sistema.' },
-
+ 
   // Utilitários
   { type: 'logger', label: 'Logger / Debugger', category: 'Utilitários', icon: Terminal, color: '#64748b', description: 'Imprime mensagem nos logs de monitoramento.' },
   { type: 'notification', label: 'Notificação Push', category: 'Utilitários', icon: Bell, color: '#3b82f6', description: 'Envia alerta para equipe no Teams/Slack/Email.' },
@@ -107,6 +126,8 @@ export const FlowBlockLibrary: React.FC<FlowBlockLibraryProps> = ({
   const [activeTabFilter, setActiveTabFilter] = useState<'all' | 'fav' | 'recent'>('all');
   const [favorites, setFavorites] = useState<string[]>(['read_property', 'sql_query', 'conditions']);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
+    'Entradas & Gatilhos': true,
+    'Respostas & Saídas': true,
     'Operações Industriais': true,
     'Fontes de Dados': true,
     'Lógica & Controle': true,
@@ -156,6 +177,8 @@ export const FlowBlockLibrary: React.FC<FlowBlockLibraryProps> = ({
   });
 
   const categories = [
+    'Entradas & Gatilhos',
+    'Respostas & Saídas',
     'Operações Industriais',
     'Fontes de Dados',
     'Lógica & Controle',

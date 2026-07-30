@@ -81,13 +81,14 @@ export type FlowStatus = 'Draft' | 'Running' | 'Paused' | 'Stopped';
 
 export interface ConnectivityFlowNodeData extends Record<string, unknown> {
   label: string;
-  category: 'Entrada' | 'Transformação' | 'Industrial' | 'Banco de Dados' | 'Comunicação' | 'Utilidades';
+  category: 'Entrada' | 'Transformação' | 'Industrial' | 'Banco de Dados' | 'Comunicação' | 'Utilidades' | 'Saída' | 'Resposta';
   blockType: string;
   iconName: string;
   color: string;
   description: string;
   inputsCount: number;
   outputsCount: number;
+  customOutputs?: { id: string; label: string; color?: string }[];
   properties: Record<string, any>;
 }
 

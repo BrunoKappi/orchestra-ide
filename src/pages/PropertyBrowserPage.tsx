@@ -51,7 +51,7 @@ export const PropertyBrowserPage: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const targetFilter = 'ALL';
   const templateFilter = 'ALL';
-  const [targetTypeFilter, setTargetTypeFilter] = useState<'template' | 'instance' | 'all'>('all');
+  const targetTypeFilter = 'instance' as const;
   
   const [isInheritedFilter, setIsInheritedFilter] = useState<boolean | null>(null);
   const [isOverriddenFilter, setIsOverriddenFilter] = useState<boolean | null>(null);
@@ -75,6 +75,20 @@ export const PropertyBrowserPage: React.FC = () => {
   // Real-time flash effect state
   const [prevValues, setPrevValues] = useState<Record<string, string>>({});
   const [changedProps, setChangedProps] = useState<Record<string, boolean>>({});
+
+  // Custom Dropdown Ref and States
+  const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
+  const groupDropdownRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (groupDropdownRef.current && !groupDropdownRef.current.contains(event.target as Node)) {
+        setIsGroupDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Trigger simulation ticks if active
   useEffect(() => {
@@ -106,7 +120,7 @@ export const PropertyBrowserPage: React.FC = () => {
   // Reset pagination on search change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchText, dataTypeFilter, categoryFilter, targetFilter, templateFilter, targetTypeFilter, isInheritedFilter, isOverriddenFilter, hasAlarmFilter, hasHistoryFilter, isSimulatedFilter, isUsedInScreensFilter]);
+  }, [searchText, dataTypeFilter, categoryFilter, targetFilter, templateFilter, isInheritedFilter, isOverriddenFilter, hasAlarmFilter, hasHistoryFilter, isSimulatedFilter, isUsedInScreensFilter]);
 
   // Execute query against property index
   const getFilteredProperties = (): IndexedProperty[] => {
@@ -366,9 +380,6 @@ export const PropertyBrowserPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <TableProperties className="w-5 h-5 text-sky-500" />
                 <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">Property Explorer</h2>
-                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-full border border-sky-200/50">
-                  {filteredProperties.length} Properties
-                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -385,30 +396,71 @@ export const PropertyBrowserPage: React.FC = () => {
                   <span>Filtros</span>
                 </button>
 
-                <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 p-0.5 text-xs font-medium">
-                  <span className="px-2 text-[10px] text-slate-400">Agrupar por:</span>
-                  <select
-                    value={groupBy}
-                    onChange={(e) => setGroupBy(e.target.value as any)}
-                    className="bg-transparent text-xs text-slate-700 dark:text-slate-200 outline-none pr-1.5 cursor-pointer"
+                <div className="relative" ref={groupDropdownRef}>
+                  <button
+                    onClick={() => setIsGroupDropdownOpen(!isGroupDropdownOpen)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
-                    <option value="none">Nenhum</option>
-                    <option value="object">Objeto</option>
-                    <option value="template">Template</option>
-                  </select>
+                    <span className="text-slate-400 font-medium">Agrupar por:</span>
+                    <span>
+                      {groupBy === 'none' ? 'Nenhum' : groupBy === 'object' ? 'Objeto' : 'Template'}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+
+                  {isGroupDropdownOpen && (
+                    <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg py-1 z-50 text-xs">
+                      <button
+                        onClick={() => {
+                          setGroupBy('none');
+                          setIsGroupDropdownOpen(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors",
+                          groupBy === 'none' ? "font-bold text-sky-600 dark:text-sky-400 bg-sky-50/30 dark:bg-sky-950/20" : "text-slate-700 dark:text-slate-300"
+                        )}
+                      >
+                        Nenhum
+                      </button>
+                      <button
+                        onClick={() => {
+                          setGroupBy('object');
+                          setIsGroupDropdownOpen(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors",
+                          groupBy === 'object' ? "font-bold text-sky-600 dark:text-sky-400 bg-sky-50/30 dark:bg-sky-950/20" : "text-slate-700 dark:text-slate-300"
+                        )}
+                      >
+                        Objeto
+                      </button>
+                      <button
+                        onClick={() => {
+                          setGroupBy('template');
+                          setIsGroupDropdownOpen(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors",
+                          groupBy === 'template' ? "font-bold text-sky-600 dark:text-sky-400 bg-sky-50/30 dark:bg-sky-950/20" : "text-slate-700 dark:text-slate-300"
+                        )}
+                      >
+                        Template
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => handleExport('json')}
-                    className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-855 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 rounded-lg text-xs font-semibold transition-all"
+                    className="flex items-center gap-1 px-2.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>JSON</span>
                   </button>
                   <button
                     onClick={() => handleExport('csv')}
-                    className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 dark:bg-slate-855 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 rounded-lg text-xs font-semibold transition-all"
+                    className="flex items-center gap-1 px-2.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>CSV</span>
@@ -431,14 +483,14 @@ export const PropertyBrowserPage: React.FC = () => {
 
             {/* Advanced Filters Card */}
             {showAdvanced && (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3.5 p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-600 dark:text-slate-400 transition-all">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-600 dark:text-slate-400 transition-all">
                 {/* DataType Filter */}
                 <div className="space-y-1">
                   <label className="font-bold text-[10px] text-slate-400 uppercase">Tipo de Dado</label>
                   <select
                     value={dataTypeFilter}
                     onChange={(e) => setDataTypeFilter(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
                   >
                     <option value="ALL">Todos os Tipos</option>
                     <option value="String">String</option>
@@ -456,26 +508,12 @@ export const PropertyBrowserPage: React.FC = () => {
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
                   >
                     <option value="ALL">Todas as Categorias</option>
                     {categories.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
-                  </select>
-                </div>
-
-                {/* Target Type Filter */}
-                <div className="space-y-1">
-                  <label className="font-bold text-[10px] text-slate-400 uppercase">Contexto</label>
-                  <select
-                    value={targetTypeFilter}
-                    onChange={(e) => setTargetTypeFilter(e.target.value as any)}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
-                  >
-                    <option value="all">Templates & Instâncias</option>
-                    <option value="template">Apenas Templates</option>
-                    <option value="instance">Apenas Instâncias (Objetos)</option>
                   </select>
                 </div>
 
@@ -488,7 +526,7 @@ export const PropertyBrowserPage: React.FC = () => {
                       const val = e.target.value;
                       setIsInheritedFilter(val === 'all' ? null : val === 'inherited');
                     }}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
                   >
                     <option value="all">Todas as Origens</option>
                     <option value="local">Locais (Definidas no Alvo)</option>
@@ -505,7 +543,7 @@ export const PropertyBrowserPage: React.FC = () => {
                       const val = e.target.value;
                       setIsOverriddenFilter(val === 'all' ? null : val === 'overridden');
                     }}
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-lg outline-none cursor-pointer"
                   >
                     <option value="all">Qualquer Status</option>
                     <option value="overridden">Sim, Sobrescritas</option>
@@ -514,7 +552,7 @@ export const PropertyBrowserPage: React.FC = () => {
                 </div>
 
                 {/* Boolean Checks */}
-                <div className="col-span-1 md:col-span-3 lg:col-span-3 flex flex-wrap gap-x-5 gap-y-2.5 items-center pt-2">
+                <div className="col-span-full flex flex-wrap gap-x-5 gap-y-2.5 items-center pt-2">
                   <label className="flex items-center gap-1.5 cursor-pointer font-medium hover:text-slate-850 dark:hover:text-slate-200">
                     <input
                       type="checkbox"

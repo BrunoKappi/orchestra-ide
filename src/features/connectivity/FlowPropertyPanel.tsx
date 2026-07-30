@@ -215,51 +215,281 @@ export const FlowPropertyPanel: React.FC<FlowPropertyPanelProps> = ({
           </h4>
 
           <div className="space-y-3">
-            {/* Tag / OPC Address */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                Endereço Tag / OPC UA Node
-              </label>
-              <input
-                type="text"
-                value={properties.nodeAddress || ''}
-                onChange={(e) => handlePropertyChange('nodeAddress', e.target.value)}
-                placeholder="ns=2;s=Line1.Tanque01.Nivel"
-                className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
-              />
-            </div>
+            {/* HTTP Listener (REST API Entrada) */}
+            {nodeData.blockType === 'http_listener' && (
+              <>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Método HTTP
+                  </label>
+                  <select
+                    value={properties.httpMethod || 'POST'}
+                    onChange={(e) => handlePropertyChange('httpMethod', e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  >
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Rota / Caminho
+                  </label>
+                  <input
+                    type="text"
+                    value={properties.httpPath || ''}
+                    onChange={(e) => handlePropertyChange('httpPath', e.target.value)}
+                    placeholder="/api/v1/webhook"
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Porta do Servidor
+                  </label>
+                  <input
+                    type="number"
+                    value={properties.port || 8080}
+                    onChange={(e) => handlePropertyChange('port', Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                  />
+                </div>
+              </>
+            )}
 
-            {/* SQL Query / Script */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                Instrução SQL / Script Code
-              </label>
-              <textarea
-                rows={4}
-                value={properties.query || properties.scriptCode || ''}
-                onChange={(e) =>
-                  handlePropertyChange(
-                    properties.query !== undefined ? 'query' : 'scriptCode',
-                    e.target.value
-                  )
-                }
-                placeholder="SELECT * FROM Producao WHERE Data = NOW()"
-                className="w-full px-2.5 py-1.5 bg-slate-900 text-emerald-400 border border-slate-700 rounded-lg text-xs font-mono outline-none resize-none"
-              />
-            </div>
+            {/* HTTP Response */}
+            {nodeData.blockType === 'http_response' && (
+              <>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Status Code
+                  </label>
+                  <input
+                    type="number"
+                    value={properties.responseStatus || 200}
+                    onChange={(e) => handlePropertyChange('responseStatus', Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Content Type
+                  </label>
+                  <input
+                    type="text"
+                    value={properties.contentType || 'application/json'}
+                    onChange={(e) => handlePropertyChange('contentType', e.target.value)}
+                    placeholder="application/json"
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Corpo da Resposta (Body)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={properties.responseBody || ''}
+                    onChange={(e) => handlePropertyChange('responseBody', e.target.value)}
+                    placeholder='{"success": true}'
+                    className="w-full px-2.5 py-1.5 bg-slate-900 text-emerald-400 border border-slate-700 rounded-lg text-xs font-mono outline-none resize-none"
+                  />
+                </div>
+              </>
+            )}
 
-            {/* Interval / Refresh ms */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                Intervalo de Polling (ms)
-              </label>
-              <input
-                type="number"
-                value={properties.pollIntervalMs || 1000}
-                onChange={(e) => handlePropertyChange('pollIntervalMs', Number(e.target.value))}
-                className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
-              />
-            </div>
+            {/* OPC UA Subscription */}
+            {nodeData.blockType === 'opc_subscription' && (
+              <>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Endereço Tag / OPC UA Node
+                  </label>
+                  <input
+                    type="text"
+                    value={properties.nodeAddress || ''}
+                    onChange={(e) => handlePropertyChange('nodeAddress', e.target.value)}
+                    placeholder="ns=2;s=Line1.Tanque01.Nivel"
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Intervalo de Polling (ms)
+                  </label>
+                  <input
+                    type="number"
+                    value={properties.pollingRateMs || properties.pollIntervalMs || 500}
+                    onChange={(e) => handlePropertyChange('pollingRateMs', Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* MQTT Blocks */}
+            {(nodeData.blockType === 'mqtt_subscription' || nodeData.blockType === 'mqtt_publish') && (
+              <div>
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                  Tópico MQTT
+                </label>
+                <input
+                  type="text"
+                  value={properties.mqttTopic || ''}
+                  onChange={(e) => handlePropertyChange('mqttTopic', e.target.value)}
+                  placeholder="sensors/temp/telemetry"
+                  className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                />
+              </div>
+            )}
+
+            {/* Cron Trigger */}
+            {nodeData.blockType === 'cron_trigger' && (
+              <>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Expressão Cron
+                  </label>
+                  <input
+                    type="text"
+                    value={properties.cronExpression || '*/5 * * * *'}
+                    onChange={(e) => handlePropertyChange('cronExpression', e.target.value)}
+                    placeholder="*/5 * * * *"
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Intervalo (Segundos)
+                  </label>
+                  <input
+                    type="number"
+                    value={properties.intervalSeconds || 300}
+                    onChange={(e) => handlePropertyChange('intervalSeconds', Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Variable Change Trigger */}
+            {nodeData.blockType === 'variable_change_trigger' && (
+              <>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Variável Alvo
+                  </label>
+                  <input
+                    type="text"
+                    value={properties.targetVariable || ''}
+                    onChange={(e) => handlePropertyChange('targetVariable', e.target.value)}
+                    placeholder="VAR_GLOBAL_PRODUCAO"
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Banda Morta (Deadband)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={properties.deadband || 0.1}
+                    onChange={(e) => handlePropertyChange('deadband', Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* End Flow */}
+            {nodeData.blockType === 'end_flow' && (
+              <>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Código de Saída
+                  </label>
+                  <input
+                    type="number"
+                    value={properties.exitCode || 0}
+                    onChange={(e) => handlePropertyChange('exitCode', Number(e.target.value))}
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                    Motivo / Mensagem
+                  </label>
+                  <input
+                    type="text"
+                    value={properties.exitReason || ''}
+                    onChange={(e) => handlePropertyChange('exitReason', e.target.value)}
+                    placeholder="Fluxo encerrado"
+                    className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Fallback to original layout for default blocks */}
+            {!['http_listener', 'http_response', 'opc_subscription', 'mqtt_subscription', 'mqtt_publish', 'cron_trigger', 'variable_change_trigger', 'end_flow'].includes(nodeData.blockType) && (
+              <>
+                {/* Tag / OPC Address */}
+                {(properties.nodeAddress !== undefined || nodeData.blockType.includes('opc') || nodeData.blockType.includes('property')) && (
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                      Endereço Tag / OPC UA Node
+                    </label>
+                    <input
+                      type="text"
+                      value={properties.nodeAddress || ''}
+                      onChange={(e) => handlePropertyChange('nodeAddress', e.target.value)}
+                      placeholder="ns=2;s=Line1.Tanque01.Nivel"
+                      className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100"
+                    />
+                  </div>
+                )}
+
+                {/* SQL Query / Script */}
+                {(properties.query !== undefined || properties.scriptCode !== undefined || nodeData.blockType === 'sql_query' || nodeData.blockType === 'execute_script') && (
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                      Instrução SQL / Script Code
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={properties.query || properties.scriptCode || ''}
+                      onChange={(e) =>
+                        handlePropertyChange(
+                          properties.query !== undefined ? 'query' : 'scriptCode',
+                          e.target.value
+                        )
+                      }
+                      placeholder="SELECT * FROM Producao WHERE Data = NOW()"
+                      className="w-full px-2.5 py-1.5 bg-slate-900 text-emerald-400 border border-slate-700 rounded-lg text-xs font-mono outline-none resize-none"
+                    />
+                  </div>
+                )}
+
+                {/* Interval / Refresh ms */}
+                {(properties.pollIntervalMs !== undefined || properties.pollingRateMs !== undefined) && (
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">
+                      Intervalo de Polling (ms)
+                    </label>
+                    <input
+                      type="number"
+                      value={properties.pollIntervalMs || properties.pollingRateMs || 1000}
+                      onChange={(e) => handlePropertyChange(properties.pollIntervalMs !== undefined ? 'pollIntervalMs' : 'pollingRateMs', Number(e.target.value))}
+                      className="w-full px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-800 dark:text-slate-100 font-mono"
+                    />
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
