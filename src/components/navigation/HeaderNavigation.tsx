@@ -22,6 +22,7 @@ import {
   Network,
   Shield,
   Sparkles,
+  LayoutGrid,
 } from "lucide-react";
 
 import { useSecurityStore } from "../../store/useSecurityStore";
@@ -190,6 +191,14 @@ export const HeaderNavigation = () => {
       colorClass: "text-sky-500",
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
+    {
+      to: "/grid-dashboard",
+      label: "Grid Designer",
+      icon: LayoutGrid,
+      colorClass: "text-amber-500",
+      activeTextClass: "text-amber-600 dark:text-amber-400",
+      badge: "PoC",
+    },
   ];
 
   const currentPath = location.pathname;
@@ -275,7 +284,7 @@ export const HeaderNavigation = () => {
         <div ref={dropdownRef} className="relative z-50">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[180px] bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/70 dark:hover:bg-slate-700/80 rounded-lg border border-slate-200/80 dark:border-slate-700/50 text-xs font-semibold text-slate-700 dark:text-slate-250 transition-all select-none cursor-pointer">
+            className="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[180px] bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/70 dark:hover:bg-slate-700/80 rounded-lg border border-slate-200/80 dark:border-slate-700/50 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all select-none cursor-pointer">
             <div className="flex items-center gap-2">
               <activeItem.icon
                 className={cn(
