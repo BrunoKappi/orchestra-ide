@@ -25,13 +25,25 @@ export class DeploymentRepository {
   }
 
   public deleteFolder(id: string): void {
-    let all = this.getFolders();
-    all = all.filter((f) => f.id !== id);
-    localStorage.setItem(STORAGE_KEYS.DEPLOYMENT_FOLDERS, JSON.stringify(all));
-
-    // Also remove deployment nodes referencing this folder or inside this folder
+    let folders = this.getFolders();
     let nodes = this.getNodes();
-    nodes = nodes.filter((n) => n.targetId !== id && n.parentFolderId !== id);
+
+    const folderIdsToDelete = new Set<string>([id]);
+    let addedAny = true;
+    while (addedAny) {
+      addedAny = false;
+      for (const f of folders) {
+        if (f.parentFolderId && folderIdsToDelete.has(f.parentFolderId) && !folderIdsToDelete.has(f.id)) {
+          folderIdsToDelete.add(f.id);
+          addedAny = true;
+        }
+      }
+    }
+
+    folders = folders.filter((f) => !folderIdsToDelete.has(f.id));
+    localStorage.setItem(STORAGE_KEYS.DEPLOYMENT_FOLDERS, JSON.stringify(folders));
+
+    nodes = nodes.filter((n) => !folderIdsToDelete.has(n.targetId) && (!n.parentFolderId || !folderIdsToDelete.has(n.parentFolderId)));
     localStorage.setItem(STORAGE_KEYS.DEPLOYMENT_NODES, JSON.stringify(nodes));
   }
 

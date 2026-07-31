@@ -161,7 +161,11 @@ export const DeploymentTree: React.FC = () => {
       icon: <Trash2 className="w-3.5 h-3.5 text-rose-500" />,
       danger: true,
       divider: true,
-      action: () => deleteDeploymentFolder(node.targetId),
+      action: () => {
+        if (confirm(`Tem certeza que deseja excluir a pasta "${node.name}" e todo seu conteúdo?`)) {
+          deleteDeploymentFolder(node.targetId);
+        }
+      },
     },
   ];
 
@@ -333,9 +337,23 @@ export const DeploymentTree: React.FC = () => {
             <span className="truncate flex-1">{node.name}</span>
           )}
 
-          <span className="opacity-0 group-hover:opacity-70 text-[10px] text-slate-400 font-normal shrink-0">
+          <span className="opacity-0 group-hover:opacity-70 text-[10px] text-slate-400 font-normal shrink-0 group-hover:hidden mr-1">
             {node.children.length}
           </span>
+
+          {/* Delete action button on hover */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (confirm(`Tem certeza que deseja excluir a pasta "${node.name}" e todo seu conteúdo?`)) {
+                deleteDeploymentFolder(node.targetId);
+              }
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-rose-500 hover:bg-rose-500/10 dark:hover:bg-rose-500/20 shrink-0 transition-opacity"
+            title="Excluir Pasta"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         {isExpanded && (
