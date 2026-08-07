@@ -18,6 +18,9 @@ import type {
   AlarmEvent,
   PropertyAlarmConfig,
   PropertyHistoryConfig,
+  ProductEntity,
+  AreaEntity,
+  EquipmentGraphicConfig,
 } from '../types/domain';
 import { templateRepo } from '../repository/TemplateRepository';
 import { objectRepo } from '../repository/ObjectRepository';
@@ -35,22 +38,24 @@ import { widgetFolderRepo } from '../repository/WidgetFolderRepository';
 import { inheritanceService } from '../services/InheritanceService';
 import { exportImportService } from '../services/ExportImportService';
 import { seedService } from '../services/SeedService';
-import { mockSeedService } from '../services/MockSeedService';
-import { mockSimulationService } from '../services/MockSimulationService';
+import { simulationEngine } from '../services/simulationEngine';
 import { AlarmEngine } from '../services/AlarmEngine';
 import { historyEngine } from '../services/HistoryEngine';
 import { propertyBrowserService } from '../services/PropertyBrowserService';
 import { STORAGE_KEYS } from '../repository/storageKey';
 import type { ActiveEventState } from '../types/event';
-import { EventEngine } from '../services/EventEngine';
 import { useOpcStore } from './useOpcStore';
 
 interface ObjectModelStoreState {
   // Navigation & Theme
   activeSidebarTab: 'derivation' | 'deployment';
-  activeEditorTab: 'properties' | 'scripts' | 'graphics' | 'flows';
+  activeEditorTab: 'properties' | 'graphics';
   theme: 'light' | 'dark';
   searchQuery: string;
+  products: ProductEntity[];
+  areas: AreaEntity[];
+  movements: any[];
+  saveEquipmentGraphicConfig: (id: string, type: EntityType, config: EquipmentGraphicConfig) => void;
 
   // Active selection
   selectedEntity: { id: string; type: EntityType } | null;
@@ -103,7 +108,7 @@ interface ObjectModelStoreState {
   // Actions
   init: () => void;
   setActiveSidebarTab: (tab: 'derivation' | 'deployment') => void;
-  setActiveEditorTab: (tab: 'properties' | 'scripts' | 'graphics' | 'flows') => void;
+  setActiveEditorTab: (tab: 'properties' | 'graphics') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
   setSearchQuery: (query: string) => void;
@@ -181,6 +186,8 @@ interface ObjectModelStoreState {
   closeHistoryConfigModal: () => void;
   saveHistoryConfig: (propertyName: string, config: PropertyHistoryConfig, targetId?: string, targetType?: EntityType) => void;
 
+  isInitialized: boolean;
+
   // System
   resetAllData: () => void;
   resetMockData: () => void;
@@ -190,6 +197,8 @@ interface ObjectModelStoreState {
 
 export const useObjectModelStore = create<ObjectModelStoreState>()(
   immer((set, get) => ({
+    isInitialized: false,
+
     activeSidebarTab: 'derivation',
     activeEditorTab: 'properties',
     theme: 'light',
@@ -233,27 +242,25 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     isHistoryConfigModalOpen: false,
     editingHistoryProperty: null,
 
+    products: [],
+    areas: [],
+    movements: [],
 
     init: () => {
+      if (get().isInitialized) {
+        get().refreshData();
+        return;
+      }
       seedService.seedInitialDataIfNeeded();
       historyEngine.init();
+      simulationEngine.start(10);
+      simulationEngine.subscribe(() => {
+        get().refreshData();
+      });
+
       get().refreshData();
 
-      // Load stored simulator settings from localStorage
-      try {
-        const storedSettings = localStorage.getItem(STORAGE_KEYS.SIMULATOR_SETTINGS);
-        if (storedSettings) {
-          const parsed = JSON.parse(storedSettings);
-          set((state) => {
-            if (typeof parsed.isSimulating === 'boolean') state.isSimulating = parsed.isSimulating;
-            if (typeof parsed.simulationSpeedMs === 'number') state.simulationSpeedMs = parsed.simulationSpeedMs;
-          });
-        }
-      } catch (err) {
-        console.error('Failed to load stored simulator settings:', err);
-      }
-
-      // Auto-select Tank101 or first available template
+      // Auto-select TK-301 or first available object
       const objects = objectRepo.getAll();
       const templates = templateRepo.getAll();
       if (objects.length > 0) {
@@ -261,6 +268,10 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       } else if (templates.length > 0) {
         get().selectEntity(templates[0].id, 'template');
       }
+
+      set((state) => {
+        state.isInitialized = true;
+      });
     },
 
     setActiveSidebarTab: (tab) => set((state) => { state.activeSidebarTab = tab; }),
@@ -269,6 +280,23 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     toggleTheme: () => set((state) => { state.theme = state.theme === 'light' ? 'dark' : 'light'; }),
     setSearchQuery: (query) => set((state) => { state.searchQuery = query; }),
 
+    saveEquipmentGraphicConfig: (id: string, type: EntityType, config: EquipmentGraphicConfig) => {
+      if (type === 'template') {
+        const tpl = templateRepo.getById(id);
+        if (tpl) {
+          tpl.graphicConfig = config;
+          templateRepo.save(tpl);
+        }
+      } else {
+        const obj = objectRepo.getById(id);
+        if (obj) {
+          obj.graphicConfig = config;
+          objectRepo.save(obj);
+        }
+      }
+      get().refreshData();
+    },
+
     refreshData: () => {
       const templates = templateRepo.getAll();
       const objects = objectRepo.getAll();
@@ -276,9 +304,12 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       const nodes = deploymentRepo.getNodes();
       const alarmEvents = alarmRepo.getAll();
 
-      const screens = screenRepo.getAll();
-      const associatedWidgets = associatedWidgetRepo.getAll();
-      const mockConfigs = mockConfigRepo.getAll();
+      const rawProds = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+      const products = rawProds ? JSON.parse(rawProds) : [];
+      const rawAreas = localStorage.getItem(STORAGE_KEYS.AREAS);
+      const areas = rawAreas ? JSON.parse(rawAreas) : [];
+      const rawMovs = localStorage.getItem(STORAGE_KEYS.MOVEMENTS);
+      const movements = rawMovs ? JSON.parse(rawMovs) : [];
 
       set((state) => {
         state.templates = templates;
@@ -286,22 +317,25 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         state.deploymentFolders = folders;
         state.deploymentNodes = nodes;
         state.alarmEvents = alarmEvents;
-        state.activeEvents = EventEngine.getActiveStates();
+        state.products = products;
+        state.areas = areas;
+        state.movements = movements;
 
         // Ensure all properties of all objects are initialized in simulatedValues
         objects.forEach((obj) => {
           const props = inheritanceService.getMergedProperties(obj.id, 'instance');
           props.forEach((prop) => {
             const key = `${obj.id}:${prop.name}`;
-            if (state.simulatedValues[key] === undefined) {
-              state.simulatedValues[key] = prop.defaultValue;
-            }
+            state.simulatedValues[key] = prop.defaultValue;
           });
         });
       });
 
       // Rebuild the Property Browser's index
       try {
+        const screens = screenRepo.getAll();
+        const associatedWidgets = associatedWidgetRepo.getAll();
+        const mockConfigs = mockConfigRepo.getAll();
         propertyBrowserService.rebuildIndex(
           templates,
           objects,
@@ -454,7 +488,6 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         if (!isDeployed) return; // Skip undeployed objects — they do not run in runtime
 
         const props = inheritanceService.getMergedProperties(obj.id, 'instance');
-        const mockConfigs = inheritanceService.getMergedMockConfigs(obj.id, 'instance', props);
 
         props.forEach((prop) => {
           const key = `${obj.id}:${prop.name}`;
@@ -487,69 +520,23 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
             }
           }
 
-          const mockConfig = mockConfigs.find((c) => c.propertyName === prop.name);
-
-          if (mockConfig && mockConfig.enabled) {
-            const currentVal = simulatedValues[key] ?? prop.defaultValue;
-            const newVal = mockSimulationService.generateSimulatedValue(
-              mockConfig,
-              nextTick,
-              currentVal
-            );
-            nextValues[key] = newVal;
-
-            // Maintain backwards compatibility for single selected entity
-            if (selectedEntity?.id === obj.id) {
-              nextValues[prop.name] = newVal;
-            }
-
-            const num = parseFloat(newVal);
-            if (!isNaN(num)) {
-              const histKey = key;
-              const hist = nextHistory[histKey] ? [...nextHistory[histKey]] : [];
-              hist.push(num);
-              if (hist.length > 15) hist.shift();
-              nextHistory[histKey] = hist;
-
-              if (selectedEntity?.id === obj.id) {
-                nextHistory[prop.name] = hist;
-              }
-            }
-
-            // Record in HistoryEngine if enabled
-            if (prop.historyConfig?.enabled) {
-              historyEngine.record(obj.id, prop.id, newVal, prop.historyConfig, 'simulation');
-            }
-          } else {
-            if (nextValues[key] === undefined) {
-              nextValues[key] = prop.defaultValue;
-            }
-            // Maintain backwards compatibility for single selected entity
-            if (selectedEntity?.id === obj.id) {
-              nextValues[prop.name] = nextValues[key];
-            }
+          if (nextValues[key] === undefined) {
+            nextValues[key] = prop.defaultValue;
+          }
+          if (selectedEntity?.id === obj.id) {
+            nextValues[prop.name] = nextValues[key];
           }
         });
       });
 
-      // Evaluate alarms
-      AlarmEngine.evaluate(nextValues, objects, inheritanceService.getMergedProperties.bind(inheritanceService));
       const alarmEvents = alarmRepo.getAll();
-
-      const activeEvents = EventEngine.evaluate(
-        nextValues,
-        objects,
-        alarmEvents,
-        nextTick,
-        get().simulationSpeedMs
-      );
 
       set((state) => {
         state.simulationTickCount = nextTick;
         state.simulatedValues = nextValues;
         state.historyValues = nextHistory;
         state.alarmEvents = alarmEvents;
-        state.activeEvents = activeEvents;
+        state.activeEvents = [];
       });
     },
 
@@ -683,29 +670,13 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         // Re-evaluate alarms instantly on manual update
         AlarmEngine.evaluate(state.simulatedValues, state.objects, inheritanceService.getMergedProperties.bind(inheritanceService));
         state.alarmEvents = alarmRepo.getAll();
-
-        const activeEvents = EventEngine.evaluate(
-          state.simulatedValues,
-          state.objects,
-          state.alarmEvents,
-          state.simulationTickCount,
-          state.simulationSpeedMs
-        );
-        state.activeEvents = activeEvents;
+        state.activeEvents = [];
       });
     },
 
     evaluateEvents: () => {
-      const { simulatedValues, objects, alarmEvents, simulationTickCount, simulationSpeedMs } = get();
-      const activeEvents = EventEngine.evaluate(
-        simulatedValues,
-        objects,
-        alarmEvents,
-        simulationTickCount,
-        simulationSpeedMs
-      );
       set((state) => {
-        state.activeEvents = activeEvents;
+        state.activeEvents = [];
       });
     },
 
@@ -1359,7 +1330,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     },
 
     resetMockData: () => {
-      mockSeedService.seedMockData();
+      seedService.seedInitialDataIfNeeded(true);
       get().init();
     },
 

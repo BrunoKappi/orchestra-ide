@@ -4,18 +4,13 @@ import {
   Box,
   Edit2,
   ListFilter,
-  Code,
   Layers,
-  Workflow,
   Trash2,
 } from "lucide-react";
 import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { PropertiesTable } from "./PropertiesTable";
-import { ScriptsEditor } from "./ScriptsEditor";
-import { AssociatedWidgetsEditor } from "./AssociatedWidgetsEditor";
-import { TemplateFlowsEditor } from "./TemplateFlowsEditor";
+import { EquipmentGraphicConfigEditor } from "./EquipmentGraphicConfigEditor";
 import { PropertyModal } from "./PropertyModal";
-import { ScriptModal } from "./ScriptModal";
 import { ExportImportModal } from "./ExportImportModal";
 import { MockConfigModal } from "./MockConfigModal";
 import { AlarmConfigModal } from "./AlarmConfigModal";
@@ -233,49 +228,25 @@ export const CentralEditor: React.FC = () => {
         <button
           onClick={() => setActiveEditorTab("properties")}
           className={cn(
-            "flex items-center gap-2 py-3 px-3 border-b-2 font-semibold transition-colors duration-150",
+            "flex items-center gap-2 py-3 px-4 border-b-2 font-semibold transition-colors duration-150 cursor-pointer",
             activeEditorTab === "properties"
-              ? "border-sky-600 text-sky-600 dark:text-sky-400"
+              ? "border-sky-600 text-sky-600 dark:text-sky-400 bg-white dark:bg-slate-900"
               : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
           )}>
-          <ListFilter className="w-4 h-4" />
-          <span>Properties</span>
-        </button>
-
-        <button
-          onClick={() => setActiveEditorTab("scripts")}
-          className={cn(
-            "flex items-center gap-2 py-3 px-3 border-b-2 font-semibold transition-colors duration-150",
-            activeEditorTab === "scripts"
-              ? "border-sky-600 text-sky-600 dark:text-sky-400"
-              : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
-          )}>
-          <Code className="w-4 h-4" />
-          <span>Scripts</span>
+          <ListFilter className="w-4 h-4 text-sky-500" />
+          <span>Propriedades</span>
         </button>
 
         <button
           onClick={() => setActiveEditorTab("graphics")}
           className={cn(
-            "flex items-center gap-2 py-3 px-3 border-b-2 font-semibold transition-colors duration-150",
+            "flex items-center gap-2 py-3 px-4 border-b-2 font-semibold transition-colors duration-150 cursor-pointer",
             activeEditorTab === "graphics"
-              ? "border-sky-600 text-sky-600 dark:text-sky-400"
+              ? "border-sky-600 text-sky-600 dark:text-sky-400 bg-white dark:bg-slate-900"
               : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
           )}>
-          <Layers className="w-4 h-4" />
-          <span>Graphics</span>
-        </button>
-
-        <button
-          onClick={() => setActiveEditorTab("flows")}
-          className={cn(
-            "flex items-center gap-2 py-3 px-3 border-b-2 font-semibold transition-colors duration-150",
-            activeEditorTab === "flows"
-              ? "border-sky-600 text-sky-600 dark:text-sky-400"
-              : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
-          )}>
-          <Workflow className="w-4 h-4 text-sky-500" />
-          <span>Flows</span>
+          <Layers className="w-4 h-4 text-amber-500" />
+          <span>Gráfico do Equipamento</span>
         </button>
       </div>
 
@@ -283,18 +254,13 @@ export const CentralEditor: React.FC = () => {
       <div className="flex-1 overflow-hidden flex flex-col bg-slate-50/30 dark:bg-slate-950">
         {activeEditorTab === "properties" ? (
           <PropertiesTable />
-        ) : activeEditorTab === "scripts" ? (
-          <ScriptsEditor />
-        ) : activeEditorTab === "graphics" ? (
-          <AssociatedWidgetsEditor />
         ) : (
-          <TemplateFlowsEditor />
+          <EquipmentGraphicConfigEditor />
         )}
       </div>
 
       {/* Modals */}
       <PropertyModal />
-      <ScriptModal />
       <ExportImportModal />
       <MockConfigModal />
       <AlarmConfigModal />

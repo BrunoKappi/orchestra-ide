@@ -6,17 +6,11 @@ import { SimulatorPage } from './pages/SimulatorPage';
 import { ScreenDesignerPage } from './pages/ScreenDesignerPage';
 import { ScreenRuntimePage } from './pages/ScreenRuntimePage';
 import { RuntimePage } from './pages/RuntimePage';
-import { DatabasePage } from './pages/DatabasePage';
 import { AlarmViewerPage } from './pages/AlarmViewerPage';
 import { HistorianPage } from './pages/HistorianPage';
-import { PropertyBrowserPage } from './pages/PropertyBrowserPage';
-import { FlowsPage } from './pages/FlowsPage';
 import { FlowsV2Page } from './pages/FlowsV2Page';
-import { FlowDesignerModal } from './features/flow-designer/FlowDesignerModal';
 import { FlowV2EditorModal } from './features/flow-v2/components/FlowV2EditorModal';
 import { OmmPage } from './pages/OmmPage';
-import { KpiDashboardPage } from './pages/KpiDashboardPage';
-import { EventEnginePage } from './pages/EventEnginePage';
 import { OpcBrowserPage } from './pages/OpcBrowserPage';
 import { SecurityPage } from './pages/SecurityPage';
 import { ConnectivityStudioPage } from './pages/ConnectivityStudioPage';
@@ -52,14 +46,11 @@ export function App() {
     if (path === '/' || path === '/orchestra') {
       title = 'Orquestra IDE - Serrano';
       emoji = '⚙️';
-    } else if (path === '/properties') {
-      title = 'Property Browser - Serrano';
-      emoji = '🔍';
     } else if (path === '/widgets') {
       title = 'Widgets - Serrano';
       emoji = '🎨';
-    } else if (path === '/flows' || path === '/fluxos') {
-      title = 'Flow Designer - Serrano';
+    } else if (path === '/flows' || path === '/fluxos' || path === '/flows-v2' || path === '/fluxogramas') {
+      title = 'Fluxogramas - Serrano';
       emoji = '🔀';
     } else if (path === '/simulator' || path === '/simulador') {
       title = 'Simulador - Serrano';
@@ -76,15 +67,9 @@ export function App() {
     } else if (path === '/alarms') {
       title = 'Alarmes - Serrano';
       emoji = '🔔';
-    } else if (path === '/database') {
-      title = 'Banco de Dados - Serrano';
-      emoji = '🛢️';
     } else if (path === '/historian') {
       title = 'Historian - Serrano';
       emoji = '📈';
-    } else if (path === '/kpi-dashboard') {
-      title = 'KPI Dashboard - Serrano';
-      emoji = '📊';
     } else if (path.startsWith('/omm')) {
       title = 'OMM - Order Movement Manager';
       emoji = '🔄';
@@ -98,7 +83,7 @@ export function App() {
       title = 'Connectivity Studio - Serrano';
       emoji = '🔌';
     } else if (path === '/grid-dashboard' || path === '/grid-designer') {
-      title = 'Grid Dashboard Designer - Serrano';
+      title = 'Grid Designer - Serrano';
       emoji = '📐';
     }
 
@@ -111,22 +96,18 @@ export function App() {
       <Routes>
         <Route path="/" element={<OrchestraPage />} />
         <Route path="/orchestra" element={<OrchestraPage />} />
-        <Route path="/properties" element={<PropertyBrowserPage />} />
         <Route path="/widgets" element={<WidgetsPage />} />
-        <Route path="/flows" element={<FlowsPage />} />
-        <Route path="/fluxos" element={<FlowsPage />} />
+        <Route path="/flows" element={<FlowsV2Page />} />
+        <Route path="/fluxos" element={<FlowsV2Page />} />
         <Route path="/flows-v2" element={<FlowsV2Page />} />
-        <Route path="/fluxogramas-2" element={<FlowsV2Page />} />
+        <Route path="/fluxogramas" element={<FlowsV2Page />} />
         <Route path="/simulator" element={<SimulatorPage />} />
         <Route path="/simulador" element={<SimulatorPage />} />
         <Route path="/screens" element={<ScreenDesignerPage />} />
         <Route path="/screen/:id" element={<ScreenRuntimePage />} />
         <Route path="/runtime" element={<RuntimePage />} />
         <Route path="/alarms" element={<AlarmViewerPage />} />
-        <Route path="/database" element={<DatabasePage />} />
         <Route path="/historian" element={<HistorianPage />} />
-        <Route path="/kpi-dashboard" element={<KpiDashboardPage />} />
-        <Route path="/events" element={<EventEnginePage />} />
         <Route path="/omm" element={<OmmPage />} />
         <Route path="/omm/*" element={<OmmPage />} />
         <Route path="/opc-browser" element={<OpcBrowserPage />} />
@@ -136,7 +117,6 @@ export function App() {
         <Route path="/grid-designer" element={<GridDashboardPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <FlowDesignerModal />
       <FlowV2EditorModal />
     </>
   );

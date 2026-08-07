@@ -1,10 +1,11 @@
 import type { PropertyEntity } from '../types/domain';
 import { STORAGE_KEYS } from './storageKey';
+import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 
 export class PropertyRepository {
   public getAll(): PropertyEntity[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.PROPERTIES);
+      const data = safeGetItem(STORAGE_KEYS.PROPERTIES);
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -29,7 +30,7 @@ export class PropertyRepository {
     } else {
       all.push(property);
     }
-    localStorage.setItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
     return property;
   }
 
@@ -37,18 +38,18 @@ export class PropertyRepository {
     let all = this.getAll();
     const initialLen = all.length;
     all = all.filter((p) => p.id !== id);
-    localStorage.setItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
     return all.length < initialLen;
   }
 
   public deleteByTargetId(targetId: string): void {
     let all = this.getAll();
     all = all.filter((p) => p.targetId !== targetId);
-    localStorage.setItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
   }
 
   public saveAll(properties: PropertyEntity[]): void {
-    localStorage.setItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(properties));
+    safeSetItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(properties));
   }
 }
 

@@ -3,7 +3,6 @@ import { useOmmStore } from '../store/useOmmStore';
 import { OmmKpiHeader } from './layout/OmmKpiHeader';
 import { OmmToolbar } from './layout/OmmToolbar';
 import { MovementTable } from './table/MovementTable';
-import { DetailPanel } from './detail/DetailPanel';
 import { PlantOverview } from './views/PlantOverview';
 import { MovementTimeline } from './views/MovementTimeline';
 import { InventoryDashboard } from './views/InventoryDashboard';
@@ -11,8 +10,9 @@ import { CutoffHistory } from './views/CutoffHistory';
 import { AdminPanel } from './admin/AdminPanel';
 import { ArrowLeftRight, Zap } from 'lucide-react';
 import { OrderDialog } from './ui/OrderDialog';
-import { MovementDialog } from './ui/MovementDialog';
+import { MovementModal } from './ui/MovementModal';
 import { SimulatorModal } from './ui/SimulatorModal';
+import { TankTelemetryModal } from './ui/TankTelemetryModal';
 
 // ---------------------------------------------------------------------------
 // View tab bar
@@ -33,17 +33,16 @@ export const OmmLayout: React.FC = () => {
   const init = useOmmStore((s) => s.init);
   const activeView = useOmmStore((s) => s.activeView);
   const setActiveView = useOmmStore((s) => s.setActiveView);
-  const isDetailPanelOpen = useOmmStore((s) => s.isDetailPanelOpen);
   const isSimulatorModalOpen = useOmmStore((s) => s.isSimulatorModalOpen);
   const openSimulatorModal = useOmmStore((s) => s.openSimulatorModal);
   const closeSimulatorModal = useOmmStore((s) => s.closeSimulatorModal);
   const simulatorState = useOmmStore((s) => s.simulatorState);
 
+  const telemetryTankId = useOmmStore((s) => s.telemetryTankId);
+  const closeTelemetryModal = useOmmStore((s) => s.closeTelemetryModal);
+
   useEffect(() => {
     init();
-    return () => {
-      // Engine continues running in background across navigation
-    };
   }, [init]);
 
   const renderMainContent = () => {
@@ -56,7 +55,6 @@ export const OmmLayout: React.FC = () => {
       default:          return (
         <div className="flex flex-1 overflow-hidden">
           <MovementTable />
-          {isDetailPanelOpen && <DetailPanel />}
         </div>
       );
     }
@@ -96,28 +94,23 @@ export const OmmLayout: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Simulator button */}
           <button
             onClick={openSimulatorModal}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer border ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border ${
               simulatorState.isRunning
-                ? 'bg-sky-900/20 border-sky-500/30 text-sky-400 hover:bg-sky-900/40'
+                ? 'bg-slate-100 border-slate-350 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:border-slate-650 dark:text-slate-100 dark:hover:bg-slate-700 shadow-sm'
                 : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
             }`}
           >
-            <Zap className={`w-3.5 h-3.5 ${simulatorState.isRunning ? 'animate-pulse text-sky-400' : ''}`} />
+            <Zap className={`w-3.5 h-3.5 ${simulatorState.isRunning ? 'animate-pulse text-amber-500 dark:text-amber-400' : 'text-slate-450 dark:text-slate-400'}`} />
             <span>Simulador</span>
             {simulatorState.isRunning && (
               <span className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                <span className="text-[9px] font-bold bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded-md">{simulatorState.speedMultiplier}x</span>
+                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-[9px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-1 py-0.2 rounded">{simulatorState.speedMultiplier}x</span>
               </span>
             )}
           </button>
-
-          <div className="text-[10px] text-slate-400 font-mono">
-            Orquestra OMM v1.0 · PoC MES
-          </div>
         </div>
       </div>
 
@@ -134,8 +127,9 @@ export const OmmLayout: React.FC = () => {
 
       {/* Dialog Modals */}
       <OrderDialog />
-      <MovementDialog />
+      <MovementModal />
       <SimulatorModal isOpen={isSimulatorModalOpen} onClose={closeSimulatorModal} />
+      <TankTelemetryModal isOpen={!!telemetryTankId} objectId={telemetryTankId} onClose={closeTelemetryModal} />
     </div>
   );
 };

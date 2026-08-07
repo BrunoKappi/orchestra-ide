@@ -1,23 +1,14 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { useOmmStore } from "../../store/useOmmStore";
 import type { OmmStatus } from "../../types";
 import {
   Plus,
-  Copy,
   Play,
   CheckCircle2,
   Lock,
   XCircle,
-  Zap,
-  Upload,
-  RefreshCw,
-  Settings,
-  Filter,
   Search,
-  ChevronDown,
-  Pause,
   Layers,
-  Edit3,
 } from "lucide-react";
 
 interface ToolbarButtonProps {
@@ -67,43 +58,14 @@ const Separator = () => (
   <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 shrink-0" />
 );
 
-interface GroupByOption {
-  value: string | null;
-  label: string;
-}
-
-const GROUP_BY_OPTIONS: GroupByOption[] = [
-  { value: null, label: "Sem agrupamento" },
-  { value: "areaName", label: "Por Área" },
-  { value: "productName", label: "Por Produto" },
-  { value: "status", label: "Por Status" },
-  { value: "type", label: "Por Tipo" },
-  { value: "operatorName", label: "Por Operador" },
-  { value: "priority", label: "Por Prioridade" },
-  { value: "orderNumber", label: "Por Ordem" },
-  { value: "originTag", label: "Por Origem" },
-  { value: "destinationTag", label: "Por Destino" },
-];
-
 export const OmmToolbar: React.FC = () => {
   const selectedMovementId = useOmmStore((s) => s.selectedMovementId);
-  const tableGroupBy = useOmmStore((s) => s.tableGroupBy);
-  const simulatorState = useOmmStore((s) => s.simulatorState);
   const globalSearch = useOmmStore((s) => s.globalSearch);
 
   const setGlobalSearch = useOmmStore((s) => s.setGlobalSearch);
-  const setTableGroupBy = useOmmStore((s) => s.setTableGroupBy);
-  const openSimulatorModal = useOmmStore((s) => s.openSimulatorModal);
   const changeMovementStatus = useOmmStore((s) => s.changeMovementStatus);
-  const duplicateMovement = useOmmStore((s) => s.duplicateMovement);
-  const refresh = useOmmStore((s) => s.refresh);
-  const setActiveView = useOmmStore((s) => s.setActiveView);
   const openOrderDialog = useOmmStore((s) => s.openOrderDialog);
-  const openMovementDialog = useOmmStore((s) => s.openMovementDialog);
-
-  const [groupByOpen, setGroupByOpen] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const openMovementModal = useOmmStore((s) => s.openMovementModal);
 
   const selectedMovement = useOmmStore(
     (s) => s.movements.find((m) => m.id === selectedMovementId) ?? null,
@@ -113,39 +75,12 @@ export const OmmToolbar: React.FC = () => {
     if (selectedMovementId) changeMovementStatus(selectedMovementId, status);
   };
 
-  const handleImportJson = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const data = JSON.parse(ev.target?.result as string);
-        const store = useOmmStore.getState();
-        if (Array.isArray(data.movements)) {
-          data.movements.forEach((m: any) => store.updateMovement(m.id, m));
-        }
-        if (Array.isArray(data.orders)) {
-          data.orders.forEach((o: any) => store.updateOrder(o.id, o));
-        }
-        store.refresh();
-      } catch {
-        setImportError("Arquivo JSON inválido");
-        setTimeout(() => setImportError(null), 3000);
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = "";
-  };
-
   const canActivate = selectedMovement?.status === "Issued";
   const canComplete = selectedMovement?.status === "Active";
   const canClose = selectedMovement?.status === "Completed";
   const canCancel =
     selectedMovement?.status === "Issued" ||
     selectedMovement?.status === "Active";
-
-  const currentGroupLabel =
-    GROUP_BY_OPTIONS.find((o) => o.value === tableGroupBy)?.label ?? "Agrupar";
 
   return (
     <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shrink-0 overflow-x-auto">
@@ -173,27 +108,7 @@ export const OmmToolbar: React.FC = () => {
       <ToolbarButton
         icon={<Layers className="w-3.5 h-3.5" />}
         label="Novo Movimento"
-        onClick={() => openMovementDialog()}
-      />
-
-      {/* Edit selected */}
-      <ToolbarButton
-        icon={<Edit3 className="w-3.5 h-3.5" />}
-        label="Editar"
-        onClick={() =>
-          selectedMovementId && openMovementDialog(selectedMovementId)
-        }
-        disabled={!selectedMovementId}
-      />
-
-      {/* Duplicate */}
-      <ToolbarButton
-        icon={<Copy className="w-3.5 h-3.5" />}
-        label="Duplicar"
-        onClick={() =>
-          selectedMovementId && duplicateMovement(selectedMovementId)
-        }
-        disabled={!selectedMovementId}
+        onClick={() => openMovementModal()}
       />
 
       <Separator />
@@ -225,87 +140,6 @@ export const OmmToolbar: React.FC = () => {
         onClick={() => handleStatusChange("Canceled")}
         disabled={!canCancel}
         variant="danger"
-      />
-
-      <Separator />
-
-      {/* Simulator */}
-      <ToolbarButton
-        icon={
-          simulatorState.isRunning ? (
-            <Pause className="w-3.5 h-3.5" />
-          ) : (
-            <Zap className="w-3.5 h-3.5" />
-          )
-        }
-        label={simulatorState.isRunning ? "Simulador (Ativo)" : "Simulador"}
-        onClick={openSimulatorModal}
-        variant={simulatorState.isRunning ? "warning" : "default"}
-      />
-
-      <Separator />
-
-      {/* Export / Import */}
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json"
-        className="hidden"
-        onChange={handleImportJson}
-      />
-      <ToolbarButton
-        icon={<Upload className="w-3.5 h-3.5" />}
-        label="Importar"
-        onClick={() => fileInputRef.current?.click()}
-      />
-      {importError && (
-        <span className="text-[10px] text-rose-500 font-semibold">
-          {importError}
-        </span>
-      )}
-
-      <Separator />
-
-      {/* Refresh */}
-      <ToolbarButton
-        icon={<RefreshCw className="w-3.5 h-3.5" />}
-        label="Atualizar"
-        onClick={refresh}
-      />
-
-      {/* Group by */}
-      <div className="relative">
-        <button
-          onClick={() => setGroupByOpen(!groupByOpen)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer whitespace-nowrap">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
-          <span>{currentGroupLabel}</span>
-          <ChevronDown className="w-3 h-3 opacity-60" />
-        </button>
-        {groupByOpen && (
-          <div className="absolute top-full mt-1 left-0 z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 min-w-[180px]">
-            {GROUP_BY_OPTIONS.map((opt) => (
-              <button
-                key={String(opt.value)}
-                onClick={() => {
-                  setTableGroupBy(opt.value);
-                  setGroupByOpen(false);
-                }}
-                className={`w-full text-left px-3 py-1.5 text-[11px] font-medium transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer
-                  ${tableGroupBy === opt.value ? "text-sky-600 dark:text-sky-400 bg-sky-50/50 dark:bg-sky-950/20" : "text-slate-600 dark:text-slate-400"}`}>
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Admin */}
-      <ToolbarButton
-        icon={<Settings className="w-3.5 h-3.5" />}
-        label="Admin"
-        onClick={() => setActiveView("admin")}
       />
     </div>
   );

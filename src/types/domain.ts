@@ -31,6 +31,7 @@ export interface TemplateEntity {
   name: string;
   parentTemplateId: string | null;
   description: string;
+  graphicConfig?: EquipmentGraphicConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,9 +42,82 @@ export interface ObjectEntity {
   templateId: string;
   description: string;
   isDeployed?: boolean;
+  graphicConfig?: EquipmentGraphicConfig;
   createdAt: string;
   updatedAt: string;
 }
+
+export type TankGeometryType =
+  | 'vertical_cylindrical'
+  | 'horizontal_cylindrical'
+  | 'spherical'
+  | 'pressurized';
+
+/**
+ * Binding between a visual field in the equipment card and a property name
+ * on the object. The component resolves this against the instance's real properties at runtime.
+ */
+export interface FieldBinding {
+  /** Name of the property on the object (e.g. 'LevelPercent', 'Temperature') */
+  propertyName: string;
+  /** Display label shown in the card header */
+  label: string;
+  /** Engineering unit displayed next to the value */
+  unit: string;
+  /** Number of decimal places for numeric values */
+  decimalPlaces: number;
+  /** Whether this field is shown on the card */
+  visible: boolean;
+}
+
+export interface EquipmentGraphicConfig {
+  geometryType: TankGeometryType;
+  /**
+   * @deprecated Use fieldBindings instead. Kept for legacy compatibility.
+   */
+  visibleFields: {
+    tag: boolean;
+    description: boolean;
+    product: boolean;
+    level: boolean;
+    volume: boolean;
+    temperature: boolean;
+    pressure: boolean;
+    flow: boolean;
+    density: boolean;
+    status: boolean;
+    alarm: boolean;
+  };
+  /**
+   * Ordered list of field-to-property bindings for the card display.
+   * Each visible binding resolves against the instance's real property values.
+   */
+  fieldBindings: FieldBinding[];
+  fieldOrder?: string[];
+  decimalPlaces: number;
+  showLevelFill: boolean;
+  showFooter: boolean;
+}
+
+export interface ProductEntity {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  density: number;
+  densityUnit: string;
+  category: string;
+  physicalState: 'Líquido' | 'Gás' | 'Pressurizado';
+  color: string;
+}
+
+export interface AreaEntity {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+}
+
 
 export interface PropertyHistoryConfig {
   enabled: boolean;

@@ -314,7 +314,10 @@ export const useSecurityStore = create<SecurityStore>()(
     }
 
     return {
-      users: loadFromStorage(STORAGE_KEYS.SECURITY_USERS, DEFAULT_USERS),
+      users: loadFromStorage<SecurityUser[]>(STORAGE_KEYS.SECURITY_USERS, DEFAULT_USERS).map(u => ({
+        ...u,
+        groupIds: u.groupIds || []
+      })),
       groups: loadFromStorage(STORAGE_KEYS.SECURITY_GROUPS, DEFAULT_GROUPS),
       profiles: loadFromStorage(STORAGE_KEYS.SECURITY_PROFILES, DEFAULT_PROFILES),
       roles: loadFromStorage(STORAGE_KEYS.SECURITY_ROLES, DEFAULT_ROLES),
@@ -400,9 +403,8 @@ export const useSecurityStore = create<SecurityStore>()(
           state.groups = state.groups.filter(g => g.id !== id);
           saveToStorage(STORAGE_KEYS.SECURITY_GROUPS, state.groups);
 
-          // Clean up group assignments from users
           state.users.forEach((u) => {
-            if (u.groupIds.includes(id)) {
+            if (u.groupIds && u.groupIds.includes(id)) {
               u.groupIds = u.groupIds.filter(gid => gid !== id);
             }
           });

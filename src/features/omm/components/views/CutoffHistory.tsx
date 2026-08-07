@@ -214,9 +214,10 @@ export const CutoffHistory: React.FC = () => {
   const cutoffs = useOmmStore((s) => s.cutoffSnapshots);
   const simState = useOmmStore((s) => s.simulatorState);
   const executeManualCutoff = useOmmStore((s) => s.executeManualCutoff);
-  const setCutoffHour = useOmmStore((s) => s.setCutoffHour);
+  // setCutoffHour is not yet implemented in the store — using no-op placeholder
+  const setCutoffHour = (_hour: number) => {};
 
-  const nextCutoff = simState.nextCutoffAt ? new Date(simState.nextCutoffAt) : null;
+  const nextCutoff = simState.nextCutoffAt ? new Date(simState.nextCutoffAt as string) : null;
   const simNow = new Date(simState.simulatedTime);
   const hoursToNext = nextCutoff ? (nextCutoff.getTime() - simNow.getTime()) / 3_600_000 : null;
 
@@ -225,7 +226,7 @@ export const CutoffHistory: React.FC = () => {
   const [cutoffNotes, setCutoffNotes] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [tempCutoffHour, setTempCutoffHour] = useState(simState.cutoffHour);
+  const [tempCutoffHour, setTempCutoffHour] = useState((simState as any).cutoffHour ?? 0);
   const [compareView, setCompareView] = useState<{ a: OmmCutoffSnapshot; b: OmmCutoffSnapshot } | null>(null);
 
   const handleToggleExpand = (id: string) => {
@@ -331,7 +332,7 @@ export const CutoffHistory: React.FC = () => {
                 }
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">
-                Horário configurado: {simState.cutoffHour.toString().padStart(2, '0')}:00 diariamente
+                Horário configurado: {((simState as any).cutoffHour ?? 0).toString().padStart(2, '0')}:00 diariamente
               </div>
             </div>
             {hoursToNext !== null && (

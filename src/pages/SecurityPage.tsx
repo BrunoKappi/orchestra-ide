@@ -136,7 +136,7 @@ export const SecurityPage: React.FC = () => {
           user.area.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesProfile = filterProfile === 'all' || user.profileId === filterProfile;
-        const matchesGroup = filterGroup === 'all' || user.groupIds.includes(filterGroup);
+        const matchesGroup = filterGroup === 'all' || (user.groupIds || []).includes(filterGroup);
         const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
 
         return matchesSearch && matchesProfile && matchesGroup && matchesStatus;
@@ -521,7 +521,7 @@ export const SecurityPage: React.FC = () => {
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                       {paginatedUsers.map((user) => {
                         const userProfile = profiles.find((p) => p.id === user.profileId);
-                        const userGroups = groups.filter((g) => user.groupIds.includes(g.id));
+                        const userGroups = groups.filter((g) => (user.groupIds || []).includes(g.id));
 
                         return (
                           <tr key={user.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition-colors">
@@ -673,7 +673,7 @@ export const SecurityPage: React.FC = () => {
               <div className="flex-1 overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {groups.map((group) => {
-                    const membersCount = users.filter((u) => u.groupIds.includes(group.id)).length;
+                    const membersCount = users.filter((u) => (u.groupIds || []).includes(group.id)).length;
                     return (
                       <div
                         key={group.id}

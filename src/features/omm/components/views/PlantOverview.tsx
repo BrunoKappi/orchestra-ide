@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useOmmStore } from '../../store/useOmmStore';
 import type { OmmEquipment } from '../../types';
 import { X, Gauge, Thermometer, Droplets, Activity, ArrowRight } from 'lucide-react';
+import { TankTelemetryModal } from '../ui/TankTelemetryModal';
 
 // ---------------------------------------------------------------------------
 // Equipment card for the plant canvas
@@ -12,24 +13,23 @@ const EquipNode: React.FC<{
   onClick: (eq: OmmEquipment) => void;
 }> = ({ eq, onClick }) => {
   const isActive = eq.isSending || eq.isReceiving;
-  const isTank = eq.type === 'Tank' || eq.type === 'Vessel';
+  const isTank = eq.type === 'Tank' || eq.type === 'Vessel' || eq.type === 'Sphere' || eq.type === 'Ship';
   const isPump = eq.type === 'Pump';
-  const isMeter = eq.type === 'FlowMeter';
-  const isShip = eq.type === 'Ship';
+  const isMeter = (eq.type as string) === 'FlowMeter';
 
   return (
     <div
-      className={`absolute cursor-pointer transition-all duration-300 select-none group
+      className={`absolute cursor-pointer transition-all duration-350 select-none group
         ${isActive ? 'drop-shadow-lg' : 'hover:drop-shadow-md'}`}
-      style={{ left: eq.x, top: eq.y, width: eq.width, zIndex: isActive ? 10 : 5 }}
+      style={{ left: eq.x ?? 0, top: eq.y ?? 0, width: eq.width ?? 80, zIndex: isActive ? 10 : 5 }}
       onClick={() => onClick(eq)}
-      title={`${eq.tag} — ${eq.name}`}
+      title={`${eq.tag} — ${eq.name} (Clique para ver telemetria)`}
     >
-      {isTank || isShip ? (
+      {isTank ? (
         <div className={`relative rounded-xl border-2 overflow-hidden transition-all
           ${isActive ? 'border-emerald-400 dark:border-emerald-500 shadow-lg shadow-emerald-500/20' : 'border-slate-300 dark:border-slate-600'}
           bg-white dark:bg-slate-800`}
-          style={{ height: eq.height }}
+          style={{ height: eq.height ?? 100 }}
         >
           {/* Level fill */}
           <div
@@ -93,7 +93,7 @@ const EquipNode: React.FC<{
 };
 
 // ---------------------------------------------------------------------------
-// Equipment faceplate overlay
+// Equipment faceplate overlay (used for non-tank equipments)
 // ---------------------------------------------------------------------------
 const EquipFaceplate: React.FC<{ eq: OmmEquipment; onClose: () => void }> = ({ eq, onClose }) => {
   const movements = useOmmStore(useShallow((s) =>
@@ -107,7 +107,7 @@ const EquipFaceplate: React.FC<{ eq: OmmEquipment; onClose: () => void }> = ({ e
         style={{ background: `linear-gradient(135deg, ${eq.color}15, transparent)` }}>
         <div>
           <div className="font-mono text-sm font-bold text-slate-800 dark:text-slate-100">{eq.tag}</div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400">{eq.name}</div>
+          <div className="text-[11px] text-slate-550 dark:text-slate-400">{eq.name}</div>
         </div>
         <div className="flex items-center gap-2">
           <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold
@@ -122,48 +122,16 @@ const EquipFaceplate: React.FC<{ eq: OmmEquipment; onClose: () => void }> = ({ e
 
       {/* Metrics */}
       <div className="p-4 space-y-3">
-        {eq.capacity > 0 && (
-          <>
-            <div>
-              <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                <span>Nível</span>
-                <span className="font-mono font-bold">{eq.currentLevel.toFixed(2)}%</span>
-              </div>
-              <div className="h-3 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${eq.currentLevel}%`, backgroundColor: eq.color }} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-2">
-                <div className="text-slate-400 text-[10px]">Volume</div>
-                <div className="font-mono font-bold text-slate-700 dark:text-slate-200">{eq.currentVolume.toFixed(0)} m³</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-2">
-                <div className="text-slate-400 text-[10px]">Capacidade</div>
-                <div className="font-mono font-bold text-slate-700 dark:text-slate-200">{eq.capacity.toFixed(0)} m³</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-2">
-                <div className="text-slate-400 text-[10px]">Massa</div>
-                <div className="font-mono font-bold text-slate-700 dark:text-slate-200">{(eq.currentMass / 1000).toFixed(2)} kt</div>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-2">
-                <div className="text-slate-400 text-[10px]">Ocupação</div>
-                <div className="font-mono font-bold text-slate-700 dark:text-slate-200">{eq.currentLevel.toFixed(1)}%</div>
-              </div>
-            </div>
-          </>
-        )}
-
-        <div className="grid grid-cols-3 gap-2 text-[10px]">
-          <div className="flex items-center gap-1 text-slate-500">
+        <div className="grid grid-cols-3 gap-2 text-[10px] text-slate-600 dark:text-slate-350 select-text">
+          <div className="flex items-center gap-1">
             <Thermometer className="w-3 h-3 text-orange-400" />
             <span>{eq.temperature.toFixed(1)}°C</span>
           </div>
-          <div className="flex items-center gap-1 text-slate-500">
+          <div className="flex items-center gap-1">
             <Activity className="w-3 h-3 text-blue-400" />
-            <span>{eq.pressure.toFixed(2)} kgf</span>
+            <span>{eq.pressure.toFixed(2)} bar</span>
           </div>
-          <div className="flex items-center gap-1 text-slate-500">
+          <div className="flex items-center gap-1">
             <Droplets className="w-3 h-3 text-cyan-400" />
             <span>{eq.density.toFixed(0)} kg/m³</span>
           </div>
@@ -175,10 +143,10 @@ const EquipFaceplate: React.FC<{ eq: OmmEquipment; onClose: () => void }> = ({ e
             <div className="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-2">Movimentos Ativos</div>
             <div className="space-y-1.5">
               {movements.map((m) => (
-                <div key={m.id} className="flex items-center gap-2 text-[10px] bg-emerald-50 dark:bg-emerald-950/20 rounded-lg px-2 py-1.5">
+                <div key={m.id} className="flex items-center gap-2 text-[10px] bg-emerald-50 dark:bg-emerald-950/20 rounded-lg px-2 py-1.5 select-text">
                   <ArrowRight className="w-3 h-3 text-emerald-500 shrink-0" />
                   <span className="font-mono font-bold text-sky-600 dark:text-sky-400">{m.number}</span>
-                  <span className="text-slate-500">{m.currentFlow.toFixed(1)} m³/h</span>
+                  <span className="text-slate-550 dark:text-slate-400">{m.currentFlow.toFixed(1)} m³/h</span>
                   <span className="ml-auto text-emerald-600 dark:text-emerald-400 font-semibold">{m.percentComplete.toFixed(0)}%</span>
                 </div>
               ))}
@@ -218,17 +186,29 @@ export const PlantOverview: React.FC = () => {
   const [selectedEq, setSelectedEq] = useState<OmmEquipment | null>(null);
   const [scale, setScale] = useState(1);
 
+  // Tank telemetry modal state
+  const [telemetryTankId, setTelemetryTankId] = useState<string | null>(null);
+
   const activeMovements = useOmmStore(useShallow((s) => s.movements.filter((m) => m.status === 'Active')));
 
   const areaColors: Record<string, string> = {};
   areas.forEach((a) => { areaColors[a.id] = a.color; });
+
+  const handleEquipClick = (eq: OmmEquipment) => {
+    // If it's a tank-like equipment, open the rich 3D telemetry modal
+    if (eq.type === 'Tank' || eq.type === 'Vessel' || eq.type === 'Sphere' || eq.type === 'Ship') {
+      setTelemetryTankId(eq.id);
+    } else {
+      setSelectedEq(eq);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 shrink-0">
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Vista da Planta Industrial</span>
+          <span className="text-[11px] font-bold text-slate-650 dark:text-slate-350">Vista da Planta Industrial</span>
           <span className="text-[10px] text-slate-400">
             {equipments.filter((e) => e.isSending || e.isReceiving).length} equipamentos ativos ·
             {activeMovements.length} movimentos
@@ -295,10 +275,10 @@ export const PlantOverview: React.FC = () => {
               const origin = equipments.find((e) => e.id === mov.originId);
               const dest = equipments.find((e) => e.id === mov.destinationId);
               if (!origin || !dest) return null;
-              const ox = origin.x + origin.width / 2;
-              const oy = origin.y + origin.height / 2;
-              const dx = dest.x + dest.width / 2;
-              const dy = dest.y + dest.height / 2;
+              const ox = (origin.x ?? 0) + (origin.width ?? 0) / 2;
+              const oy = (origin.y ?? 0) + (origin.height ?? 0) / 2;
+              const dx = (dest.x ?? 0) + (dest.width ?? 0) / 2;
+              const dy = (dest.y ?? 0) + (dest.height ?? 0) / 2;
               const mx = (ox + dx) / 2;
               const my = Math.min(oy, dy) - 40;
               return (
@@ -323,7 +303,7 @@ export const PlantOverview: React.FC = () => {
 
           {/* Equipment nodes */}
           {equipments.map((eq) => (
-            <EquipNode key={eq.id} eq={eq} onClick={setSelectedEq} />
+            <EquipNode key={eq.id} eq={eq} onClick={handleEquipClick} />
           ))}
         </div>
 
@@ -332,6 +312,13 @@ export const PlantOverview: React.FC = () => {
           <EquipFaceplate eq={selectedEq} onClose={() => setSelectedEq(null)} />
         )}
       </div>
+
+      {/* Reusable telemetry modal */}
+      <TankTelemetryModal
+        isOpen={!!telemetryTankId}
+        objectId={telemetryTankId}
+        onClose={() => setTelemetryTankId(null)}
+      />
     </div>
   );
 };

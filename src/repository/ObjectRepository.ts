@@ -1,10 +1,11 @@
 import type { ObjectEntity } from '../types/domain';
 import { STORAGE_KEYS } from './storageKey';
+import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 
 export class ObjectRepository {
   public getAll(): ObjectEntity[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.OBJECTS);
+      const data = safeGetItem(STORAGE_KEYS.OBJECTS);
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -29,7 +30,7 @@ export class ObjectRepository {
     } else {
       all.push(obj);
     }
-    localStorage.setItem(STORAGE_KEYS.OBJECTS, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.OBJECTS, JSON.stringify(all));
     return obj;
   }
 
@@ -37,12 +38,12 @@ export class ObjectRepository {
     let all = this.getAll();
     const initialLen = all.length;
     all = all.filter((o) => o.id !== id);
-    localStorage.setItem(STORAGE_KEYS.OBJECTS, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.OBJECTS, JSON.stringify(all));
     return all.length < initialLen;
   }
 
   public saveAll(objects: ObjectEntity[]): void {
-    localStorage.setItem(STORAGE_KEYS.OBJECTS, JSON.stringify(objects));
+    safeSetItem(STORAGE_KEYS.OBJECTS, JSON.stringify(objects));
   }
 }
 

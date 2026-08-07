@@ -129,7 +129,7 @@ export const SimulatorModal: React.FC<SimulatorModalProps> = ({ isOpen, onClose 
 
   const handleToggleAutoMode = () => {
     if (!selectedEqId || !selectedTank) return;
-    const nextMode = selectedTank.simMode === 'auto' ? 'manual' : 'auto';
+    const nextMode = selectedTank.simMode === 'Auto' ? 'Manual' : 'Auto';
     
     // Initialize default configs if enabling auto mode
     const defaultAutoConfig = selectedTank.autoConfig || {
@@ -203,8 +203,8 @@ export const SimulatorModal: React.FC<SimulatorModalProps> = ({ isOpen, onClose 
     const movementsIn = movements.filter(m => m.status === 'Active' && m.destinationId === eq.id && !m.simPaused);
     const movementsOut = movements.filter(m => m.status === 'Active' && m.originId === eq.id && !m.simPaused);
     
-    const movInFlow = movementsIn.reduce((acc, m) => acc + (m.simFlowRate * m.simSpeedMultiplier), 0);
-    const movOutFlow = movementsOut.reduce((acc, m) => acc + (m.simFlowRate * m.simSpeedMultiplier), 0);
+    const movInFlow = movementsIn.reduce((acc, m) => acc + (m.simFlowRate * (m.simSpeedMultiplier ?? 1)), 0);
+    const movOutFlow = movementsOut.reduce((acc, m) => acc + (m.simFlowRate * (m.simSpeedMultiplier ?? 1)), 0);
     
     const netFlow = (movInFlow + (eq.flowIn || 0)) - (movOutFlow + (eq.flowOut || 0));
     return {
@@ -826,12 +826,12 @@ export const SimulatorModal: React.FC<SimulatorModalProps> = ({ isOpen, onClose 
                         <button
                           onClick={handleToggleAutoMode}
                           className={`px-2.5 py-1 rounded-lg text-[9px] font-bold border transition-all cursor-pointer ${
-                            selectedTank.simMode === 'auto'
+                            selectedTank.simMode === 'Auto'
                               ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
                               : 'bg-slate-800 border-slate-750 text-slate-300'
                           }`}
                         >
-                          {selectedTank.simMode === 'auto' ? 'Módulo Auto' : 'Módulo Manual'}
+                          {selectedTank.simMode === 'Auto' ? 'Módulo Auto' : 'Módulo Manual'}
                         </button>
                       </div>
                     </div>
@@ -894,7 +894,7 @@ export const SimulatorModal: React.FC<SimulatorModalProps> = ({ isOpen, onClose 
 
                     {/* Mode variables editor */}
                     <div className="flex-1 space-y-4">
-                      {selectedTank.simMode === 'auto' ? (
+                      {selectedTank.simMode === 'Auto' ? (
                         /* AUTOMATIC MODE VARIABLES EDIT */
                         <div className="space-y-4">
                           <span className="block text-[10px] uppercase tracking-wider font-bold text-slate-500">Configurações de Automação</span>

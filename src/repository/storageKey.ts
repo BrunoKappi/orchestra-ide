@@ -28,6 +28,9 @@ export const STORAGE_KEYS = {
   SECURITY_ROLES: 'archestra_db_security_roles_v1',
   SECURITY_PERMISSION_CONFIGS: 'archestra_db_security_permission_configs_v1',
   SECURITY_AUDIT_LOGS: 'archestra_db_security_audit_logs_v1',
+  PRODUCTS: 'archestra_db_products_v1',
+  AREAS: 'archestra_db_areas_v1',
+  MOVEMENTS: 'archestra_db_movements_v1',
 } as const;
 
 

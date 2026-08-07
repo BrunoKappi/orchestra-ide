@@ -1,10 +1,11 @@
 import type { TemplateEntity } from '../types/domain';
 import { STORAGE_KEYS } from './storageKey';
+import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 
 export class TemplateRepository {
   public getAll(): TemplateEntity[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.TEMPLATES);
+      const data = safeGetItem(STORAGE_KEYS.TEMPLATES);
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -24,7 +25,7 @@ export class TemplateRepository {
     } else {
       all.push(template);
     }
-    localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(all));
     return template;
   }
 
@@ -32,12 +33,12 @@ export class TemplateRepository {
     let all = this.getAll();
     const initialLen = all.length;
     all = all.filter((t) => t.id !== id);
-    localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(all));
     return all.length < initialLen;
   }
 
   public saveAll(templates: TemplateEntity[]): void {
-    localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(templates));
+    safeSetItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(templates));
   }
 }
 

@@ -17,9 +17,9 @@ const ROW_HEIGHT = 32;    // px
 
 export const MovementTimeline: React.FC = () => {
   const getMovementRows = useOmmStore((s) => s.getMovementRows);
-  const movementsLen = useOmmStore((s) => s.movements.length);
+  const movements = useOmmStore((s) => s.movements);
   const simulatorTick = useOmmStore((s) => s.simulatorState.tickCount);
-  const rows = useMemo(() => getMovementRows(), [getMovementRows, movementsLen, simulatorTick]);
+  const rows = useMemo(() => getMovementRows(), [getMovementRows, movements, simulatorTick]);
   const simulatedTime = useOmmStore((s) => s.simulatorState.simulatedTime);
 
   // Reference: start of simulated day
@@ -47,7 +47,7 @@ export const MovementTimeline: React.FC = () => {
   // Filter movements relevant to today
   const todayRows = useMemo(() =>
     rows.filter((r) => {
-      const issued = new Date(r.issuedAt).getTime();
+      const issued = new Date(r.issuedAt ?? '').getTime();
       const end = r.completedAt ? new Date(r.completedAt).getTime()
         : r.etoc ? new Date(r.etoc).getTime()
         : dayEnd.getTime();
@@ -108,9 +108,9 @@ export const MovementTimeline: React.FC = () => {
               Nenhum movimento hoje
             </div>
           ) : todayRows.map((row, i) => {
-            const startX = toX(row.activatedAt ?? row.issuedAt, dayStart);
+            const startX = toX(row.activatedAt ?? row.issuedAt ?? null, dayStart);
             const endX = toX(
-              row.completedAt ?? row.closedAt ?? row.etoc,
+              row.completedAt ?? row.closedAt ?? row.etoc ?? null,
               new Date(dayStart.getTime() + 3_600_000 * 4),
             );
             const barWidth = Math.max(4, endX - startX);

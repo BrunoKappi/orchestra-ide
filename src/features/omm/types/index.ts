@@ -1,5 +1,5 @@
 // =============================================================================
-// OMM – Order Movement Manager — Domain Types
+// OMM – Order Movement Manager — Domain Types (Simplified)
 // =============================================================================
 
 // ---------------------------------------------------------------------------
@@ -11,58 +11,27 @@ export type OmmStatus = 'Issued' | 'Active' | 'Completed' | 'Closed' | 'Canceled
 export type OmmPriority = 'Low' | 'Normal' | 'High' | 'Critical';
 
 export type MovementType =
-  | 'Transfer'
-  | 'Receipt'
-  | 'Dispatch'
-  | 'Internal'
-  | 'Recirculation'
-  | 'Blending'
-  | 'Stripping'
+  | 'TankToTank'
+  | 'TankToSphere'
+  | 'SphereToTank'
+  | 'TankToArea'
+  | 'AreaToTank'
+  | 'AreaToArea'
   | 'Loading'
   | 'Unloading'
-  | 'Sampling';
-
-export type ProductCategory =
-  | 'Crude'
-  | 'Refined'
-  | 'Intermediate'
-  | 'Additive'
-  | 'Chemical'
-  | 'Utility'
-  | 'LPG'
-  | 'Gas'
-  | 'Water'
-  | 'Waste';
+  | 'Recirculation';
 
 export type EquipmentType =
   | 'Tank'
   | 'Vessel'
-  | 'ProcessUnit'
+  | 'Sphere'
   | 'Pump'
   | 'Pipeline'
   | 'Manifold'
   | 'Ship'
   | 'Truck'
   | 'RailCar'
-  | 'FlowMeter'
-  | 'LevelGauge'
-  | 'Valve'
-  | 'HeatExchanger'
   | 'Area';
-
-export type MeasurementMethod =
-  | 'FlowMeter'
-  | 'TankGauging'
-  | 'OpenTankGauging'
-  | 'MassFlowMeter'
-  | 'TruckScale'
-  | 'ShipDraft'
-  | 'Manual'
-  | 'Calculated';
-
-export type SimulationMode = 'fixed' | 'ramp' | 'sine' | 'variable' | 'noise';
-
-export type AlarmSeverity = 'Low' | 'Medium' | 'High' | 'Critical';
 
 export type AuditAction =
   | 'CREATE'
@@ -77,26 +46,9 @@ export type AuditAction =
   | 'SIM_STOP'
   | 'SIM_PARAM_CHANGE'
   | 'COMMENT'
-  | 'ACKNOWLEDGE'
-  | 'EXPORT'
-  | 'IMPORT'
   | 'CUTOFF';
 
-export type EventType =
-  | 'THRESHOLD_90PCT'
-  | 'FLOW_DEVIATION'
-  | 'TEMPERATURE_LIMIT'
-  | 'LOW_ACCURACY'
-  | 'DENSITY_CHANGE'
-  | 'COMM_LOSS'
-  | 'METER_FREEZE'
-  | 'STATUS_CHANGE'
-  | 'CUTOFF_CROSSING'
-  | 'COMPLETION'
-  | 'ALARM_ACTIVE'
-  | 'MIDNIGHT_SELECTION'
-  | 'OPERATOR_COMMENT'
-  | 'SYSTEM';
+export type AlarmSeverity = 'Low' | 'Medium' | 'High' | 'Critical';
 
 export type CutoffStatus = 'Open' | 'Locked' | 'Validated' | 'Sent';
 
@@ -106,16 +58,14 @@ export type CutoffStatus = 'Open' | 'Locked' | 'Validated' | 'Sent';
 
 export interface OmmOrder {
   id: string;
-  number: string;           // ORD-001
+  number: string;          // ORD-001
   description: string;
-  area: string;             // areaId ref
+  areaId: string;          // areaId ref
   status: OmmStatus;
   priority: OmmPriority;
-  operator: string;         // operatorId ref
+  operatorId: string;      // userId ref from Security module
   notes: string;
   movementIds: string[];
-  issuedAt: string;
-  activatedAt: string | null;
   completedAt: string | null;
   closedAt: string | null;
   canceledAt: string | null;
@@ -126,65 +76,46 @@ export interface OmmOrder {
 export interface OmmMovement {
   id: string;
   orderId: string;
-  number: string;           // MOV-001
+  number: string;          // MOV-0001
   description: string;
   // Classification
-  type: MovementType;
-  category: ProductCategory;
+  typeId: string;          // ref to OmmMovementTypeConfig.id
   productId: string;
   areaId: string;
   // Route
-  originId: string;
-  viaId: string | null;
-  destinationId: string;
+  originId: string;        // objectRepo ID (real Orquestra equipment)
+  destinationId: string;   // objectRepo ID (real Orquestra equipment)
   alignmentId: string | null;
-  meterId: string | null;
-  measurementMethod: MeasurementMethod;
   // Status
   status: OmmStatus;
   priority: OmmPriority;
-  operatorId: string;
+  operatorId: string;      // userId ref from Security module
   // Planned quantities
-  plannedVolume: number;    // m³
-  plannedMass: number;      // t
-  plannedFlow: number;      // m³/h
-  plannedStartAt: string | null;
-  plannedEndAt: string | null;
-  // Actuals (simulation computed)
-  currentVolume: number;
-  currentMass: number;
-  currentFlow: number;
-  avgFlow: number;
-  temperature: number;      // °C
-  pressure: number;         // kgf/cm²
-  density: number;          // kg/m³ @ operating temp
-  density20: number;        // kg/m³ @ 20°C
-  vcf: number;              // Volume Correction Factor
-  correctedVolume: number;  // m³ @ 20°C
-  accuracy: number;         // %
-  percentComplete: number;
-  ettcMin: number;          // Estimated time to complete (min)
-  etoc: string | null;      // ISO timestamp
-  initialLevel: number;     // % in origin equipment
-  currentLevel: number;     // % in origin equipment (decreasing)
-  destLevel: number;        // % in destination equipment (increasing)
-  finalLevel: number | null;
-  // Simulation config
-  simFlowRate: number;      // m³/h
-  simNoise: number;         // 0..1
-  simMode: SimulationMode;
-  simPaused: boolean;
-  simSpeedMultiplier: number;
+  plannedVolume: number;   // m³
+  plannedFlow: number;     // m³/h
+  engUnitId: string;       // ref to OmmEngUnitConfig.id
+  // Actuals (simulation computed — never set manually)
+  currentVolume: number;   // m³ — written by SimulationEngine
+  currentFlow: number;     // m³/h — written by SimulationEngine
+  percentComplete: number; // 0-100 — written by SimulationEngine
+  // Simulation config (per-movement)
+  simFlowRate: number;     // m³/h override for simulation
+  simPaused: boolean;      // pauses this specific movement in simulation
   // Timestamps
-  issuedAt: string;
-  activatedAt: string | null;
+  issuedAt?: string;
+  activatedAt?: string | null;
+  etoc?: string | null;
   completedAt: string | null;
   closedAt: string | null;
   canceledAt: string | null;
   lastUpdatedAt: string;
+  // Simulator scenario configurations
+  plannedStartAt?: string;
+  plannedEndAt?: string;
+  simSpeedMultiplier?: number;
+  type?: string;
   // Meta
   notes: string;
-  tags: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -193,13 +124,10 @@ export interface OmmProduct {
   id: string;
   code: string;
   name: string;
-  category: ProductCategory;
-  density20: number;        // kg/m³ @ 20°C reference
-  apiGravity: number;
-  flashPoint: number;       // °C
-  viscosity: number;        // cSt
-  color: string;            // CSS color for UI
-  unit: string;             // m³ or t
+  description: string;
+  density: number;         // kg/m³ reference density
+  engUnitId: string;       // default engineering unit
+  color: string;           // CSS color for UI identification
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -210,52 +138,45 @@ export interface OmmArea {
   code: string;
   name: string;
   description: string;
-  supervisor: string;
   color: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
+// OmmEquipment is a read-only mirror of objectRepo — not edited in OMM Admin
 export interface OmmEquipment {
   id: string;
-  tag: string;              // e.g. TQ-101
+  tag: string;
   name: string;
   type: EquipmentType;
   areaId: string;
-  productId: string | null; // current product
-  capacity: number;         // m³ or t
-  currentLevel: number;     // % 0-100
-  currentVolume: number;    // m³
-  currentMass: number;      // t
-  temperature: number;      // °C
-  pressure: number;         // kgf/cm²
-  density: number;          // kg/m³
+  productId: string | null;
+  capacity: number;        // m³
+  currentLevel: number;    // % 0-100
+  currentVolume: number;   // m³
+  currentMass: number;     // t
+  temperature: number;     // °C
+  pressure: number;        // bar
+  density: number;         // kg/m³
   isActive: boolean;
   isSending: boolean;
   isReceiving: boolean;
-  latitude: number;         // for plant map
-  longitude: number;
-  x: number;                // canvas position
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-  notes: string;
-  createdAt: string;
-  updatedAt: string;
-  
-  // Simulator extensions
-  flowIn?: number;          // m³/h
-  flowOut?: number;         // m³/h
-  simMode?: 'manual' | 'auto';
+  flowIn: number;          // m³/h
+  flowOut: number;         // m³/h
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  color?: string;
+  simMode?: 'Auto' | 'Manual';
   autoConfig?: {
-    level?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
-    temperature?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
-    pressure?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
-    density?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
-    flowIn?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
-    flowOut?: { type: 'random' | 'ramp' | 'sine' | 'triangle' | 'sawtooth' | 'noise' | 'oscillation'; min: number; max: number; period: number; step?: number };
+    level?: any;
+    temperature?: any;
+    pressure?: any;
+    density?: any;
+    flowIn?: any;
+    flowOut?: any;
   };
 }
 
@@ -264,47 +185,37 @@ export interface OmmAlignment {
   code: string;
   name: string;
   description: string;
-  fromEquipmentId: string;
-  toEquipmentId: string;
-  viaEquipmentIds: string[];
+  fromEquipmentId: string; // objectRepo ID
+  toEquipmentId: string;   // objectRepo ID
+  available: boolean;
+  color: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface OmmOperator {
+// ---------------------------------------------------------------------------
+// Audit Log
+// ---------------------------------------------------------------------------
+
+export interface OmmAuditEntry {
   id: string;
-  code: string;
-  name: string;
-  role: string;
-  area: string;
-  isOnline: boolean;
-  lastSeen: string;
+  entityType: 'Order' | 'Movement' | 'Cutoff' | 'Config';
+  entityId: string;
+  entityNumber: string;
+  action: AuditAction;
+  field: string | null;
+  oldValue: string | null;
+  newValue: string | null;
+  description: string;
+  operator: string;
+  source: 'UI' | 'Simulation' | 'System';
   createdAt: string;
-  updatedAt: string;
 }
 
 // ---------------------------------------------------------------------------
-// Event & Alarm Entities
+// Alarm (minimal for OMM context)
 // ---------------------------------------------------------------------------
-
-export interface OmmEvent {
-  id: string;
-  movementId: string | null;
-  orderId: string | null;
-  equipmentId: string | null;
-  type: EventType;
-  severity: AlarmSeverity;
-  message: string;
-  detail: string;
-  value: string | null;
-  threshold: string | null;
-  acknowledged: boolean;
-  acknowledgedBy: string | null;
-  acknowledgedAt: string | null;
-  resolvedAt: string | null;
-  createdAt: string;
-}
 
 export interface OmmAlarm {
   id: string;
@@ -323,52 +234,13 @@ export interface OmmAlarm {
 }
 
 // ---------------------------------------------------------------------------
-// Audit Log
-// ---------------------------------------------------------------------------
-
-export interface OmmAuditEntry {
-  id: string;
-  entityType: 'Order' | 'Movement' | 'Equipment' | 'Cutoff' | 'Config';
-  entityId: string;
-  entityNumber: string;
-  action: AuditAction;
-  field: string | null;
-  oldValue: string | null;
-  newValue: string | null;
-  description: string;
-  operator: string;
-  source: 'UI' | 'Simulation' | 'System' | 'API';
-  createdAt: string;
-}
-
-// ---------------------------------------------------------------------------
-// History (time-series data per movement)
-// ---------------------------------------------------------------------------
-
-export interface OmmHistoryPoint {
-  id: string;
-  movementId: string;
-  timestamp: string;
-  volume: number;
-  mass: number;
-  flow: number;
-  temperature: number;
-  pressure: number;
-  density: number;
-  level: number;
-  accuracy: number;
-  quality: 'Good' | 'Bad' | 'Uncertain';
-}
-
-// ---------------------------------------------------------------------------
 // Cut-off Snapshot
 // ---------------------------------------------------------------------------
 
 export interface OmmCutoffSnapshot {
   id: string;
-  number: string;            // CO-2024-001
-  scheduledAt: string;       // e.g. 01:00 every day
-  executedAt: string | null;
+  number: string;          // CO-2024-001
+  executedAt: string;
   status: CutoffStatus;
   inventoryByEquipment: Array<{
     equipmentId: string;
@@ -381,31 +253,69 @@ export interface OmmCutoffSnapshot {
     temperature: number;
     density: number;
   }>;
-  movementsActive: string[];   // movement IDs that were active at cutoff
-  movementsCrossing: string[]; // movement IDs crossing midnight
+  movementsActive: string[];
+  movementsCrossing: string[];
   totalVolume: number;
   totalMass: number;
   notes: string;
   validatedBy: string | null;
   validatedAt: string | null;
-  sentAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 // ---------------------------------------------------------------------------
-// Simulation Engine State
+// Simulation State
 // ---------------------------------------------------------------------------
 
 export interface OmmSimulatorState {
   isRunning: boolean;
-  speedMultiplier: number;   // 1 = real-time, 10 = 10x, 60 = 1min/sec
-  simulatedTime: string;     // ISO timestamp (simulated "now")
+  speedMultiplier: number; // 1 = real-time, 10 = 10x, 60 = 1min/sec
+  simulatedTime: string;
   tickCount: number;
   lastTickAt: string;
-  nextCutoffAt: string;      // next scheduled cutoff ISO
-  cutoffHour: number;        // default 1 (01:00)
   activeMovementCount: number;
+  nextCutoffAt?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Auxiliary Entities
+// ---------------------------------------------------------------------------
+
+export interface OmmMovementTypeConfig {
+  id: string;
+  code: string;
+  name: string;
+  category: string;        // e.g. 'Internal', 'External', 'Loading'
+  color: string;
+  description: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OmmPriorityConfig {
+  id: string;
+  code: string;
+  name: string;
+  color: string;
+  level: number;           // 1=Low, 2=Normal, 3=High, 4=Critical
+  description: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OmmEngUnitConfig {
+  id: string;
+  symbol: string;          // m³, m³/h, °C, bar, kg/m³, %
+  name: string;
+  category: string;        // Volume, Flow, Temperature, Pressure, Density
+  decimals: number;        // decimal places to display
+  factor: number;          // conversion factor (1 = base unit)
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -423,9 +333,10 @@ export interface MovementRow extends OmmMovement {
   originName: string;
   destinationTag: string;
   destinationName: string;
-  viaTag: string | null;
-  meterTag: string | null;
   alignmentCode: string | null;
+  movementTypeName: string;
+  movementTypeColor: string;
+  engUnitSymbol: string;
 }
 
 export interface OmmKpiMetrics {
@@ -436,72 +347,10 @@ export interface OmmKpiMetrics {
   completedCount: number;
   closedCount: number;
   canceledCount: number;
-  avgAccuracy: number;
   dailyVolume: number;
-  dailyMass: number;
   activeAlarms: number;
-  operatorsOnline: number;
   simulatorRunning: boolean;
   simulatedTime: string;
-  nextCutoffAt: string;
-}
-
-
-// ---------------------------------------------------------------------------
-// Auxiliary Entities
-// ---------------------------------------------------------------------------
-
-export interface OmmUserGroup {
-  id: string;
-  code: string;
-  name: string;
-  description: string;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OmmMovementTypeConfig {
-  id: string;
-  code: string;
-  name: string;
-  color: string;
-  description: string;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OmmPriorityConfig {
-  id: string;
-  code: string;
-  name: string;
-  color: string;
-  level: number;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OmmMeasurementMethodConfig {
-  id: string;
-  code: string;
-  name: string;
-  description: string;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OmmEngUnitConfig {
-  id: string;
-  code: string;
-  name: string;
-  symbol: string;
-  dimension: string;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -514,37 +363,31 @@ export interface OmmStoreState {
   movements: OmmMovement[];
   products: OmmProduct[];
   areas: OmmArea[];
-  equipments: OmmEquipment[];
+  equipments: OmmEquipment[];  // read-only mirror from objectRepo
   alignments: OmmAlignment[];
-  operators: OmmOperator[];
-  userGroups: OmmUserGroup[];
   movementTypes: OmmMovementTypeConfig[];
   priorities: OmmPriorityConfig[];
-  measurementMethods: OmmMeasurementMethodConfig[];
   engUnits: OmmEngUnitConfig[];
-  events: OmmEvent[];
   alarms: OmmAlarm[];
   auditLog: OmmAuditEntry[];
-  historyPoints: OmmHistoryPoint[];
   cutoffSnapshots: OmmCutoffSnapshot[];
   simulatorState: OmmSimulatorState;
+  securityUsers: Array<{ id: string; name: string; login: string; role: string; areaId?: string; status: string }>;
 
   // UI state
   selectedMovementId: string | null;
   selectedOrderId: string | null;
-  detailPanelTab: string;
   activeView: 'movements' | 'plant' | 'timeline' | 'inventory' | 'cutoff' | 'admin';
-  isDetailPanelOpen: boolean;
-  tableGroupBy: string | null;
   tableFilters: Record<string, string>;
   globalSearch: string;
-  columnVisibility: Record<string, boolean>;
+  tableGroupBy: string | null;
   isSeeded: boolean;
 
   // Dialog states
   isOrderDialogOpen: boolean;
-  isMovementDialogOpen: boolean;
+  isMovementModalOpen: boolean;       // the new central movement modal
   isSimulatorModalOpen: boolean;
   editingOrderId: string | null;
-  editingMovementId: string | null;
+  editingMovementId: string | null;   // null = create mode
+  telemetryTankId: string | null;
 }

@@ -6,19 +6,33 @@ import { propertyRepo } from '../repository/PropertyRepository';
 import { scriptRepo } from '../repository/ScriptRepository';
 import { deploymentRepo } from '../repository/DeploymentRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
-import { widgetRepo } from '../repository/WidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
 import { alarmRepo } from '../repository/AlarmRepository';
-import { flowchartRepo } from '../repository/FlowchartRepository';
-import { widgetSeedService } from './WidgetSeedService';
+import type { ProductEntity, AreaEntity, EquipmentGraphicConfig, PropertyEntity } from '../types/domain';
 
+// ---------------------------------------------------------------------------
+// Helper: create a PropertyEntity skeleton
+// ---------------------------------------------------------------------------
+type PropDef = Omit<PropertyEntity, 'id' | 'createdAt' | 'updatedAt'>;
+
+function makeProp(
+  targetId: string,
+  targetType: 'template' | 'instance',
+  name: string,
+  dataType: PropertyEntity['dataType'],
+  defaultValue: string,
+  description: string,
+  category?: string,
+): PropDef {
+  return { targetId, targetType, name, dataType, defaultValue, description, category };
+}
 
 export class SeedService {
   public seedInitialDataIfNeeded(force: boolean = false): void {
     const isSeeded = localStorage.getItem(STORAGE_KEYS.SEEDED);
     if (isSeeded && !force) return;
 
-    // Clear existing data
+    // 1. Clear existing storage
     templateRepo.saveAll([]);
     objectRepo.saveAll([]);
     propertyRepo.saveAll([]);
@@ -29,661 +43,669 @@ export class SeedService {
     mockConfigRepo.saveAll([]);
     alarmRepo.clear();
 
-
     const now = new Date().toISOString();
 
-    // 1. Tank Template (Root Template)
-    const tankTemplateId = uuidv4();
+    // -------------------------------------------------------------------------
+    // 2. Products Catalog
+    // -------------------------------------------------------------------------
+    const products: ProductEntity[] = [
+      {
+        id: 'prod-naphtha',
+        code: 'NAF-01',
+        name: 'Nafta Petroquímica',
+        description: 'Alimentação para unidade de craqueamento petroquímico',
+        density: 720,
+        densityUnit: 'kg/m³',
+        category: 'Hidrocarboneto Leve',
+        physicalState: 'Líquido',
+        color: '#f59e0b',
+      },
+      {
+        id: 'prod-benzene',
+        code: 'BZ-02',
+        name: 'Benzeno Purificado',
+        description: 'Aromático purificado grau químico (pureza >99.9%)',
+        density: 876,
+        densityUnit: 'kg/m³',
+        category: 'Aromáticos',
+        physicalState: 'Líquido',
+        color: '#8b5cf6',
+      },
+      {
+        id: 'prod-ethene',
+        code: 'ETH-03',
+        name: 'Eteno (Etileno)',
+        description: 'Olefrina monômero para polietileno',
+        density: 568,
+        densityUnit: 'kg/m³',
+        category: 'Olefinas',
+        physicalState: 'Pressurizado',
+        color: '#06b6d4',
+      },
+      {
+        id: 'prod-propene',
+        code: 'PRP-04',
+        name: 'Propeno (Propileno)',
+        description: 'Monoméro para polipropileno de alta pureza',
+        density: 514,
+        densityUnit: 'kg/m³',
+        category: 'Olefinas',
+        physicalState: 'Pressurizado',
+        color: '#3b82f6',
+      },
+      {
+        id: 'prod-paraxylene',
+        code: 'PXY-05',
+        name: 'Para-Xileno',
+        description: 'Intermediário para cadeia de poliéster / PTA',
+        density: 861,
+        densityUnit: 'kg/m³',
+        category: 'Aromáticos',
+        physicalState: 'Líquido',
+        color: '#ec4899',
+      },
+      {
+        id: 'prod-fueloil',
+        code: 'FO-06',
+        name: 'Óleo Combustível Heavy',
+        description: 'Frações pesadas para utilidades de caldeira',
+        density: 980,
+        densityUnit: 'kg/m³',
+        category: 'Combustível',
+        physicalState: 'Líquido',
+        color: '#64748b',
+      },
+    ];
+    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+
+    // -------------------------------------------------------------------------
+    // 3. Areas
+    // -------------------------------------------------------------------------
+    const areas: AreaEntity[] = [
+      {
+        id: 'area-300',
+        code: 'A-300',
+        name: 'Unidade 300 - Parque de Tanques de Matéria-Prima',
+        description: 'Armazenamento e bombeamento de Nafta e Condensados',
+      },
+      {
+        id: 'area-400',
+        code: 'A-400',
+        name: 'Unidade 400 - Parque de Tanques Intermediários',
+        description: 'Armazenamento de Benzeno, Para-Xileno e Aromáticos',
+      },
+      {
+        id: 'area-500',
+        code: 'A-500',
+        name: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        description: 'Armazenamento liquefeito pressurizado de Eteno e Propeno',
+      },
+    ];
+    localStorage.setItem(STORAGE_KEYS.AREAS, JSON.stringify(areas));
+
+    // -------------------------------------------------------------------------
+    // 4. Users (Security & Operators)
+    // -------------------------------------------------------------------------
+    const users = [
+      {
+        id: 'usr-1',
+        name: 'Carlos Silva',
+        login: 'csilva',
+        email: 'carlos.silva@braskem-poc.com',
+        role: 'Operador de Inventário',
+        group: 'Operações Matéria-Prima',
+        areaId: 'area-300',
+        status: 'Active',
+        lastLogin: now,
+      },
+      {
+        id: 'usr-2',
+        name: 'Ana Souza',
+        login: 'asouza',
+        email: 'ana.souza@braskem-poc.com',
+        role: 'Supervisora de Movimentação',
+        group: 'Supervisão de Parque',
+        areaId: 'area-400',
+        status: 'Active',
+        lastLogin: now,
+      },
+      {
+        id: 'usr-3',
+        name: 'Roberto Mendes',
+        login: 'rmendes',
+        email: 'roberto.mendes@braskem-poc.com',
+        role: 'Engenheiro de Processos',
+        group: 'Engenharia de Produção',
+        areaId: 'area-500',
+        status: 'Active',
+        lastLogin: now,
+      },
+      {
+        id: 'usr-4',
+        name: 'Juliana Lima',
+        login: 'jlima',
+        email: 'juliana.lima@braskem-poc.com',
+        role: 'Operadora de Painel',
+        group: 'Operações Matéria-Prima',
+        areaId: 'area-300',
+        status: 'Active',
+        lastLogin: now,
+      },
+      {
+        id: 'usr-5',
+        name: 'Marcos Oliveira',
+        login: 'moliveira',
+        email: 'marcos.oliveira@braskem-poc.com',
+        role: 'Engenheiro de Automação',
+        group: 'Engenharia de Automação',
+        areaId: 'area-400',
+        status: 'Active',
+        lastLogin: now,
+      },
+    ];
+    localStorage.setItem(STORAGE_KEYS.SECURITY_USERS, JSON.stringify(users));
+
+    // -------------------------------------------------------------------------
+    // 5. Templates
+    // -------------------------------------------------------------------------
+    const baseTankTplId = 'tpl-tank';
+
+    const defaultGraphicConfig: EquipmentGraphicConfig = {
+      geometryType: 'vertical_cylindrical',
+      visibleFields: {
+        tag: true,
+        description: true,
+        product: true,
+        level: true,
+        volume: true,
+        temperature: true,
+        pressure: true,
+        flow: true,
+        density: true,
+        status: true,
+        alarm: true,
+      },
+      fieldBindings: [
+        { propertyName: 'Level', label: 'Nível', unit: '%', decimalPlaces: 1, visible: true },
+        { propertyName: 'Volume', label: 'Volume', unit: 'm³', decimalPlaces: 1, visible: true },
+        { propertyName: 'Temperature', label: 'Temperatura', unit: '°C', decimalPlaces: 1, visible: true },
+        { propertyName: 'Pressure', label: 'Pressão', unit: 'bar', decimalPlaces: 2, visible: true },
+        { propertyName: 'Flow', label: 'Vazão', unit: 'm³/h', decimalPlaces: 1, visible: true },
+        { propertyName: 'Density', label: 'Densidade', unit: 'kg/m³', decimalPlaces: 1, visible: false },
+        { propertyName: 'Mass', label: 'Massa', unit: 't', decimalPlaces: 1, visible: false },
+      ],
+      decimalPlaces: 1,
+      showLevelFill: true,
+      showFooter: true,
+    };
+
+    // Root Template: Base Tank
     templateRepo.save({
-      id: tankTemplateId,
+      id: baseTankTplId,
       name: 'Tank Template',
       parentTemplateId: null,
-      description: 'Base template for industrial process tanks',
+      description: 'Template base para equipamentos de tancagem industrial. Define as propriedades comuns a todos os tanques.',
+      graphicConfig: defaultGraphicConfig,
       createdAt: now,
       updatedAt: now,
     });
 
-    // Tank Template Properties
-    const tankProps = [
-      { name: 'Tag', dataType: 'String', defaultValue: 'TANK_000', description: 'Equipment identification tag' },
-      { name: 'Description', dataType: 'String', defaultValue: 'Base Tank Equipment', description: 'Detailed equipment description' },
-      { name: 'Level', dataType: 'Float', defaultValue: '0.0', description: 'Current fluid level percentage (0-100%)' },
-      { name: 'Temperature', dataType: 'Float', defaultValue: '25.0', description: 'Current process temperature (°C)' },
-      { name: 'Pressure', dataType: 'Float', defaultValue: '1.013', description: 'Internal pressure (bar)' },
-      { name: 'Flow', dataType: 'Float', defaultValue: '0.0', description: 'Inlet/Outlet flow rate (m³/h)' },
+    // -------------------------------------------------------------------------
+    // 5a. Properties on the BASE TANK TEMPLATE
+    // These are inherited by all derived templates and instances.
+    // -------------------------------------------------------------------------
+    const baseTplProps: PropDef[] = [
+      // Identificação
+      makeProp(baseTankTplId, 'template', 'Tag', 'String', '', 'TAG industrial do equipamento (ex: TK-301)', 'Identificação'),
+      makeProp(baseTankTplId, 'template', 'Description', 'String', '', 'Descrição operacional completa', 'Identificação'),
+      makeProp(baseTankTplId, 'template', 'Area', 'String', '', 'Área da planta industrial onde o equipamento está localizado', 'Identificação'),
+      makeProp(baseTankTplId, 'template', 'Product', 'String', '', 'Produto petroquímico armazenado', 'Identificação'),
+
+      // Estado Operacional
+      makeProp(baseTankTplId, 'template', 'Status', 'String', 'Normal', 'Status operacional e de inventário do tanque', 'Status'),
+
+      // Capacidade e Inventário
+      makeProp(baseTankTplId, 'template', 'Capacity', 'Float', '15000.0', 'Capacidade volumétrica nominal total (m³)', 'Inventário'),
+      makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário'),
+      makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário'),
+      makeProp(baseTankTplId, 'template', 'Mass', 'Float', '0.0', 'Massa total armazenada (toneladas)', 'Inventário'),
+      makeProp(baseTankTplId, 'template', 'VCF', 'Float', '1.000', 'Fator de Correção de Volume (Volume Correction Factor)', 'Inventário'),
+
+      // Processo
+      makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo'),
+      makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo'),
+      makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo'),
+      makeProp(baseTankTplId, 'template', 'Density', 'Float', '800.0', 'Densidade operacional do produto (kg/m³)', 'Processo'),
+
+      // Limites de Alarme
+      makeProp(baseTankTplId, 'template', 'HighHighLevel', 'Float', '90.0', 'Limite de alarme Nível Muito Alto - HH (%)', 'Limites'),
+      makeProp(baseTankTplId, 'template', 'HighLevel', 'Float', '80.0', 'Limite de alarme Nível Alto - H (%)', 'Limites'),
+      makeProp(baseTankTplId, 'template', 'LowLevel', 'Float', '15.0', 'Limite de alarme Nível Baixo - L (%)', 'Limites'),
+      makeProp(baseTankTplId, 'template', 'LowLowLevel', 'Float', '5.0', 'Limite de alarme Nível Muito Baixo - LL (%)', 'Limites'),
+      makeProp(baseTankTplId, 'template', 'HighPressure', 'Float', '2.5', 'Limite de alarme Pressão Alta (bar)', 'Limites'),
+      makeProp(baseTankTplId, 'template', 'LowPressure', 'Float', '0.9', 'Limite de alarme Pressão Baixa (bar)', 'Limites'),
     ];
 
-    tankProps.forEach((p) => {
-      let alarmConfig: any = undefined;
+    baseTplProps.forEach((p) =>
+      propertyRepo.save({ id: uuidv4(), ...p, createdAt: now, updatedAt: now })
+    );
 
-      if (p.name === 'Level') {
-        alarmConfig = {
-          enabled: true,
-          rules: [
-            {
-              id: uuidv4(),
-              type: 'H',
-              enabled: true,
-              blocked: false,
-              compareValue: '80.0',
-              severity: 'high',
-              priority: 70,
-              message: 'Nível do Tanque Alto (> 80%)',
-              color: '#f97316',
-              icon: 'AlertTriangle',
-              activationDelay: 2,
-              returnDelay: 1,
-              hysteresis: 2.0,
-              requireAck: true,
-              historical: true,
-            },
-            {
-              id: uuidv4(),
-              type: 'HH',
-              enabled: true,
-              blocked: false,
-              compareValue: '90.0',
-              severity: 'critical',
-              priority: 95,
-              message: 'Nível do Tanque Crítico (> 90%)',
-              color: '#ef4444',
-              icon: 'ShieldAlert',
-              activationDelay: 0,
-              returnDelay: 1,
-              hysteresis: 1.0,
-              requireAck: true,
-              historical: true,
-            }
-          ]
-        };
-      } else if (p.name === 'Temperature') {
-        alarmConfig = {
-          enabled: true,
-          rules: [
-            {
-              id: uuidv4(),
-              type: 'H',
-              enabled: true,
-              blocked: false,
-              compareValue: '60.0',
-              severity: 'medium',
-              priority: 50,
-              message: 'Temperatura do Tanque Alta (> 60°C)',
-              color: '#eab308',
-              icon: 'AlertCircle',
-              activationDelay: 3,
-              returnDelay: 2,
-              hysteresis: 3.0,
-              requireAck: true,
-              historical: true,
-            }
-          ]
-        };
-      }
-
-      propertyRepo.save({
-        id: uuidv4(),
-        targetId: tankTemplateId,
-        targetType: 'template',
-        name: p.name,
-        dataType: p.dataType as any,
-        defaultValue: p.defaultValue,
-        description: p.description,
-        alarmConfig,
-        createdAt: now,
-        updatedAt: now,
-      });
-    });
-
-
-    // Tank Template Default Mock Configurations
-    mockConfigRepo.save({
-      id: uuidv4(),
-      targetId: tankTemplateId,
-      targetType: 'template',
-      propertyName: 'Level',
-      enabled: true,
-      preset: 'sine',
-      params: { min: 0, max: 100, periodSeconds: 10, decimals: 2 },
+    // -------------------------------------------------------------------------
+    // 5b. Derived Templates
+    // -------------------------------------------------------------------------
+    const tplAtm = {
+      id: 'tpl-atm-tank',
+      name: 'Atmospheric Tank',
+      parentTemplateId: baseTankTplId,
+      description: 'Tanque cilíndrico vertical atmosférico de teto fixo ou flutuante (API 650)',
+      graphicConfig: {
+        ...defaultGraphicConfig,
+        geometryType: 'vertical_cylindrical' as const,
+      },
       createdAt: now,
       updatedAt: now,
-    });
+    };
 
-    mockConfigRepo.save({
-      id: uuidv4(),
-      targetId: tankTemplateId,
-      targetType: 'template',
-      propertyName: 'Temperature',
-      enabled: true,
-      preset: 'walk',
-      params: { min: 20, max: 90, step: 1.5, decimals: 1 },
+    const tplHoriz = {
+      id: 'tpl-horiz-tank',
+      name: 'Horizontal Tank',
+      parentTemplateId: baseTankTplId,
+      description: 'Tanque cilíndrico horizontal para médios e pequenos volumes (API 12F)',
+      graphicConfig: {
+        ...defaultGraphicConfig,
+        geometryType: 'horizontal_cylindrical' as const,
+        fieldBindings: defaultGraphicConfig.fieldBindings.map((fb) => ({
+          ...fb,
+          visible: fb.propertyName === 'Flow' ? false : fb.visible,
+        })),
+      },
       createdAt: now,
       updatedAt: now,
-    });
+    };
 
-    mockConfigRepo.save({
-      id: uuidv4(),
-      targetId: tankTemplateId,
-      targetType: 'template',
-      propertyName: 'Pressure',
-      enabled: true,
-      preset: 'range',
-      params: { min: 1.0, max: 4.5, decimals: 3 },
+    const tplSpherical = {
+      id: 'tpl-spherical-tank',
+      name: 'Spherical Tank',
+      parentTemplateId: baseTankTplId,
+      description: 'Esfera pressurizada para armazenamento de gases liquefeitos (API 2510)',
+      graphicConfig: {
+        ...defaultGraphicConfig,
+        geometryType: 'spherical' as const,
+        fieldBindings: defaultGraphicConfig.fieldBindings.map((fb) => ({
+          ...fb,
+          visible: fb.propertyName === 'Pressure' ? true : fb.visible,
+        })),
+      },
       createdAt: now,
       updatedAt: now,
-    });
+    };
 
-    mockConfigRepo.save({
-      id: uuidv4(),
-      targetId: tankTemplateId,
-      targetType: 'template',
-      propertyName: 'Flow',
-      enabled: true,
-      preset: 'sine',
-      params: { min: 0, max: 150, periodSeconds: 8, decimals: 1 },
+    const tplPressurized = {
+      id: 'tpl-pressurized-tank',
+      name: 'Pressurized Vessel',
+      parentTemplateId: baseTankTplId,
+      description: 'Vaso pressurizado cilíndrico com tampos abaulados (ASME VIII)',
+      graphicConfig: {
+        ...defaultGraphicConfig,
+        geometryType: 'pressurized' as const,
+        fieldBindings: defaultGraphicConfig.fieldBindings.map((fb) => ({
+          ...fb,
+          visible: fb.propertyName === 'Pressure' ? true : fb.visible,
+        })),
+      },
       createdAt: now,
       updatedAt: now,
-    });
+    };
 
-    // Tank Template Script
-    scriptRepo.save({
-      id: uuidv4(),
-      targetId: tankTemplateId,
-      targetType: 'template',
-      name: 'OnLevelHighAlarm',
-      trigger: 'Value Changed',
-      triggerExpression: 'me.Level > 85.0',
-      loopTimeMs: null,
-      code: `// High level alarm logic for Tank
-if (me.Level > 85.0) {
-  LogWarning("Tank " + me.Tag + " level exceeded high limit: " + me.Level + "%");
-  me.AlarmStatus = true;
-}`,
-      description: 'Triggers when fluid level exceeds high threshold',
-      createdAt: now,
-      updatedAt: now,
-    });
+    templateRepo.save(tplAtm);
+    templateRepo.save(tplHoriz);
+    templateRepo.save(tplSpherical);
+    templateRepo.save(tplPressurized);
 
-    // 2. Storage Tank Template (Derived Template)
-    const storageTankTemplateId = uuidv4();
-    templateRepo.save({
-      id: storageTankTemplateId,
-      name: 'Storage Tank',
-      parentTemplateId: tankTemplateId,
-      description: 'Specialized storage tank with high-capacity controls',
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Additional Property for Storage Tank
-    propertyRepo.save({
-      id: uuidv4(),
-      targetId: storageTankTemplateId,
-      targetType: 'template',
-      name: 'Capacity',
-      dataType: 'Float',
-      defaultValue: '5000.0',
-      description: 'Maximum storage volumetric capacity (Liters)',
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // 3. Pump Template (Root Template)
-    const pumpTemplateId = uuidv4();
-    templateRepo.save({
-      id: pumpTemplateId,
-      name: 'Pump Template',
-      parentTemplateId: null,
-      description: 'Base template for centrifugal process pumps',
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    const pumpProps = [
-      { name: 'Tag', dataType: 'String', defaultValue: 'PUMP_000', description: 'Pump Tag ID' },
-      { name: 'Status', dataType: 'Boolean', defaultValue: 'false', description: 'Run status (Running / Stopped)' },
-      { name: 'SpeedRPM', dataType: 'Integer', defaultValue: '1750', description: 'Operational rotational speed (RPM)' },
-      { name: 'Vibration', dataType: 'Float', defaultValue: '0.12', description: 'Vibration amplitude (mm/s RMS)' },
+    // -------------------------------------------------------------------------
+    // 6. Tank Instances — only VALUE OVERRIDES (not duplicating template props)
+    // -------------------------------------------------------------------------
+    const tankSeeds = [
+      // Unit 300 - Atmospheric Nafta Tanks
+      {
+        id: 'tank-tk-301',
+        tag: 'TK-301',
+        name: 'TK-301',
+        description: 'Tanque Atmosférico de Nafta TK-301',
+        templateId: 'tpl-atm-tank',
+        areaId: 'area-300',
+        areaName: 'Unidade 300 - Parque de Tanques de Matéria-Prima',
+        productName: 'Nafta Petroquímica',
+        capacity: 15000,
+        level: 75.0,
+        temp: 28.5,
+        press: 1.02,
+        flow: -120.0,
+        density: 720.0,
+        status: 'Em Transferência',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 2.5, lPress: 0.9,
+        geometry: 'vertical_cylindrical' as const,
+      },
+      {
+        id: 'tank-tk-302',
+        tag: 'TK-302',
+        name: 'TK-302',
+        description: 'Tanque Atmosférico de Nafta TK-302',
+        templateId: 'tpl-atm-tank',
+        areaId: 'area-300',
+        areaName: 'Unidade 300 - Parque de Tanques de Matéria-Prima',
+        productName: 'Nafta Petroquímica',
+        capacity: 15000,
+        level: 35.0,
+        temp: 27.8,
+        press: 1.01,
+        flow: 120.0,
+        density: 720.0,
+        status: 'Em Transferência',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 2.5, lPress: 0.9,
+        geometry: 'vertical_cylindrical' as const,
+      },
+      // Unit 400 - Aromatics & Intermediates
+      {
+        id: 'tank-tk-403',
+        tag: 'TK-403',
+        name: 'TK-403',
+        description: 'Tanque Horizontal Para-Xileno TK-403',
+        templateId: 'tpl-horiz-tank',
+        areaId: 'area-400',
+        areaName: 'Unidade 400 - Parque de Tanques Intermediários',
+        productName: 'Para-Xileno',
+        capacity: 5000,
+        level: 55.0,
+        temp: 26.0,
+        press: 1.15,
+        flow: 0.0,
+        density: 861.0,
+        status: 'Normal',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 2.5, lPress: 0.9,
+        geometry: 'horizontal_cylindrical' as const,
+      },
+      {
+        id: 'tank-tk-404',
+        tag: 'TK-404',
+        name: 'TK-404',
+        description: 'Tanque Horizontal Para-Xileno TK-404',
+        templateId: 'tpl-horiz-tank',
+        areaId: 'area-400',
+        areaName: 'Unidade 400 - Parque de Tanques Intermediários',
+        productName: 'Para-Xileno',
+        capacity: 5000,
+        level: 40.0,
+        temp: 24.5,
+        press: 1.12,
+        flow: 0.0,
+        density: 861.0,
+        status: 'Normal',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 2.5, lPress: 0.9,
+        geometry: 'horizontal_cylindrical' as const,
+      },
+      // Unit 500 - Spheres & Pressurized Vessels
+      {
+        id: 'tank-v-301',
+        tag: 'V-301',
+        name: 'V-301',
+        description: 'Esfera Pressurizada de Eteno V-301',
+        templateId: 'tpl-spherical-tank',
+        areaId: 'area-500',
+        areaName: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        productName: 'Eteno (Etileno)',
+        capacity: 6000,
+        level: 64.0,
+        temp: -10.5,
+        press: 18.5,
+        flow: 0.0,
+        density: 568.0,
+        status: 'Normal',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 22.0, lPress: 10.0,
+        geometry: 'spherical' as const,
+      },
+      {
+        id: 'tank-v-302',
+        tag: 'V-302',
+        name: 'V-302',
+        description: 'Esfera Pressurizada de Eteno V-302',
+        templateId: 'tpl-spherical-tank',
+        areaId: 'area-500',
+        areaName: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        productName: 'Eteno (Etileno)',
+        capacity: 6000,
+        level: 48.0,
+        temp: -12.0,
+        press: 17.8,
+        flow: 0.0,
+        density: 568.0,
+        status: 'Normal',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 22.0, lPress: 10.0,
+        geometry: 'spherical' as const,
+      },
+      {
+        id: 'tank-v-401',
+        tag: 'V-401',
+        name: 'V-401',
+        description: 'Vaso Pressurizado de Propeno V-401',
+        templateId: 'tpl-pressurized-tank',
+        areaId: 'area-500',
+        areaName: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        productName: 'Propeno (Propileno)',
+        capacity: 4000,
+        level: 72.0,
+        temp: 15.0,
+        press: 12.4,
+        flow: 0.0,
+        density: 514.0,
+        status: 'Normal',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 15.0, lPress: 7.0,
+        geometry: 'pressurized' as const,
+      },
+      {
+        id: 'tank-v-402',
+        tag: 'V-402',
+        name: 'V-402',
+        description: 'Vaso Pressurizado de Propeno V-402',
+        templateId: 'tpl-pressurized-tank',
+        areaId: 'area-500',
+        areaName: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        productName: 'Propeno (Propileno)',
+        capacity: 4000,
+        level: 30.0,
+        temp: 16.5,
+        press: 11.5,
+        flow: 0.0,
+        density: 514.0,
+        status: 'Normal',
+        hhLevel: 90.0, hLevel: 80.0, lLevel: 15.0, llLevel: 5.0,
+        hPress: 15.0, lPress: 7.0,
+        geometry: 'pressurized' as const,
+      },
     ];
 
-    pumpProps.forEach((p) => {
-      propertyRepo.save({
-        id: uuidv4(),
-        targetId: pumpTemplateId,
-        targetType: 'template',
-        name: p.name,
-        dataType: p.dataType as any,
-        defaultValue: p.defaultValue,
-        description: p.description,
-        createdAt: now,
-        updatedAt: now,
-      });
-    });
+    // Deployment folders (Areas)
+    const folder300Id = 'folder-area-300';
+    const folder400Id = 'folder-area-400';
+    const folder500Id = 'folder-area-500';
 
-    // Pump Script
-    scriptRepo.save({
-      id: uuidv4(),
-      targetId: pumpTemplateId,
-      targetType: 'template',
-      name: 'OnStartupCheck',
-      trigger: 'Initialize',
-      triggerExpression: '',
-      loopTimeMs: null,
-      code: `// Initial safety checks for pump startup
-LogInfo("Initializing Pump " + me.Tag + "...");
-me.Status = false;
-me.Vibration = 0.0;`,
-      description: 'Initialization script executed on start',
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // 4. Instances (Objects)
-    const tank101Id = uuidv4();
-    objectRepo.save({
-      id: tank101Id,
-      name: 'Tank101',
-      templateId: storageTankTemplateId,
-      description: 'Raw Water Storage Tank 101 in Area A',
-      isDeployed: true,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Custom local override for Tank101
-    propertyRepo.save({
-      id: uuidv4(),
-      targetId: tank101Id,
-      targetType: 'instance',
-      name: 'Tag',
-      dataType: 'String',
-      defaultValue: 'TK-101-RAW',
-      description: 'Specific Tag for Tank 101',
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    const tank102Id = uuidv4();
-    objectRepo.save({
-      id: tank102Id,
-      name: 'Tank102',
-      templateId: storageTankTemplateId,
-      description: 'Treated Water Storage Tank 102 in Area A',
-      isDeployed: false,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    const pump201Id = uuidv4();
-    objectRepo.save({
-      id: pump201Id,
-      name: 'Pump201',
-      templateId: pumpTemplateId,
-      description: 'Main Feed Pump 201 in Area B',
-      isDeployed: true,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // 5. Deployment Tree Structure
-    // Plant Folder
-    const plantFolderId = uuidv4();
     deploymentRepo.saveFolder({
-      id: plantFolderId,
-      name: 'Plant',
+      id: folder300Id,
+      name: 'Unidade 300 - Matéria-Prima',
       parentFolderId: null,
-      order: 0,
+      order: 1,
       createdAt: now,
       updatedAt: now,
     });
-
-    // Área A Subfolder inside Plant
-    const areaAFolderId = uuidv4();
     deploymentRepo.saveFolder({
-      id: areaAFolderId,
-      name: 'Área A',
-      parentFolderId: plantFolderId,
-      order: 0,
+      id: folder400Id,
+      name: 'Unidade 400 - Intermediários',
+      parentFolderId: null,
+      order: 2,
       createdAt: now,
       updatedAt: now,
     });
-
-    // Área B Subfolder inside Plant
-    const areaBFolderId = uuidv4();
     deploymentRepo.saveFolder({
-      id: areaBFolderId,
-      name: 'Área B',
-      parentFolderId: plantFolderId,
-      order: 1,
+      id: folder500Id,
+      name: 'Unidade 500 - Olefinas Pressurizadas',
+      parentFolderId: null,
+      order: 3,
       createdAt: now,
       updatedAt: now,
     });
 
-    // Deployment Nodes
-    // Node for Área A folder inside Plant
-    deploymentRepo.saveNode({
-      id: uuidv4(),
-      type: 'folder',
-      targetId: areaAFolderId,
-      parentFolderId: plantFolderId,
-      order: 0,
-      createdAt: now,
-      updatedAt: now,
-    });
+    tankSeeds.forEach((seed, idx) => {
+      const vol = (seed.capacity * seed.level) / 100;
+      const mass = (vol * seed.density) / 1000;
+      const targetFolderId =
+        seed.areaId === 'area-300' ? folder300Id :
+        seed.areaId === 'area-400' ? folder400Id : folder500Id;
 
-    // Node for Tank101 inside Área A
-    deploymentRepo.saveNode({
-      id: uuidv4(),
-      type: 'object',
-      targetId: tank101Id,
-      parentFolderId: areaAFolderId,
-      order: 0,
-      createdAt: now,
-      updatedAt: now,
-    });
+      // Determine graphicConfig based on template
+      const tplGraphic = seed.geometry === 'horizontal_cylindrical' ? tplHoriz.graphicConfig
+        : seed.geometry === 'spherical' ? tplSpherical.graphicConfig
+        : seed.geometry === 'pressurized' ? tplPressurized.graphicConfig
+        : tplAtm.graphicConfig;
 
-    // Node for Tank102 inside Área A
-    deploymentRepo.saveNode({
-      id: uuidv4(),
-      type: 'object',
-      targetId: tank102Id,
-      parentFolderId: areaAFolderId,
-      order: 1,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Node for Área B folder inside Plant
-    deploymentRepo.saveNode({
-      id: uuidv4(),
-      type: 'folder',
-      targetId: areaBFolderId,
-      parentFolderId: plantFolderId,
-      order: 1,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Node for Pump201 inside Área B
-    deploymentRepo.saveNode({
-      id: uuidv4(),
-      type: 'object',
-      targetId: pump201Id,
-      parentFolderId: areaBFolderId,
-      order: 0,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Seeding default Graphic associations
-    widgetSeedService.seedIfEmpty();
-    const widgets = widgetRepo.getAll();
-    const tankWidget = widgets.find(w => w.name.toLowerCase().includes('tank level'));
-    const pumpWidget = widgets.find(w => w.name.toLowerCase().includes('motor pump'));
-
-    if (tankWidget) {
-      const levelProp = tankWidget.customProperties.find(p => p.name === 'Level_PV');
-      const alarmProp = tankWidget.customProperties.find(p => p.name === 'HighAlarm');
-      associatedWidgetRepo.save({
-        id: uuidv4(),
-        targetId: tankTemplateId,
-        targetType: 'template',
-        widgetId: tankWidget.id,
-        mappings: {
-          ...(levelProp ? { [levelProp.id]: { type: 'property', value: 'me.Level' } } : {}),
-          ...(alarmProp ? { [alarmProp.id]: { type: 'fixed', value: 'false' } } : {}),
+      // Save ObjectEntity
+      objectRepo.save({
+        id: seed.id,
+        name: seed.name,
+        templateId: seed.templateId,
+        description: seed.description,
+        isDeployed: true,
+        graphicConfig: {
+          ...tplGraphic,
+          geometryType: seed.geometry,
         },
         createdAt: now,
         updatedAt: now,
       });
-    }
 
-    if (pumpWidget) {
-      const stateProp = pumpWidget.customProperties.find(p => p.name === 'PumpState');
-      const speedProp = pumpWidget.customProperties.find(p => p.name === 'MotorSpeed');
-      const tagProp = pumpWidget.customProperties.find(p => p.name === 'HeaderTag');
-      associatedWidgetRepo.save({
+      // -----------------------------------------------------------------------
+      // Instance-level OVERRIDES only — values that differ from template defaults.
+      // -----------------------------------------------------------------------
+      const instanceProps: PropDef[] = [
+        makeProp(seed.id, 'instance', 'Tag', 'String', seed.tag, 'TAG industrial do equipamento', 'Identificação'),
+        makeProp(seed.id, 'instance', 'Description', 'String', seed.description, 'Descrição operacional', 'Identificação'),
+        makeProp(seed.id, 'instance', 'Area', 'String', seed.areaName, 'Área da planta industrial', 'Identificação'),
+        makeProp(seed.id, 'instance', 'Product', 'String', seed.productName, 'Produto petroquímico armazenado', 'Identificação'),
+        makeProp(seed.id, 'instance', 'Status', 'String', seed.status, 'Status operacional e de inventário', 'Status'),
+        makeProp(seed.id, 'instance', 'Capacity', 'Float', seed.capacity.toString(), 'Capacidade volumétrica nominal total (m³)', 'Inventário'),
+        makeProp(seed.id, 'instance', 'Level', 'Float', seed.level.toString(), 'Nível medido (%)', 'Inventário'),
+        makeProp(seed.id, 'instance', 'Volume', 'Float', vol.toFixed(1), 'Volume atual (m³)', 'Inventário'),
+        makeProp(seed.id, 'instance', 'Temperature', 'Float', seed.temp.toString(), 'Temperatura (°C)', 'Processo'),
+        makeProp(seed.id, 'instance', 'Pressure', 'Float', seed.press.toString(), 'Pressão (bar)', 'Processo'),
+        makeProp(seed.id, 'instance', 'Flow', 'Float', seed.flow.toString(), 'Vazão (m³/h)', 'Processo'),
+        makeProp(seed.id, 'instance', 'Density', 'Float', seed.density.toString(), 'Densidade (kg/m³)', 'Processo'),
+        makeProp(seed.id, 'instance', 'VCF', 'Float', '0.994', 'Fator de Correção de Volume', 'Inventário'),
+        makeProp(seed.id, 'instance', 'Mass', 'Float', mass.toFixed(1), 'Massa total armazenada (t)', 'Inventário'),
+        makeProp(seed.id, 'instance', 'HighHighLevel', 'Float', seed.hhLevel.toString(), 'Limite HH de nível (%)', 'Limites'),
+        makeProp(seed.id, 'instance', 'HighLevel', 'Float', seed.hLevel.toString(), 'Limite H de nível (%)', 'Limites'),
+        makeProp(seed.id, 'instance', 'LowLevel', 'Float', seed.lLevel.toString(), 'Limite L de nível (%)', 'Limites'),
+        makeProp(seed.id, 'instance', 'LowLowLevel', 'Float', seed.llLevel.toString(), 'Limite LL de nível (%)', 'Limites'),
+        makeProp(seed.id, 'instance', 'HighPressure', 'Float', seed.hPress.toString(), 'Limite de alta pressão (bar)', 'Limites'),
+        makeProp(seed.id, 'instance', 'LowPressure', 'Float', seed.lPress.toString(), 'Limite de baixa pressão (bar)', 'Limites'),
+      ];
+
+      instanceProps.forEach((p) =>
+        propertyRepo.save({ id: uuidv4(), ...p, createdAt: now, updatedAt: now })
+      );
+
+      // Save Deployment Node
+      deploymentRepo.saveNode({
         id: uuidv4(),
-        targetId: pumpTemplateId,
-        targetType: 'template',
-        widgetId: pumpWidget.id,
-        mappings: {
-          ...(stateProp ? { [stateProp.id]: { type: 'property', value: 'me.Status' } } : {}),
-          ...(speedProp ? { [speedProp.id]: { type: 'property', value: 'me.SpeedRPM' } } : {}),
-          ...(tagProp ? { [tagProp.id]: { type: 'property', value: 'me.Tag' } } : {}),
-        },
+        type: 'object',
+        targetId: seed.id,
+        parentFolderId: targetFolderId,
+        order: idx + 1,
         createdAt: now,
         updatedAt: now,
       });
-    }
+    });
 
-    // Seed Sample Flowcharts
-    flowchartRepo.saveAll([
+    // -------------------------------------------------------------------------
+    // 7. Initial OMM Movements
+    // -------------------------------------------------------------------------
+    const initialMovements = [
       {
-        id: uuidv4(),
-        name: 'Controle de Bombeamento e Nível da Planta',
-        description: 'Fluxograma global de automação para controle de transferência de fluido entre tanques de processo.',
-        category: 'Automação de Produção',
-        tags: ['Bombeamento', 'Nível', 'Nível Alto', 'Batelada'],
-        version: '1.0.0',
-        author: 'Engenharia de Automação',
-        contextType: 'global',
-        targetId: null,
-        folderId: null,
-        bpmnXml: `<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
-  <bpmn:process id="Process_1" isExecutable="false">
-    <bpmn:startEvent id="StartEvent_1" name="Início da Batelada">
-      <bpmn:outgoing>Flow_1</bpmn:outgoing>
-    </bpmn:startEvent>
-    <bpmn:serviceTask id="Task_ReadLevel" name="Ler Propriedade: Nível Tanque">
-      <bpmn:incoming>Flow_1</bpmn:incoming>
-      <bpmn:outgoing>Flow_2</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_Compare" name="Nível > 80%?">
-      <bpmn:incoming>Flow_2</bpmn:incoming>
-      <bpmn:outgoing>Flow_High</bpmn:outgoing>
-      <bpmn:outgoing>Flow_Normal</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Task_StartPump" name="Escrever Propriedade: Ligar Bomba">
-      <bpmn:incoming>Flow_High</bpmn:incoming>
-      <bpmn:outgoing>Flow_3</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:intermediateCatchEvent id="Event_Delay" name="Aguardar 5s">
-      <bpmn:incoming>Flow_Normal</bpmn:incoming>
-      <bpmn:outgoing>Flow_4</bpmn:outgoing>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:endEvent id="EndEvent_1" name="Fim da Sequência">
-      <bpmn:incoming>Flow_3</bpmn:incoming>
-      <bpmn:incoming>Flow_4</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_ReadLevel" />
-    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_ReadLevel" targetRef="Gateway_Compare" />
-    <bpmn:sequenceFlow id="Flow_High" name="Sim" sourceRef="Gateway_Compare" targetRef="Task_StartPump" />
-    <bpmn:sequenceFlow id="Flow_Normal" name="Não" sourceRef="Gateway_Compare" targetRef="Event_Delay" />
-    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_StartPump" targetRef="EndEvent_1" />
-    <bpmn:sequenceFlow id="Flow_4" sourceRef="Event_Delay" targetRef="EndEvent_1" />
-  </bpmn:process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="160" y="120" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Task_ReadLevel" bpmnElement="Task_ReadLevel">
-        <dc:Bounds x="250" y="98" width="160" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Gateway_Compare" bpmnElement="Gateway_Compare" isMarkerVisible="true">
-        <dc:Bounds x="465" y="113" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Task_StartPump" bpmnElement="Task_StartPump">
-        <dc:Bounds x="570" y="40" width="160" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Event_Delay" bpmnElement="Event_Delay">
-        <dc:Bounds x="630" y="192" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_EndEvent_1" bpmnElement="EndEvent_1">
-        <dc:Bounds x="800" y="120" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Edge_Flow_1" bpmnElement="Flow_1">
-        <di:waypoint x="196" y="138" />
-        <di:waypoint x="250" y="138" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_2" bpmnElement="Flow_2">
-        <di:waypoint x="410" y="138" />
-        <di:waypoint x="465" y="138" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_High" bpmnElement="Flow_High">
-        <di:waypoint x="490" y="113" />
-        <di:waypoint x="490" y="80" />
-        <di:waypoint x="570" y="80" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_Normal" bpmnElement="Flow_Normal">
-        <di:waypoint x="490" y="163" />
-        <di:waypoint x="490" y="210" />
-        <di:waypoint x="630" y="210" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3">
-        <di:waypoint x="730" y="80" />
-        <di:waypoint x="818" y="80" />
-        <di:waypoint x="818" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_4" bpmnElement="Flow_4">
-        <di:waypoint x="666" y="210" />
-        <di:waypoint x="818" y="210" />
-        <di:waypoint x="818" y="156" />
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</bpmn:definitions>`,
-        nodeMetadata: {
-          Task_ReadLevel: {
-            id: 'Task_ReadLevel',
-            name: 'Ler Propriedade: Nível Tanque',
-            isIndustrialNode: true,
-            industrialType: 'read_property',
-            targetPropertyName: 'me.Level',
-          },
-          Gateway_Compare: {
-            id: 'Gateway_Compare',
-            name: 'Nível > 80%?',
-            isIndustrialNode: true,
-            industrialType: 'compare_variable',
-            expression: {
-              logic: 'AND',
-              conditions: [
-                {
-                  id: 'c1',
-                  leftOperand: 'me.Level',
-                  leftOperandType: 'property',
-                  operator: 'GreaterThan',
-                  rightOperand: '80.0',
-                  rightOperandType: 'constant',
-                },
-              ],
-            },
-          },
-          Task_StartPump: {
-            id: 'Task_StartPump',
-            name: 'Escrever Propriedade: Ligar Bomba',
-            isIndustrialNode: true,
-            industrialType: 'write_property',
-            targetPropertyName: 'PUMP_001.Status',
-            assignment: {
-              targetProperty: 'PUMP_001.Status',
-              sourceType: 'constant',
-              sourceValue: 'true',
-            },
-          },
-          Event_Delay: {
-            id: 'Event_Delay',
-            name: 'Aguardar 5s',
-            isIndustrialNode: true,
-            industrialType: 'delay',
-            durationMs: 5000,
-          },
-        },
-        createdAt: now,
-        updatedAt: now,
+        id: 'mov-1',
+        code: 'MOV-2026-001',
+        description: 'Transferência Interna de Nafta TK-301 -> TK-302',
+        sourceTankId: 'tank-tk-301',
+        sourceTankTag: 'TK-301',
+        destinationTankId: 'tank-tk-302',
+        destinationTankTag: 'TK-302',
+        productId: 'prod-naphtha',
+        productName: 'Nafta Petroquímica',
+        via: 'Duto Principal D-301',
+        areaId: 'area-300',
+        operatorId: 'usr-1',
+        operatorName: 'Carlos Silva',
+        flowRate: 120.0,
+        plannedVolume: 2000.0,
+        volumeMoved: 450.0,
+        remainingVolume: 1550.0,
+        status: 'Active',
+        ettc: '12.9h',
+        etoc: '12.9h',
+        startTime: new Date(Date.now() - 3600000 * 3.75).toISOString(),
       },
       {
-        id: uuidv4(),
-        name: 'Procedimento de Drenagem e Segurança do Tanque',
-        description: 'Fluxograma específico do modelo Tank Template para rotina de drenagem automática quando alarmes são acionados.',
-        category: 'Procedimento Operacional',
-        tags: ['Segurança', 'Tanque', 'Drenagem', 'Alarme'],
-        version: '1.0.0',
-        author: 'Sistemas Industriais',
-        contextType: 'template',
-        targetId: tankTemplateId,
-        folderId: null,
-        bpmnXml: `<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_2" targetNamespace="http://bpmn.io/schema/bpmn">
-  <bpmn:process id="Process_2" isExecutable="false">
-    <bpmn:startEvent id="Start_Alarm" name="Evento Alarme Nível HH">
-      <bpmn:outgoing>Flow_A1</bpmn:outgoing>
-    </bpmn:startEvent>
-    <bpmn:serviceTask id="Task_Ack" name="Reconhecer Alarme">
-      <bpmn:incoming>Flow_A1</bpmn:incoming>
-      <bpmn:outgoing>Flow_A2</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_ScriptDrain" name="Executar Script: Iniciar Drenagem">
-      <bpmn:incoming>Flow_A2</bpmn:incoming>
-      <bpmn:outgoing>Flow_A3</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:endEvent id="End_Drain" name="Drenagem Concluída">
-      <bpmn:incoming>Flow_A3</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_A1" sourceRef="Start_Alarm" targetRef="Task_Ack" />
-    <bpmn:sequenceFlow id="Flow_A2" sourceRef="Task_Ack" targetRef="Task_ScriptDrain" />
-    <bpmn:sequenceFlow id="Flow_A3" sourceRef="Task_ScriptDrain" targetRef="End_Drain" />
-  </bpmn:process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_2">
-    <bpmndi:BPMNPlane id="BPMNPlane_2" bpmnElement="Process_2">
-      <bpmndi:BPMNShape id="Shape_Start_Alarm" bpmnElement="Start_Alarm">
-        <dc:Bounds x="160" y="120" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Task_Ack" bpmnElement="Task_Ack">
-        <dc:Bounds x="250" y="98" width="160" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_Task_ScriptDrain" bpmnElement="Task_ScriptDrain">
-        <dc:Bounds x="460" y="98" width="180" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Shape_End_Drain" bpmnElement="End_Drain">
-        <dc:Bounds x="690" y="120" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Edge_Flow_A1" bpmnElement="Flow_A1">
-        <di:waypoint x="196" y="138" />
-        <di:waypoint x="250" y="138" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_A2" bpmnElement="Flow_A2">
-        <di:waypoint x="410" y="138" />
-        <di:waypoint x="460" y="138" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_Flow_A3" bpmnElement="Flow_A3">
-        <di:waypoint x="640" y="138" />
-        <di:waypoint x="690" y="138" />
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
-</bpmn:definitions>`,
-        nodeMetadata: {
-          Task_Ack: {
-            id: 'Task_Ack',
-            name: 'Reconhecer Alarme',
-            isIndustrialNode: true,
-            industrialType: 'ack_alarm',
-          },
-          Task_ScriptDrain: {
-            id: 'Task_ScriptDrain',
-            name: 'Executar Script: Iniciar Drenagem',
-            isIndustrialNode: true,
-            industrialType: 'execute_script',
-          },
-        },
-        createdAt: now,
-        updatedAt: now,
+        id: 'mov-2',
+        code: 'MOV-2026-002',
+        description: 'Transferência Programada de Nafta TK-302 -> TK-301',
+        sourceTankId: 'tank-tk-302',
+        sourceTankTag: 'TK-302',
+        destinationTankId: 'tank-tk-301',
+        destinationTankTag: 'TK-301',
+        productId: 'prod-naphtha',
+        productName: 'Nafta Petroquímica',
+        via: 'Linha Aromáticos L-401',
+        areaId: 'area-300',
+        operatorId: 'usr-2',
+        operatorName: 'Ana Souza',
+        flowRate: 80.0,
+        plannedVolume: 1500.0,
+        volumeMoved: 0.0,
+        remainingVolume: 1500.0,
+        status: 'Issued',
+        ettc: '18.7h',
+        etoc: '18.7h',
+        startTime: null,
       },
-    ]);
+      {
+        id: 'mov-3',
+        code: 'MOV-2026-003',
+        description: 'Transferência Concluída Eteno V-301 -> V-302',
+        sourceTankId: 'tank-v-301',
+        sourceTankTag: 'V-301',
+        destinationTankId: 'tank-v-302',
+        destinationTankTag: 'V-302',
+        productId: 'prod-ethene',
+        productName: 'Eteno (Etileno)',
+        via: 'Manifold de Olefinas M-501',
+        areaId: 'area-500',
+        operatorId: 'usr-3',
+        operatorName: 'Roberto Mendes',
+        flowRate: 150.0,
+        plannedVolume: 1000.0,
+        volumeMoved: 1000.0,
+        remainingVolume: 0.0,
+        status: 'Completed',
+        ettc: '0.0h',
+        etoc: '0.0h',
+        startTime: new Date(Date.now() - 86400000).toISOString(),
+      },
+    ];
+    localStorage.setItem(STORAGE_KEYS.MOVEMENTS, JSON.stringify(initialMovements));
 
     localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
   }

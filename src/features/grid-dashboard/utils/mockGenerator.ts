@@ -50,6 +50,8 @@ export function generateRandomTankCard(
     pressure,
     pressureUnit: 'mbar',
     temperature,
+    geometryType: 'vertical_cylindrical',
+    fieldBindings: [],
     strappingFactor,
     calculatedVolume,
     volumeUnit: 'm³',

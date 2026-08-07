@@ -1,10 +1,13 @@
 import type { AlarmEvent } from '../types/domain';
 import { STORAGE_KEYS } from './storageKey';
+import { safeGetItem, safeSetItem } from '../utils/safeStorage';
+
+const MAX_ALARM_EVENTS = 200;
 
 export class AlarmRepository {
   public getAll(): AlarmEvent[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.ALARM_EVENTS);
+      const data = safeGetItem(STORAGE_KEYS.ALARM_EVENTS);
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -24,24 +27,29 @@ export class AlarmRepository {
     } else {
       all.push(event);
     }
-    localStorage.setItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(all));
+    // Cap total stored alarms to avoid infinite array growth
+    if (all.length > MAX_ALARM_EVENTS) {
+      all.splice(0, all.length - MAX_ALARM_EVENTS);
+    }
+    safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(all));
     return event;
   }
 
   public saveAll(events: AlarmEvent[]): void {
-    localStorage.setItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(events));
+    const capped = events.length > MAX_ALARM_EVENTS ? events.slice(-MAX_ALARM_EVENTS) : events;
+    safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(capped));
   }
 
   public delete(id: string): boolean {
     let all = this.getAll();
     const initialLen = all.length;
     all = all.filter((evt) => evt.id !== id);
-    localStorage.setItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(all));
+    safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(all));
     return all.length < initialLen;
   }
 
   public clear(): void {
-    localStorage.setItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify([]));
+    safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify([]));
   }
 }
 

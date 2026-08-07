@@ -59,7 +59,7 @@ export const ConnectivityStudioPage: React.FC = () => {
         <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/60">
           {navTabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id || (activeTab === 'flow-designer' && tab.id === 'flows');
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
@@ -120,7 +120,7 @@ export const ConnectivityStudioPage: React.FC = () => {
 
       {/* Main Module Active Tab Viewport */}
       <main className="flex-1 overflow-hidden relative">
-        {(activeTab === 'flows' || activeTab === 'flow-designer') && <FlowDesignerTab />}
+        {activeTab === 'flows' && <FlowDesignerTab />}
         {(activeTab === 'datasources' || activeTab === 'connection-designer') && <DataSourcesTab />}
         {(activeTab === 'logs' || activeTab === 'message-inspector' || activeTab === 'scheduler') && <LogsTab />}
         {activeTab === 'analytics' && <AnalyticsTab />}

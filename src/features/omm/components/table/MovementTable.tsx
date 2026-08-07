@@ -63,13 +63,11 @@ const GroupRowRenderer: React.FC<{
 // ---------------------------------------------------------------------------
 export const MovementTable: React.FC = () => {
   const getMovementRows = useOmmStore((s) => s.getMovementRows);
-  const movementsLen = useOmmStore((s) => s.movements.length);
-  const simulatorTick = useOmmStore((s) => s.simulatorState.tickCount);
-  const rows = useMemo(() => getMovementRows(), [getMovementRows, movementsLen, simulatorTick]);
+  const movements = useOmmStore((s) => s.movements);
+  const rows = useMemo(() => getMovementRows(), [getMovementRows, movements]);
   const selectedMovementId = useOmmStore((s) => s.selectedMovementId);
   const globalSearch = useOmmStore((s) => s.globalSearch);
   const tableGroupBy = useOmmStore((s) => s.tableGroupBy);
-  const simulatorState = useOmmStore((s) => s.simulatorState);
   const setSelectedMovement = useOmmStore((s) => s.setSelectedMovement);
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: false }]);
@@ -107,9 +105,9 @@ export const MovementTable: React.FC = () => {
       r.destinationTag.toLowerCase().includes(q) ||
       r.operatorName.toLowerCase().includes(q) ||
       r.status.toLowerCase().includes(q) ||
-      r.type.toLowerCase().includes(q)
+      r.movementTypeName.toLowerCase().includes(q)
     );
-  }, [rows, globalSearch, simulatorState.tickCount]);
+  }, [rows, globalSearch]);
 
   const table = useReactTable({
     data,
@@ -222,12 +220,14 @@ export const MovementTable: React.FC = () => {
                         )}
                       </div>
                       {/* Resize handle */}
-                      <div
-                        onMouseDown={header.getResizeHandler()}
-                        onTouchStart={header.getResizeHandler()}
-                        className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-sky-400 transition-colors"
-                        style={{ userSelect: 'none', touchAction: 'none' }}
-                      />
+                      {header.column.getCanResize() && (
+                        <div
+                          onMouseDown={header.getResizeHandler()}
+                          onTouchStart={header.getResizeHandler()}
+                          className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-sky-400 transition-colors"
+                          style={{ userSelect: 'none', touchAction: 'none' }}
+                        />
+                      )}
                     </th>
                   );
                 })}
@@ -250,7 +250,9 @@ export const MovementTable: React.FC = () => {
               return (
                 <tr
                   key={row.id}
-                  onClick={() => setSelectedMovement(isSelected ? null : row.original.id)}
+                  onClick={() => {
+                    setSelectedMovement(row.original.id);
+                  }}
                   className={`
                     border-b border-slate-100 dark:border-slate-800/60 cursor-pointer transition-colors
                     ${isSelected

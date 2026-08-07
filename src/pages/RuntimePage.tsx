@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Search,
   Box,
@@ -23,8 +23,9 @@ import {
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
 import { useObjectModelStore } from '../store/useObjectModelStore';
 import { inheritanceService } from '../services/InheritanceService';
-import type { MergedProperty, DeploymentTreeNode, DataType } from '../types/domain';
+import type { MergedProperty, DeploymentTreeNode } from '../types/domain';
 import { cn } from '../utils/cn';
+import { TankTelemetryDashboard } from '../components/ui/TankTelemetryDashboard';
 
 export const RuntimePage: React.FC = () => {
   const {
@@ -44,7 +45,6 @@ export const RuntimePage: React.FC = () => {
   const [editingPropKey, setEditingPropKey] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState('');
 
-
   const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
   const [sidebarSearch, setSidebarSearch] = useState('');
   const [propertySearch, setPropertySearch] = useState('');
@@ -59,6 +59,9 @@ export const RuntimePage: React.FC = () => {
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
     '__unassigned__': true,
   });
+
+  // Detail tab state (Properties list vs. 3D Telemetry dashboard)
+  const [detailTab, setDetailTab] = useState<'properties' | 'telemetry'>('telemetry');
 
   // Initialize objects on mount
   useEffect(() => {
@@ -86,11 +89,18 @@ export const RuntimePage: React.FC = () => {
     if (Object.keys(newlyChanged).length > 0) {
       setChangedProps(newlyChanged);
       const timer = setTimeout(() => setChangedProps({}), 600);
-      setPrevValues(simulatedValues);
       return () => clearTimeout(timer);
     }
+  }, [simulatedValues]);
+
+  useEffect(() => {
     setPrevValues(simulatedValues);
   }, [simulatedValues]);
+
+  // Reset tab to telemetry when selecting another object
+  useEffect(() => {
+    setDetailTab('telemetry');
+  }, [selectedObjectId]);
 
   // Expand folders on load
   useEffect(() => {
@@ -240,32 +250,17 @@ export const RuntimePage: React.FC = () => {
       return 0;
     });
 
+  // Check if object is a tank/vessel with telemetry data
+  const hasTelemetry = useMemo(() => {
+    return allProperties.some((p) => p.name === 'Level' || p.name === 'Volume');
+  }, [allProperties]);
+
   // Quick stats computed
   const localPropsCount = allProperties.filter((p) => !p.isInherited).length;
   const inheritedPropsCount = allProperties.filter((p) => p.isInherited).length;
 
-  // Format DataType display badges
-  const renderTypeBadge = (type: DataType) => {
-    const base = "px-2 py-0.5 rounded text-[10px] font-semibold border";
-    switch (type) {
-      case 'String':
-        return <span className={cn(base, "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/60")}>{type}</span>;
-      case 'Boolean':
-        return <span className={cn(base, "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/60")}>{type}</span>;
-      case 'Integer':
-        return <span className={cn(base, "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60")}>{type}</span>;
-      case 'Float':
-        return <span className={cn(base, "bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800/60")}>{type}</span>;
-      case 'Date':
-        return <span className={cn(base, "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/60")}>{type}</span>;
-      case 'Enum':
-        return <span className={cn(base, "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800/60")}>{type}</span>;
-      default:
-        return <span className={cn(base, "bg-slate-50 dark:bg-slate-950/40 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800/60")}>{type}</span>;
-    }
-  };
 
-  // Sidebar tree rendering functions
+
   const renderObjectRow = (node: DeploymentTreeNode, depth: number) => {
     const isSelected = selectedObjectId === node.targetId;
     return (
@@ -275,21 +270,23 @@ export const RuntimePage: React.FC = () => {
           e.stopPropagation();
           setSelectedObjectId(node.targetId);
         }}
-        style={{ paddingLeft: `${(depth + 1) * 12 + 6}px` }}
+        style={{ paddingLeft: `${depth * 12 + 8}px` }}
         className={cn(
-          'group flex items-center gap-2 py-1.5 pr-3 rounded-md text-xs font-medium cursor-pointer transition-all duration-150',
+          "flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-xs font-medium cursor-pointer transition-colors select-none",
           isSelected
-            ? 'bg-sky-500/10 text-sky-700 dark:text-sky-400 font-semibold border-l-2 border-sky-500'
-            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
+            ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-400 border-l-2 border-sky-500"
+            : "text-slate-650 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800/40"
         )}
       >
-        <Box className={cn('w-3.5 h-3.5 shrink-0 text-emerald-500')} />
-        <span className="truncate flex-1">{node.name}</span>
-        {node.templateName && (
-          <span className="opacity-0 group-hover:opacity-100 text-[10px] text-slate-400 font-normal px-1 rounded bg-slate-100 dark:bg-slate-800 shrink-0 transition-opacity">
-            {node.templateName}
-          </span>
-        )}
+        <Box className={cn("w-3.5 h-3.5", isSelected ? "text-sky-500" : "text-slate-400")} />
+        <div className="flex-1 truncate">
+          <span className="font-semibold">{node.name}</span>
+          {node.templateName && (
+            <span className="text-[9px] text-slate-400 dark:text-slate-550 ml-1.5 font-normal">
+              ({node.templateName})
+            </span>
+          )}
+        </div>
       </div>
     );
   };
@@ -400,7 +397,7 @@ export const RuntimePage: React.FC = () => {
                 placeholder="Buscar objetos..."
                 value={sidebarSearch}
                 onChange={(e) => setSidebarSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
+                className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
               />
             </div>
           </div>
@@ -422,7 +419,7 @@ export const RuntimePage: React.FC = () => {
         {/* Central Display Pane */}
         <main className="flex-1 flex flex-col bg-slate-100/50 dark:bg-slate-950/20 overflow-hidden">
           {selectedObj ? (
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-900">
               
               {/* Object Header Info */}
               <div className="p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-2xs select-none shrink-0">
@@ -482,220 +479,229 @@ export const RuntimePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Stats Bar */}
-              <div className="p-3 grid grid-cols-3 gap-3 shrink-0 select-none">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-3 rounded-lg flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-sky-500/10 dark:bg-sky-500/5 text-sky-50">
-                    <Database className="w-4 h-4 text-sky-500" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Total de Propriedades</span>
-                    <strong className="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">{allProperties.length}</strong>
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-3 rounded-lg flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-violet-500/10 dark:bg-violet-500/5 text-violet-50">
-                    <Layers className="w-4 h-4 text-violet-500" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Herdadas de Modelos</span>
-                    <strong className="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">{inheritedPropsCount}</strong>
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-3 rounded-lg flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/5 text-emerald-50">
-                    <FileCode className="w-4 h-4 text-emerald-500" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Locais/Customizadas</span>
-                    <strong className="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">{localPropsCount}</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* Filtering Toolbar */}
-              <div className="px-4 py-2 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
-                
-                {/* Search & Type filters */}
-                <div className="flex items-center gap-2 flex-1 min-w-[280px]">
-                  <div className="relative flex-1">
-                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Pesquisar por nome, valor ou descrição..."
-                      value={propertySearch}
-                      onChange={(e) => setPropertySearch(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
-                    />
-                  </div>
-
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-700 dark:text-slate-300"
+              {/* Tabs selector if object has telemetry variables */}
+              {hasTelemetry && (
+                <div className="flex border-b border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 shrink-0">
+                  <button
+                    onClick={() => setDetailTab('telemetry')}
+                    className={cn(
+                      "px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer",
+                      detailTab === 'telemetry'
+                        ? "border-sky-500 text-sky-600 dark:text-sky-400 font-bold"
+                        : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
+                    )}
                   >
-                    <option value="ALL">Todos os Tipos</option>
-                    <option value="String">String</option>
-                    <option value="Boolean">Boolean</option>
-                    <option value="Integer">Integer</option>
-                    <option value="Float">Float</option>
-                    <option value="Date">Date</option>
-                    <option value="Enum">Enum</option>
-                  </select>
-                </div>
-
-                {/* Sort Option */}
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 font-medium">
-                  <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Ordenar por:</span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
-                    className="px-2 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs outline-none focus:border-sky-500 text-slate-700 dark:text-slate-300 font-semibold"
+                    Telemetria & Tendências (3D)
+                  </button>
+                  <button
+                    onClick={() => setDetailTab('properties')}
+                    className={cn(
+                      "px-4 py-2 text-xs font-semibold border-b-2 transition-all cursor-pointer",
+                      detailTab === 'properties'
+                        ? "border-sky-500 text-sky-600 dark:text-sky-400 font-bold"
+                        : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350"
+                    )}
                   >
-                    <option value="name-asc">Nome (A-Z)</option>
-                    <option value="name-desc">Nome (Z-A)</option>
-                    <option value="type-asc">Tipo (Ascendente)</option>
-                    <option value="type-desc">Tipo (Descendente)</option>
-                  </select>
+                    Propriedades Gerais
+                  </button>
                 </div>
-              </div>
+              )}
 
-              {/* Properties Table */}
-              <div className="flex-1 overflow-auto p-4">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-2xs">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
-                        <th className="py-2.5 px-4 font-semibold">Propriedade</th>
-                        <th className="py-2.5 px-4 font-semibold w-32 text-center">Tipo</th>
-                        <th className="py-2.5 px-4 font-semibold w-48">Valor Atual</th>
-                        <th className="py-2.5 px-4 font-semibold w-40">Origem</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-                      {filteredProperties.map((prop) => {
-                        const key = `${selectedObjectId}:${prop.name}`;
-                        const liveValue = simulatedValues[key] ?? prop.defaultValue;
-                        const isChanged = changedProps[key];
+              {/* Conditional rendering based on active tab */}
+              {detailTab === 'telemetry' && hasTelemetry ? (
+                <div className="flex-1 overflow-hidden">
+                  <TankTelemetryDashboard objectId={selectedObjectId!} />
+                </div>
+              ) : (
+                /* Tab 1: Properties Table View */
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {/* Stats Bar */}
+                  <div className="p-3 grid grid-cols-3 gap-3 shrink-0 select-none bg-slate-50/50 dark:bg-slate-950/20">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-3 rounded-lg flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-sky-500/10 dark:bg-sky-500/5 text-sky-50">
+                        <Database className="w-4 h-4 text-sky-500" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Total de Propriedades</span>
+                        <strong className="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">{allProperties.length}</strong>
+                      </div>
+                    </div>
 
-                        return (
-                          <tr
-                            key={prop.id}
-                            className="hover:bg-slate-50/60 dark:hover:bg-slate-800/10 transition-colors"
-                          >
-                            {/* Property Details */}
-                            <td className="py-3 px-4">
-                              <div className="font-semibold text-slate-850 dark:text-slate-200">
-                                {prop.name}
-                              </div>
-                              {prop.description && (
-                                <div className="text-[10px] text-slate-400 mt-0.5 font-normal">
-                                  {prop.description}
-                                </div>
-                              )}
-                            </td>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-3 rounded-lg flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-violet-500/10 dark:bg-violet-500/5 text-violet-50">
+                        <Layers className="w-4 h-4 text-violet-500" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Herdadas de Modelos</span>
+                        <strong className="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">{inheritedPropsCount}</strong>
+                      </div>
+                    </div>
 
-                            {/* Property DataType badge */}
-                            <td className="py-3 px-4 text-center select-none">
-                              {renderTypeBadge(prop.dataType)}
-                            </td>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-3 rounded-lg flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/5 text-emerald-50">
+                        <FileCode className="w-4 h-4 text-emerald-500" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Locais/Customizadas</span>
+                        <strong className="text-base font-bold text-slate-800 dark:text-slate-100 leading-none">{localPropsCount}</strong>
+                      </div>
+                    </div>
+                  </div>
 
-                            {/* Current simulated value with flash edit */}
-                            <td className="py-3 px-4">
-                              {editingPropKey === key ? (
-                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                  <input
-                                    type="text"
-                                    value={tempValue}
-                                    onChange={(e) => setTempValue(e.target.value)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                        updateSimulatedValue(key, tempValue);
-                                        setEditingPropKey(null);
-                                      }
-                                      if (e.key === 'Escape') {
-                                        setEditingPropKey(null);
-                                      }
-                                    }}
-                                    className="px-2 py-0.5 border border-sky-500 rounded bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-mono text-xs w-28 outline-none focus:ring-1 focus:ring-sky-500/20"
-                                    autoFocus
-                                  />
-                                  <button
-                                    onClick={() => {
-                                      updateSimulatedValue(key, tempValue);
-                                      setEditingPropKey(null);
-                                    }}
-                                    className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors"
-                                    title="Confirmar"
-                                  >
-                                    <Check className="w-3 h-3" />
-                                  </button>
-                                  <button
-                                    onClick={() => setEditingPropKey(null)}
-                                    className="p-1 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-colors"
-                                    title="Cancelar"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <div
-                                  onClick={() => {
-                                    setEditingPropKey(key);
-                                    setTempValue(liveValue);
-                                  }}
-                                  className={cn(
-                                    "font-mono font-bold transition-all duration-300 rounded px-2 py-1 inline-flex items-center justify-between gap-2 min-w-[100px] cursor-pointer hover:bg-slate-200/50 dark:hover:bg-slate-800/40 group/val",
-                                    isChanged
-                                      ? "bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 scale-102"
-                                      : "bg-slate-100/50 dark:bg-slate-950/45 text-slate-800 dark:text-slate-350"
-                                  )}
-                                  title="Clique para alterar valor"
-                                >
-                                  <span>{liveValue}</span>
-                                  <Edit2 className="w-2.5 h-2.5 text-slate-400 opacity-0 group-hover/val:opacity-100 transition-opacity shrink-0" />
-                                </div>
-                              )}
-                            </td>
+                  {/* Filtering Toolbar */}
+                  <div className="px-4 py-2 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                    {/* Search & Type filters */}
+                    <div className="flex items-center gap-2 flex-1 min-w-[280px]">
+                      <div className="relative flex-1">
+                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          placeholder="Pesquisar por nome, valor ou descrição..."
+                          value={propertySearch}
+                          onChange={(e) => setPropertySearch(e.target.value)}
+                          className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
+                        />
+                      </div>
 
+                      <select
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 text-slate-700 dark:text-slate-300"
+                      >
+                        <option value="ALL">Todos os Tipos</option>
+                        <option value="String">String</option>
+                        <option value="Boolean">Boolean</option>
+                        <option value="Integer">Integer</option>
+                        <option value="Float">Float</option>
+                        <option value="Date">Date</option>
+                        <option value="Enum">Enum</option>
+                      </select>
+                    </div>
 
-                            {/* Inheritance Source Info */}
-                            <td className="py-3 px-4 select-none">
-                              {prop.isInherited ? (
-                                <span
-                                  className="inline-flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-medium"
-                                  title={`Herdada do modelo ${prop.sourceTemplateName}`}
-                                >
-                                  <Layers className="w-3 h-3 text-slate-400" />
-                                  <span className="truncate max-w-[120px]">
-                                    {prop.sourceTemplateName}
-                                  </span>
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  Local
-                                </span>
-                              )}
-                            </td>
+                    {/* Sort Option */}
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 font-medium">
+                      <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Ordenar por:</span>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="px-2 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-md text-xs outline-none focus:border-sky-500 text-slate-700 dark:text-slate-300 font-semibold"
+                      >
+                        <option value="name-asc">Nome (A-Z)</option>
+                        <option value="name-desc">Nome (Z-A)</option>
+                        <option value="type-asc">Tipo (Ascendente)</option>
+                        <option value="type-desc">Tipo (Descendente)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Properties Table */}
+                  <div className="flex-1 overflow-auto p-4 bg-slate-50/20 dark:bg-slate-950/5">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-2xs">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                           <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
+                            <th className="py-2.5 px-4 font-semibold">Propriedade</th>
+                            <th className="py-2.5 px-4 font-semibold w-[500px]">Valor Atual</th>
                           </tr>
-                        );
-                      })}
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                          {filteredProperties.map((prop) => {
+                            const key = `${selectedObjectId}:${prop.name}`;
+                            const liveValue = simulatedValues[key] ?? prop.defaultValue;
+                            const isChanged = changedProps[key];
 
-                      {filteredProperties.length === 0 && (
-                        <tr>
-                          <td colSpan={4} className="py-8 text-center text-slate-400 dark:text-slate-500 italic">
-                            Nenhuma propriedade encontrada para este filtro.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                            return (
+                              <tr
+                                key={prop.id}
+                                className="hover:bg-slate-50/60 dark:hover:bg-slate-800/10 transition-colors animate-in fade-in duration-100"
+                              >
+                                {/* Property Details */}
+                                <td className="py-3 px-4">
+                                  <div className="font-semibold text-slate-850 dark:text-slate-200">
+                                    {prop.name}
+                                  </div>
+                                  {prop.description && (
+                                    <div className="text-[10px] text-slate-400 mt-0.5 font-normal">
+                                      {prop.description}
+                                    </div>
+                                  )}
+                                </td>
+
+                                {/* Current simulated value with flash edit */}
+                                <td className="py-3 px-4">
+                                  {editingPropKey === key ? (
+                                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                      <input
+                                        type="text"
+                                        value={tempValue}
+                                        onChange={(e) => setTempValue(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            updateSimulatedValue(key, tempValue);
+                                            setEditingPropKey(null);
+                                          }
+                                          if (e.key === 'Escape') {
+                                            setEditingPropKey(null);
+                                          }
+                                        }}
+                                        className="px-2 py-0.5 border border-sky-500 rounded bg-white dark:bg-slate-955 text-slate-900 dark:text-slate-100 font-mono text-xs w-28 outline-none focus:ring-1 focus:ring-sky-500/20"
+                                        autoFocus
+                                      />
+                                      <button
+                                        onClick={() => {
+                                          updateSimulatedValue(key, tempValue);
+                                          setEditingPropKey(null);
+                                        }}
+                                        className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors"
+                                        title="Confirmar"
+                                      >
+                                        <Check className="w-3 h-3" />
+                                      </button>
+                                      <button
+                                        onClick={() => setEditingPropKey(null)}
+                                        className="p-1 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-colors"
+                                        title="Cancelar"
+                                      >
+                                        <X className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div
+                                      onClick={() => {
+                                        setEditingPropKey(key);
+                                        setTempValue(liveValue);
+                                      }}
+                                      className={cn(
+                                        "font-mono font-bold transition-all duration-305 rounded px-2 py-1 inline-flex items-center justify-between gap-2 min-w-[100px] cursor-pointer hover:bg-slate-200/50 dark:hover:bg-slate-800/40 group/val",
+                                        isChanged
+                                          ? "bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 scale-102"
+                                          : "bg-slate-100/50 dark:bg-slate-950/45 text-slate-800 dark:text-slate-350"
+                                      )}
+                                      title="Clique para alterar valor"
+                                    >
+                                      <span>{liveValue}{prop.historyConfig?.engineeringUnit ? ` ${prop.historyConfig.engineeringUnit}` : ''}</span>
+                                      <Edit2 className="w-2.5 h-2.5 text-slate-400 opacity-0 group-hover/val:opacity-100 transition-opacity shrink-0" />
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+
+                          {filteredProperties.length === 0 && (
+                            <tr>
+                              <td colSpan={2} className="py-8 text-center text-slate-400 dark:text-slate-550 italic">
+                                Nenhuma propriedade encontrada para este filtro.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ) : (
             /* Welcome / Placeholder screen when no object is selected */

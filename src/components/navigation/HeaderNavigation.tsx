@@ -9,14 +9,11 @@ import {
   RotateCcw,
   Monitor,
   Zap,
-  Database,
   Bell,
   ChevronDown,
   ChevronUp,
   TrendingUp,
-  Search,
   Workflow,
-  GitFork,
   AlertTriangle,
   ArrowLeftRight,
   Network,
@@ -77,13 +74,6 @@ export const HeaderNavigation = () => {
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
     {
-      to: "/properties",
-      label: "Property Browser",
-      icon: Search,
-      colorClass: "text-sky-500",
-      activeTextClass: "text-sky-600 dark:text-sky-400",
-    },
-    {
       to: "/widgets",
       label: "Widgets",
       icon: Shapes,
@@ -96,14 +86,6 @@ export const HeaderNavigation = () => {
       icon: Workflow,
       colorClass: "text-sky-500",
       activeTextClass: "text-sky-600 dark:text-sky-400",
-    },
-    {
-      to: "/flows-v2",
-      label: "Fluxogramas 2",
-      icon: GitFork,
-      colorClass: "text-emerald-500",
-      activeTextClass: "text-emerald-600 dark:text-emerald-400",
-      badge: "XYFlow",
     },
     {
       to: "/simulator",
@@ -136,32 +118,11 @@ export const HeaderNavigation = () => {
       animate: activeUnackCount > 0 ? "animate-bounce" : undefined,
     },
     {
-      to: "/database",
-      label: "Banco de Dados",
-      icon: Database,
-      colorClass: "text-cyan-500",
-      activeTextClass: "text-cyan-600 dark:text-cyan-400",
-    },
-    {
       to: "/historian",
       label: "Historian",
       icon: TrendingUp,
       colorClass: "text-violet-500",
       activeTextClass: "text-violet-600 dark:text-violet-400",
-    },
-    {
-      to: "/kpi-dashboard",
-      label: "KPI Dashboard",
-      icon: TrendingUp,
-      colorClass: "text-orange-500",
-      activeTextClass: "text-orange-600 dark:text-orange-400",
-    },
-    {
-      to: "/events",
-      label: "Event Engine",
-      icon: Zap,
-      colorClass: "text-sky-400",
-      activeTextClass: "text-sky-500 dark:text-sky-400",
     },
     {
       to: "/omm",
@@ -197,7 +158,6 @@ export const HeaderNavigation = () => {
       icon: LayoutGrid,
       colorClass: "text-amber-500",
       activeTextClass: "text-amber-600 dark:text-amber-400",
-      badge: "PoC",
     },
   ];
 
@@ -254,11 +214,26 @@ export const HeaderNavigation = () => {
     useScreenStore.getState().clearAllData();
     useFlowStore.getState().clearAllData();
     useSecurityStore.getState().clearAllData();
+    // Clear OMM-specific namespace
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('omm_v2') || key === 'grid_dashboard_layout')) keysToRemove.push(key);
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
     setIsResetConfirmOpen(false);
   };
 
   const executeResetMockData = () => {
-    useObjectModelStore.getState().resetMockData();
+    // Full reset: clear everything including OMM namespace, then reseed
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('omm_v2')) keysToRemove.push(key);
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+    localStorage.removeItem('grid_dashboard_layout');
+    useObjectModelStore.getState().resetAllData();
     useOpcStore.getState().init();
     useWidgetStore.getState().init();
     useScreenStore.getState().init();
@@ -407,8 +382,8 @@ export const HeaderNavigation = () => {
                 <li>Todos os Objetos & Modelos</li>
                 <li>Todas as Telas & Gráficos</li>
                 <li>Todos os Alarmes & Históricos</li>
-                <li>Todos os Fluxogramas & BPMN</li>
-                <li>Todos os Scripts & Variáveis</li>
+                <li>Todos os Fluxogramas</li>
+                <li>Todos os Movimentos OMM</li>
               </ul>
             </div>
           </div>
