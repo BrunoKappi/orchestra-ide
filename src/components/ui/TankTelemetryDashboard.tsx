@@ -21,7 +21,7 @@ interface VariableHistory {
 }
 
 export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ objectId }) => {
-  const { objects, simulatedValues, init } = useObjectModelStore();
+  const { objects, templates, simulatedValues, init } = useObjectModelStore();
 
   useEffect(() => {
     init();
@@ -29,6 +29,10 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
 
   // Find the selected object
   const objectDetail = objects.find((o) => o.id === objectId) ?? null;
+
+  // Resolve geometry type from object configuration or template configuration
+  const graphicCfg = objectDetail?.graphicConfig || (objectDetail ? templates.find((t) => t.id === objectDetail.templateId)?.graphicConfig : undefined);
+  const geometryType = graphicCfg?.geometryType || 'vertical_cylindrical';
 
   // Resolve properties including inherited ones
   const allProperties = useMemo(() => {
@@ -204,7 +208,7 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
             
             {/* Render geometry component */}
             <TankGeometrySvg
-              geometry="vertical_cylindrical"
+              geometry={geometryType}
               levelPercent={currentLevel}
               fillColor="#0284c7"
               width={110}
