@@ -46,7 +46,7 @@ interface OmmMovementSyncEntry {
 const OMM_MOVEMENTS_KEY = 'omm_v2_movements';
 
 // History sampling: record every N ticks to avoid filling localStorage
-const HISTORY_SAMPLE_INTERVAL = 5;
+const HISTORY_SAMPLE_INTERVAL = 1;
 
 export class SimulationEngine {
   private timer: number | null = null;
@@ -310,10 +310,10 @@ export class SimulationEngine {
     const trackedProps = ['Level', 'Volume', 'Temperature', 'Pressure', 'Flow', 'Mass'];
     const defaultHistConfig = {
       enabled: true,
-      collectionMode: 'on_change' as const,
-      intervalMs: 5000,
+      collectionMode: 'interval' as const,
+      intervalMs: 1000,
       retentionMs: 3600000 * 24,
-      maxSamples: 2000,
+      maxSamples: 1000,
       deadband: 0,
       compression: false,
       engineeringUnit: '',

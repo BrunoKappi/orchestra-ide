@@ -220,8 +220,8 @@
     "semantic_hash": "c47fd4ae8dd9c3b1c210e5baf0b40564"
   },
   "src/store/useObjectModelStore.ts": {
-    "mtime": 1786125726.3771944,
-    "ast_hash": "1764d41f789daa385c7d257942301bb4",
+    "mtime": 1786132842.2474806,
+    "ast_hash": "4b721ee40a8e5e32a02b6407096578b5",
     "semantic_hash": ""
   },
   "src/store/useWidgetStore.ts": {
@@ -375,9 +375,9 @@
     "semantic_hash": "e69200cc1a1feec87f5fa4cdb4dc40dd"
   },
   "src/services/HistoryEngine.ts": {
-    "mtime": 1785005448.6099448,
-    "ast_hash": "6ff86cee7272041ea053a2b6ce5bba00",
-    "semantic_hash": "6ff86cee7272041ea053a2b6ce5bba00"
+    "mtime": 1786132879.1902795,
+    "ast_hash": "d6586e0e6838c84573a6c1f7be6e8c5c",
+    "semantic_hash": ""
   },
   "src/services/PropertyBrowserService.ts": {
     "mtime": 1785014942.6032925,
@@ -725,13 +725,13 @@
     "semantic_hash": "05feb8aa73d47420a74a2df6a5654b61"
   },
   "src/features/grid-dashboard/components/GridCanvas.tsx": {
-    "mtime": 1785430955.537973,
-    "ast_hash": "ae0014f1981781e9c436899fbb47cb19",
-    "semantic_hash": "ae0014f1981781e9c436899fbb47cb19"
+    "mtime": 1786132132.0570023,
+    "ast_hash": "f61d5e992c6f679ee1d819f7fbf098ba",
+    "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/GridCardInspector.tsx": {
-    "mtime": 1786118197.8068354,
-    "ast_hash": "76c0f4a4e26c1a7d64eec1080e6ce762",
+    "mtime": 1786132952.5248384,
+    "ast_hash": "8389df89a654ddae6dca124c31a1ad26",
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/GridDashboardHeader.tsx": {
@@ -750,8 +750,8 @@
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/types.ts": {
-    "mtime": 1786124914.7166667,
-    "ast_hash": "1f63857b3ae7ec800dc1cc6263f87466",
+    "mtime": 1786132083.3499916,
+    "ast_hash": "1c14417749d2d8d7adf98933cbdbd73f",
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/utils/mockGenerator.ts": {
@@ -760,8 +760,8 @@
     "semantic_hash": ""
   },
   "src/pages/GridDashboardPage.tsx": {
-    "mtime": 1786124815.593077,
-    "ast_hash": "bd92fbba6350eac6a5f60f8997180252",
+    "mtime": 1786132972.7323093,
+    "ast_hash": "a8d5a799f1b94d8ab176385567bebcd7",
     "semantic_hash": ""
   },
   "src/features/object-model/EquipmentGraphicConfigEditor.tsx": {
@@ -770,8 +770,8 @@
     "semantic_hash": ""
   },
   "src/services/simulationEngine.ts": {
-    "mtime": 1786120426.6939194,
-    "ast_hash": "819261c40e254f8ddd407535ca8440ab",
+    "mtime": 1786132891.0482655,
+    "ast_hash": "ed24be020b18733fb56a69b848a7b546",
     "semantic_hash": ""
   },
   "src/components/TankGeometrySvg.tsx": {
@@ -780,8 +780,8 @@
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/ObjectSelectorModal.tsx": {
-    "mtime": 1786114650.3677573,
-    "ast_hash": "a3763989cd6d9028536c7849d30848b4",
+    "mtime": 1786133155.0475535,
+    "ast_hash": "e6afc6318b2aea0d7069ca45ab0396eb",
     "semantic_hash": ""
   },
   "src/utils/safeStorage.ts": {
@@ -812,6 +812,16 @@
   "src/features/omm/components/ui/TankTelemetryModal.tsx": {
     "mtime": 1786124219.4725368,
     "ast_hash": "6ec235cc30dd50089e49e6d4f538c6c0",
+    "semantic_hash": ""
+  },
+  "src/features/grid-dashboard/components/TrendChartCard.tsx": {
+    "mtime": 1786133041.8375068,
+    "ast_hash": "2ca4e6ff0de7427e1cf5698ddfbb4892",
+    "semantic_hash": ""
+  },
+  "src/hooks/useResizeObserver.ts": {
+    "mtime": 1786132902.575513,
+    "ast_hash": "87ddb38a0daa249536eeebba4af06948",
     "semantic_hash": ""
   }
 }

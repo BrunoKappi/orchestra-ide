@@ -488,7 +488,6 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         if (!isDeployed) return; // Skip undeployed objects — they do not run in runtime
 
         const props = inheritanceService.getMergedProperties(obj.id, 'instance');
-
         props.forEach((prop) => {
           const key = `${obj.id}:${prop.name}`;
 
@@ -520,11 +519,23 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
             }
           }
 
-          if (nextValues[key] === undefined) {
-            nextValues[key] = prop.defaultValue;
-          }
+          // Non-OPC: Always read latest default value (updates from SimulationEngine)
+          nextValues[key] = prop.defaultValue;
           if (selectedEntity?.id === obj.id) {
             nextValues[prop.name] = nextValues[key];
+          }
+
+          // Always track history values for all numeric properties
+          const num = parseFloat(prop.defaultValue);
+          if (!isNaN(num)) {
+            const histKey = key;
+            const hist = nextHistory[histKey] ? [...nextHistory[histKey]] : [];
+            hist.push(num);
+            if (hist.length > 15) hist.shift();
+            nextHistory[histKey] = hist;
+            if (selectedEntity?.id === obj.id) {
+              nextHistory[prop.name] = hist;
+            }
           }
         });
       });

@@ -53,6 +53,14 @@ export interface TankCardData {
   startCol: number;
   rowSpan: number;
   colSpan: number;
+
+  isTrend?: boolean;
+  trendProperties?: Array<{
+    objectId: string;
+    propertyName: string;
+    label: string;
+    color?: string;
+  }>;
 }
 
 export interface GridConfig {

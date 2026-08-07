@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { TankCardData, GridConfig } from '../types';
 import { IndustrialTankCard } from './IndustrialTankCard';
+import { TrendChartCard } from './TrendChartCard';
 import { cn } from '../../../utils/cn';
 
 interface GridCanvasProps {
@@ -338,13 +339,22 @@ export const GridCanvas: React.FC<GridCanvasProps> = ({
                 isBeingMoved && "opacity-40"
               )}
             >
-              {/* Tank Component */}
-              <IndustrialTankCard
-                card={card}
-                isSelected={isSelected}
-                isViewMode={isViewMode}
-                onClick={() => !isViewMode && onSelectCard(card.id)}
-              />
+              {/* Tank Component or Trend Chart */}
+              {card.isTrend ? (
+                <TrendChartCard
+                  card={card}
+                  isSelected={isSelected}
+                  isViewMode={isViewMode}
+                  onClick={() => !isViewMode && onSelectCard(card.id)}
+                />
+              ) : (
+                <IndustrialTankCard
+                  card={card}
+                  isSelected={isSelected}
+                  isViewMode={isViewMode}
+                  onClick={() => !isViewMode && onSelectCard(card.id)}
+                />
+              )}
 
               {/* Move Handle (Edit mode overlay when selected) */}
               {!isViewMode && isSelected && (

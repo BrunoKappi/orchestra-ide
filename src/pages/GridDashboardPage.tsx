@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
 import type { GridConfig, TankCardData, GridLayoutState } from '../features/grid-dashboard/types';
 import { GridCanvas } from '../features/grid-dashboard/components/GridCanvas';
@@ -115,6 +116,9 @@ export const GridDashboardPage = () => {
   // Pending add card position (to show object selector)
   const [pendingAdd, setPendingAdd] = useState<{ sRow: number; sCol: number; rSpan: number; cSpan: number } | null>(null);
 
+  // State for editing variables of a trend card
+  const [editingTrendCard, setEditingTrendCard] = useState<TankCardData | null>(null);
+
   const [isNewScreenModalOpen, setIsNewScreenModalOpen] = useState(false);
   const [isChangeGridModalOpen, setIsChangeGridModalOpen] = useState(false);
 
@@ -125,7 +129,7 @@ export const GridDashboardPage = () => {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const { objects, simulatedValues } = useObjectModelStore();
+  const { objects, simulatedValues, isSimulating, simulationSpeedMs, tickSimulation } = useObjectModelStore();
 
   // Sync card live values from the simulatedValues store and object graphicConfig
   const syncCardValues = useCallback((prevCards: TankCardData[]): TankCardData[] => {
@@ -176,6 +180,15 @@ export const GridDashboardPage = () => {
   useEffect(() => {
     setCards((prev) => syncCardValues(prev));
   }, [simulatedValues, syncCardValues]);
+
+  // Start simulation loop if active
+  useEffect(() => {
+    if (!isSimulating) return;
+    const interval = setInterval(() => {
+      tickSimulation();
+    }, simulationSpeedMs);
+    return () => clearInterval(interval);
+  }, [isSimulating, simulationSpeedMs, tickSimulation]);
 
   // Load saved layout on mount, seeding defaults if no layout exists
   useEffect(() => {
@@ -285,6 +298,79 @@ export const GridDashboardPage = () => {
     showToast(`✓ Equipamento ${newCard.tag} adicionado ao Grid`);
   };
 
+  const handleTrendSelected = (
+    properties: Array<{ objectId: string; propertyName: string; objectName: string; propertyLabel: string }>
+  ) => {
+    if (!pendingAdd) return;
+    const { sRow, sCol, rSpan, cSpan } = pendingAdd;
+
+    const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+    const trendProps = properties.map((p, idx) => ({
+      objectId: p.objectId,
+      propertyName: p.propertyName,
+      label: `${p.objectName}.${p.propertyLabel || p.propertyName}`,
+      color: colors[idx % colors.length]
+    }));
+
+    const newCard: TankCardData = {
+      id: `trend-${uuidv4()}`,
+      tag: 'TENDÊNCIA',
+      category: 'GRÁFICO',
+      title: trendProps.length === 1 
+        ? `Tendência de ${trendProps[0].label}` 
+        : `Gráfico de Tendência (${trendProps.length} var)`,
+      description: 'Gráfico de tendência em tempo real',
+      geometryType: 'vertical_cylindrical',
+      levelPercent: 0,
+      status: 'NORMAL',
+      footerLabel: 'Live',
+      fieldBindings: [],
+      startRow: sRow,
+      startCol: sCol,
+      rowSpan: rSpan,
+      colSpan: cSpan,
+      isTrend: true,
+      trendProperties: trendProps
+    };
+
+    setCards((prev) => [...prev, newCard]);
+    setSelectedCardId(newCard.id);
+    setPendingAdd(null);
+    showToast(`✓ Gráfico de tendência adicionado ao Grid`);
+  };
+
+  const handleSaveTrendEdit = (
+    properties: Array<{ objectId: string; propertyName: string; objectName: string; propertyLabel: string }>
+  ) => {
+    if (!editingTrendCard) return;
+
+    const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+    const trendProps = properties.map((p, idx) => {
+      const existing = editingTrendCard.trendProperties?.find(
+        (ep) => ep.objectId === p.objectId && ep.propertyName === p.propertyName
+      );
+      return {
+        objectId: p.objectId,
+        propertyName: p.propertyName,
+        label: `${p.objectName}.${p.propertyLabel || p.propertyName}`,
+        color: existing?.color || colors[idx % colors.length]
+      };
+    });
+
+    const updatedCard: TankCardData = {
+      ...editingTrendCard,
+      trendProperties: trendProps,
+      title: trendProps.length === 1
+        ? `Tendência de ${trendProps[0].label}`
+        : `Gráfico de Tendência (${trendProps.length} var)`,
+    };
+
+    setCards((prev) => prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)));
+    setSelectedCardId(updatedCard.id);
+    setEditingTrendCard(null);
+    showToast(`✓ Gráfico de tendência atualizado`);
+  };
+
   const handleUpdateCardPosition = (id: string, sRow: number, sCol: number, rSpan: number, cSpan: number) => {
     setCards((prev) =>
       prev.map((c) =>
@@ -353,6 +439,7 @@ export const GridDashboardPage = () => {
             onClose={() => setSelectedCardId(null)}
             onUpdateCard={handleUpdateCard}
             onDeleteCard={handleDeleteCard}
+            onEditTrendVariables={() => setEditingTrendCard(selectedCard)}
           />
         )}
       </div>
@@ -374,10 +461,33 @@ export const GridDashboardPage = () => {
       />
 
       <ObjectSelectorModal
-        isOpen={pendingAdd !== null}
-        onClose={() => setPendingAdd(null)}
+        isOpen={pendingAdd !== null || editingTrendCard !== null}
+        onClose={() => {
+          setPendingAdd(null);
+          setEditingTrendCard(null);
+        }}
         onSelect={handleObjectSelected}
         alreadySelectedIds={alreadySelectedObjectIds}
+        initialSelectedProps={
+          editingTrendCard
+            ? editingTrendCard.trendProperties?.map((p) => {
+                const obj = objects.find((o) => o.id === p.objectId);
+                return {
+                  objectId: p.objectId,
+                  propertyName: p.propertyName,
+                  objectName: obj?.name || '',
+                  propertyLabel: p.label.split('.').slice(1).join('.') || p.propertyName,
+                };
+              })
+            : []
+        }
+        onSelectTrend={(properties) => {
+          if (editingTrendCard) {
+            handleSaveTrendEdit(properties);
+          } else {
+            handleTrendSelected(properties);
+          }
+        }}
       />
     </div>
   );

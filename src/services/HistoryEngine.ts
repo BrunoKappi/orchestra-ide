@@ -33,20 +33,32 @@ function loadFromStorage(): void {
   }
 }
 
-function persistKey(k: string): void {
-  try {
-    const samples = store.get(k) ?? [];
-    localStorage.setItem(`${STORAGE_PREFIX}${k}`, JSON.stringify(samples));
+const pendingPersist = new Set<string>();
+let persistTimeout: any = null;
 
-    // Maintain index
-    const index = localStorage.getItem(`${STORAGE_PREFIX}index`);
-    const keys: string[] = index ? JSON.parse(index) : [];
-    if (!keys.includes(k)) {
-      keys.push(k);
-      localStorage.setItem(`${STORAGE_PREFIX}index`, JSON.stringify(keys));
-    }
-  } catch {
-    // Quota exceeded — skip silently
+function schedulePersist(k: string): void {
+  pendingPersist.add(k);
+  if (persistTimeout === null) {
+    persistTimeout = setTimeout(() => {
+      pendingPersist.forEach((keyToPersist) => {
+        try {
+          const samples = store.get(keyToPersist) ?? [];
+          localStorage.setItem(`${STORAGE_PREFIX}${keyToPersist}`, JSON.stringify(samples));
+
+          // Maintain index
+          const index = localStorage.getItem(`${STORAGE_PREFIX}index`);
+          const keys: string[] = index ? JSON.parse(index) : [];
+          if (!keys.includes(keyToPersist)) {
+            keys.push(keyToPersist);
+            localStorage.setItem(`${STORAGE_PREFIX}index`, JSON.stringify(keys));
+          }
+        } catch {
+          // Quota exceeded — skip silently
+        }
+      });
+      pendingPersist.clear();
+      persistTimeout = null;
+    }, 2000);
   }
 }
 
@@ -89,24 +101,36 @@ export const historyEngine = {
 
     const k = key(objectId, propertyId);
     const now = Date.now();
-
-    // --- Deadband check ---
     const prevValue = lastRecordedValue.get(k);
-    if (prevValue !== undefined && config.deadband > 0) {
-      const prevNum = parseFloat(prevValue);
-      const curNum = parseFloat(value);
-      if (!isNaN(prevNum) && !isNaN(curNum)) {
-        if (Math.abs(curNum - prevNum) < config.deadband) return false;
-      } else {
-        // String values: only record if changed
-        if (prevValue === value) return false;
-      }
-    }
 
     // --- Collection mode check ---
     if (config.collectionMode === 'interval') {
       const last = lastRecordedAt.get(k) ?? 0;
       if (now - last < config.intervalMs) return false;
+
+      // If deadband check is required in interval mode
+      if (prevValue !== undefined && config.deadband > 0) {
+        const prevNum = parseFloat(prevValue);
+        const curNum = parseFloat(value);
+        if (!isNaN(prevNum) && !isNaN(curNum)) {
+          if (Math.abs(curNum - prevNum) < config.deadband) return false;
+        }
+      }
+    } else {
+      // on_change mode: only record if value changed (respecting deadband if numeric)
+      if (prevValue !== undefined) {
+        if (config.deadband > 0) {
+          const prevNum = parseFloat(prevValue);
+          const curNum = parseFloat(value);
+          if (!isNaN(prevNum) && !isNaN(curNum)) {
+            if (Math.abs(curNum - prevNum) < config.deadband) return false;
+          } else if (prevValue === value) {
+            return false;
+          }
+        } else if (prevValue === value) {
+          return false;
+        }
+      }
     }
 
     // --- Purge old samples before inserting ---
@@ -128,7 +152,7 @@ export const historyEngine = {
     lastRecordedAt.set(k, now);
     lastRecordedValue.set(k, value);
 
-    persistKey(k);
+    schedulePersist(k);
     return true;
   },
 
