@@ -279,7 +279,7 @@ export const movementColumnDefs: ColDef[] = [
   ), 80),
 
   col('plannedVolume', 'Vol. Plan.', (r) => r.plannedVolume, (v, row) => (
-    <span className="font-mono text-[11px] font-medium text-slate-700 dark:text-slate-300">
+    <span className="font-mono text-[11px] font-semibold text-slate-900 dark:text-slate-100">
       {v >= 1000 ? (v / 1000).toFixed(2) + 'k' : v.toFixed(0)} {row.engUnitSymbol}
     </span>
   ), 90),
