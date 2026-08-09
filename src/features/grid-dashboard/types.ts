@@ -73,3 +73,13 @@ export interface GridLayoutState {
   config: GridConfig;
   cards: TankCardData[];
 }
+
+export interface GridScreenEntity {
+  id: string;
+  name: string;
+  rows: number;
+  cols: number;
+  cards: TankCardData[];
+  createdAt: string;
+  updatedAt: string;
+}

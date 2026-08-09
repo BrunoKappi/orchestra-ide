@@ -6,7 +6,6 @@ import {
   AlertCircle,
   Search,
   FilterX,
-  Download,
   CheckCircle,
   Clock,
   Trash2,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useObjectModelStore } from '../store/useObjectModelStore';
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
+import { AlarmConfigModal } from '../features/object-model/AlarmConfigModal';
 import type { AlarmEvent } from '../types/domain';
 import { cn } from '../utils/cn';
 
@@ -28,7 +28,8 @@ export const AlarmViewerPage: React.FC = () => {
     alarmEvents,
     objects,
     acknowledgeAlarms,
-    clearAlarmHistory
+    clearAlarmHistory,
+    openAlarmConfigModal,
   } = useObjectModelStore();
 
   // Search & Filter State
@@ -251,47 +252,6 @@ export const AlarmViewerPage: React.FC = () => {
     setGroupBy('none');
   };
 
-  // Export functions
-  const handleExportJSON = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(filteredEvents, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `alarm_report_${new Date().toISOString().slice(0,10)}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
-  const handleExportCSV = () => {
-    const headers = ['ID', 'Status', 'Severity', 'Priority', 'Object', 'Property', 'Message', 'Current Value', 'Config Value', 'Activated At', 'Acknowledged At', 'Cleared At', 'Acked By', 'Duration (ms)'];
-    const rows = filteredEvents.map((evt) => [
-      evt.id,
-      evt.status,
-      evt.severity,
-      evt.priority,
-      evt.objectName,
-      evt.propertyName,
-      evt.message,
-      evt.currentValue,
-      evt.configuredValue,
-      evt.activatedAt,
-      evt.acknowledgedAt || '',
-      evt.clearedAt || '',
-      evt.ackedBy || '',
-      evt.durationMs || ''
-    ]);
-
-    const csvContent = 'data:text/csv;charset=utf-8,' 
-      + [headers.join(','), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
-      
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', encodeURI(csvContent));
-    downloadAnchor.setAttribute('download', `alarm_report_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
   const formatDuration = (ms: number | null) => {
     if (ms === null || ms === undefined) return '-';
     if (ms < 1000) return `${ms}ms`;
@@ -451,24 +411,14 @@ export const AlarmViewerPage: React.FC = () => {
                   </button>
                 )}
 
-                <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden shrink-0">
-                  <button
-                    onClick={handleExportJSON}
-                    className="p-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700 transition-colors"
-                    title="Exportar JSON"
-                  >
-                    <Download className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-                    <span className="text-[10px] font-semibold ml-1 mr-0.5">JSON</span>
-                  </button>
-                  <button
-                    onClick={handleExportCSV}
-                    className="p-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
-                    title="Exportar CSV"
-                  >
-                    <Download className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-                    <span className="text-[10px] font-semibold ml-1 mr-0.5">CSV</span>
-                  </button>
-                </div>
+                <button
+                  onClick={() => openAlarmConfigModal(undefined as any)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold transition-colors shrink-0"
+                  title="Abrir Setup de Alarmes"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                  <span>Setup de Alarmes</span>
+                </button>
               </div>
             </div>
 
@@ -833,6 +783,8 @@ export const AlarmViewerPage: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* Modal Setup de Alarmes */}
+      <AlarmConfigModal />
     </div>
   );
 
@@ -843,7 +795,7 @@ export const AlarmViewerPage: React.FC = () => {
         {showHeader && (
           <thead className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 sticky top-0 backdrop-blur-xs z-10">
             <tr className="text-slate-500 dark:text-slate-400 font-semibold select-none">
-              <th className="py-2.5 px-3 w-8 whitespace-nowrap">
+              <th className="py-2 px-3 w-8 whitespace-nowrap">
                 <button
                   onClick={toggleSelectAll}
                   className="p-1 rounded text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center"
@@ -851,35 +803,35 @@ export const AlarmViewerPage: React.FC = () => {
                   <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
                 </button>
               </th>
-              <th className="py-2.5 px-3 w-28 whitespace-nowrap">
-                <button onClick={() => handleSort('status')} className="flex items-center gap-1 font-semibold hover:text-slate-905 dark:hover:text-slate-200">
+              <th className="py-2 px-3 w-28 whitespace-nowrap">
+                <button onClick={() => handleSort('status')} className="flex items-center gap-1 font-semibold hover:text-slate-900 dark:hover:text-slate-200">
                   <span>Estado</span>
                 </button>
               </th>
-              <th className="py-2.5 px-3 w-16 whitespace-nowrap">
-                <button onClick={() => handleSort('severity')} className="flex items-center gap-1 font-semibold hover:text-slate-905 dark:hover:text-slate-200">
+              <th className="py-2 px-3 w-16 whitespace-nowrap">
+                <button onClick={() => handleSort('severity')} className="flex items-center gap-1 font-semibold hover:text-slate-900 dark:hover:text-slate-200">
                   <span>Severidade</span>
                 </button>
               </th>
-              <th className="py-2.5 px-3 w-28 whitespace-nowrap">
-                <button onClick={() => handleSort('objectName')} className="flex items-center gap-1 font-semibold hover:text-slate-905 dark:hover:text-slate-200">
+              <th className="py-2 px-3 w-28 whitespace-nowrap">
+                <button onClick={() => handleSort('objectName')} className="flex items-center gap-1 font-semibold hover:text-slate-900 dark:hover:text-slate-200">
                   <span>Objeto</span>
                 </button>
               </th>
-              <th className="py-2.5 px-3 w-28 whitespace-nowrap">
-                <button onClick={() => handleSort('propertyName')} className="flex items-center gap-1 font-semibold hover:text-slate-905 dark:hover:text-slate-200">
+              <th className="py-2 px-3 w-28 whitespace-nowrap">
+                <button onClick={() => handleSort('propertyName')} className="flex items-center gap-1 font-semibold hover:text-slate-900 dark:hover:text-slate-200">
                   <span>Propriedade</span>
                 </button>
               </th>
-              <th className="py-2.5 px-3 w-16 whitespace-nowrap">Valor</th>
-              <th className="py-2.5 px-3">Mensagem</th>
-              <th className="py-2.5 px-3 w-40 whitespace-nowrap">
-                <button onClick={() => handleSort('activatedAt')} className="flex items-center gap-1 font-semibold hover:text-slate-905 dark:hover:text-slate-200">
+              <th className="py-2 px-3 w-16 whitespace-nowrap">Valor</th>
+              <th className="py-2 px-3 w-20 whitespace-nowrap">Limite</th>
+              <th className="py-2 px-3">Mensagem</th>
+              <th className="py-2 px-3 w-40 whitespace-nowrap">
+                <button onClick={() => handleSort('activatedAt')} className="flex items-center gap-1 font-semibold hover:text-slate-900 dark:hover:text-slate-200">
                   <span>Data/Hora Ativação</span>
                 </button>
               </th>
-              <th className="py-2.5 px-3 w-16 text-right whitespace-nowrap">Duração</th>
-
+              <th className="py-2 px-3 w-16 text-right whitespace-nowrap">Duração</th>
             </tr>
           </thead>
         )}
@@ -895,17 +847,17 @@ export const AlarmViewerPage: React.FC = () => {
                 key={evt.id}
                 onClick={() => setSelectedAlarmId(evt.id)}
                 className={cn(
-                  'group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all cursor-pointer relative',
+                  'group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all cursor-pointer relative h-8',
                   isActiveUnacknowledged && 'bg-rose-500/5 dark:bg-rose-950/5 border-l-2',
                   isSelectedDetail && 'bg-sky-500/5 dark:bg-sky-950/10 border-l-2 border-sky-600'
                 )}
                 style={isActiveUnacknowledged ? { borderLeftColor: evt.color } : {}}
               >
                 {/* Select Box */}
-                <td className="py-2 px-2.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                <td className="py-1 px-2.5 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => toggleSelect(evt.id)}
-                    className="p-1 rounded text-slate-400 hover:bg-slate-150 dark:hover:bg-slate-850 flex items-center justify-center"
+                    className="p-0.5 rounded text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center"
                   >
                     {isSelected ? (
                       <CheckCircle className="w-3.5 h-3.5 text-sky-500" />
@@ -916,7 +868,7 @@ export const AlarmViewerPage: React.FC = () => {
                 </td>
 
                 {/* Status */}
-                <td className="py-2 px-2.5 whitespace-nowrap">
+                <td className="py-1 px-2.5 whitespace-nowrap">
                   <span className={cn(
                     'font-semibold text-[10px] inline-flex items-center gap-1',
                     isAlarmActive ? 'text-rose-500 font-bold' : 'text-emerald-500 font-bold'
@@ -927,7 +879,7 @@ export const AlarmViewerPage: React.FC = () => {
                 </td>
 
                 {/* Severity Badge */}
-                <td className="py-2 px-2.5 whitespace-nowrap">
+                <td className="py-1 px-2.5 whitespace-nowrap">
                   <span
                     className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wide text-white font-mono"
                     style={{ backgroundColor: evt.color }}
@@ -938,35 +890,39 @@ export const AlarmViewerPage: React.FC = () => {
                 </td>
 
                 {/* Object */}
-                <td className="py-2 px-2.5 whitespace-nowrap font-semibold text-slate-700 dark:text-slate-300">
+                <td className="py-1 px-2.5 whitespace-nowrap font-semibold text-slate-700 dark:text-slate-300" title={evt.objectName}>
                   {evt.objectName}
                 </td>
 
                 {/* Property */}
-                <td className="py-2 px-2.5 whitespace-nowrap font-mono font-medium text-slate-650 dark:text-slate-300">
+                <td className="py-1 px-2.5 whitespace-nowrap font-mono font-medium text-slate-600 dark:text-slate-300" title={evt.propertyName}>
                   {evt.propertyName}
                 </td>
 
                 {/* Value */}
-                <td className="py-2 px-2.5 whitespace-nowrap font-mono font-bold text-slate-750 dark:text-slate-200">
+                <td className="py-1 px-2.5 whitespace-nowrap font-mono font-bold text-slate-800 dark:text-slate-200">
                   {evt.currentValue}
                 </td>
 
+                {/* Limite */}
+                <td className="py-1 px-2.5 whitespace-nowrap font-mono text-slate-600 dark:text-slate-400">
+                  {evt.configuredValue}
+                </td>
+
                 {/* Message */}
-                <td className="py-2 px-2.5 font-medium text-slate-800 dark:text-slate-200 line-clamp-1 max-w-xs mt-1.5">
-                  {evt.message}
+                <td className="py-1 px-2.5 max-w-xs font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap overflow-hidden" title={evt.message}>
+                  <div className="truncate">{evt.message}</div>
                 </td>
 
                 {/* Date/Time */}
-                <td className="py-2 px-2.5 whitespace-nowrap font-mono text-slate-500 dark:text-slate-400 text-[10px]">
+                <td className="py-1 px-2.5 whitespace-nowrap font-mono text-slate-500 dark:text-slate-400 text-[10px]">
                   {new Date(evt.activatedAt).toLocaleString()}
                 </td>
 
                 {/* Duration */}
-                <td className="py-2 px-2.5 whitespace-nowrap font-mono text-slate-600 dark:text-slate-300 text-right font-medium">
+                <td className="py-1 px-2.5 whitespace-nowrap font-mono text-slate-600 dark:text-slate-300 text-right font-medium">
                   {formatDuration(evt.durationMs)}
                 </td>
-
               </tr>
             );
           })}

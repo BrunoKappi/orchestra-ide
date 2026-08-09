@@ -1,33 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Bell, Save, Lock, Unlock } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, Trash2, Bell, Save, Lock, Unlock, Database, Tag } from 'lucide-react';
 import { useObjectModelStore } from '../../store/useObjectModelStore';
 import { Modal } from '../../components/ui/Modal';
+import { inheritanceService } from '../../services/InheritanceService';
 import type { AlarmConditionType, AlarmRule } from '../../types/domain';
 import { v4 as uuidv4 } from 'uuid';
-
 
 export const AlarmConfigModal: React.FC = () => {
   const {
     isAlarmConfigModalOpen,
     editingAlarmProperty,
+    selectedEntity,
+    objects,
     closeAlarmConfigModal,
     saveAlarmConfig,
   } = useObjectModelStore();
 
+  const [selectedObjectId, setSelectedObjectId] = useState<string>('');
+  const [selectedPropName, setSelectedPropName] = useState<string>('');
   const [isEnabled, setIsEnabled] = useState(false);
   const [rules, setRules] = useState<AlarmRule[]>([]);
 
+  // Initialize selected object and property when modal opens
   useEffect(() => {
-    if (editingAlarmProperty) {
-      const config = editingAlarmProperty.alarmConfig;
-      setIsEnabled(config?.enabled ?? false);
-      setRules(config?.rules ? JSON.parse(JSON.stringify(config.rules)) : []);
+    if (!isAlarmConfigModalOpen) return;
+
+    if (objects.length > 0) {
+      let initialObjId = objects[0].id;
+      if (selectedEntity?.type === 'instance') {
+        const foundObj = objects.find((o) => o.id === selectedEntity.id);
+        if (foundObj) initialObjId = foundObj.id;
+      }
+      setSelectedObjectId(initialObjId);
+
+      const mergedProps = inheritanceService.getMergedProperties(initialObjId, 'instance');
+      let initialPropName = editingAlarmProperty?.name || (mergedProps[0]?.name ?? '');
+      if (!mergedProps.some((p) => p.name === initialPropName) && mergedProps.length > 0) {
+        initialPropName = mergedProps[0].name;
+      }
+      setSelectedPropName(initialPropName);
+
+      const currentProp = mergedProps.find((p) => p.name === initialPropName);
+      if (currentProp?.alarmConfig) {
+        setIsEnabled(currentProp.alarmConfig.enabled ?? false);
+        setRules(JSON.parse(JSON.stringify(currentProp.alarmConfig.rules || [])));
+      } else {
+        setIsEnabled(false);
+        setRules([]);
+      }
     }
-  }, [editingAlarmProperty, isAlarmConfigModalOpen]);
+  }, [isAlarmConfigModalOpen, editingAlarmProperty, selectedEntity, objects]);
 
-  if (!editingAlarmProperty) return null;
+  // Available properties for current object
+  const availableProperties = useMemo(() => {
+    if (!selectedObjectId) return [];
+    return inheritanceService.getMergedProperties(selectedObjectId, 'instance');
+  }, [selectedObjectId]);
 
-  const dataType = editingAlarmProperty.dataType;
+  // Current active property
+  const activeProp = useMemo(() => {
+    return availableProperties.find((p) => p.name === selectedPropName) || availableProperties[0] || null;
+  }, [availableProperties, selectedPropName]);
+
+  // Object change handler
+  const handleObjectChange = (objId: string) => {
+    setSelectedObjectId(objId);
+    const props = inheritanceService.getMergedProperties(objId, 'instance');
+    const firstPropName = props[0]?.name ?? '';
+    setSelectedPropName(firstPropName);
+
+    const targetProp = props.find((p) => p.name === firstPropName);
+    if (targetProp?.alarmConfig) {
+      setIsEnabled(targetProp.alarmConfig.enabled ?? false);
+      setRules(JSON.parse(JSON.stringify(targetProp.alarmConfig.rules || [])));
+    } else {
+      setIsEnabled(false);
+      setRules([]);
+    }
+  };
+
+  // Property change handler
+  const handlePropChange = (pName: string) => {
+    setSelectedPropName(pName);
+    const targetProp = availableProperties.find((p) => p.name === pName);
+    if (targetProp?.alarmConfig) {
+      setIsEnabled(targetProp.alarmConfig.enabled ?? false);
+      setRules(JSON.parse(JSON.stringify(targetProp.alarmConfig.rules || [])));
+    } else {
+      setIsEnabled(false);
+      setRules([]);
+    }
+  };
+
+  if (!isAlarmConfigModalOpen) return null;
+
+  const selectedObj = objects.find((o) => o.id === selectedObjectId);
+  const dataType = activeProp?.dataType || 'String';
   const isNumeric = dataType === 'Integer' || dataType === 'Float';
 
   // Available condition types based on data type
@@ -65,10 +133,9 @@ export const AlarmConfigModal: React.FC = () => {
 
   const handleAddRule = () => {
     const options = getConditionOptions();
-    if (options.length === 0) return;
+    if (options.length === 0 || !activeProp) return;
 
     const defaultType = options[0].value;
-
 
     const newRule: AlarmRule = {
       id: uuidv4(),
@@ -77,8 +144,8 @@ export const AlarmConfigModal: React.FC = () => {
       blocked: false,
       compareValue: dataType === 'Boolean' ? 'true' : '0',
       severity: 'medium',
-      priority: 5,
-      message: `${editingAlarmProperty.name} exceeded alarm limit`,
+      priority: 50,
+      message: `[${selectedObj?.name || 'Objeto'}] Alerta em ${activeProp.name}`,
       color: '#eab308',
       icon: 'AlertCircle',
       activationDelay: 0,
@@ -101,7 +168,6 @@ export const AlarmConfigModal: React.FC = () => {
         if (r.id === id) {
           const updated = { ...r, ...updates };
 
-          // Auto-fill color & icon if severity changes
           if (updates.severity) {
             if (updates.severity === 'critical') {
               updated.color = '#ef4444';
@@ -126,28 +192,75 @@ export const AlarmConfigModal: React.FC = () => {
   };
 
   const handleSave = () => {
-    saveAlarmConfig(editingAlarmProperty.name, {
-      enabled: isEnabled,
-      rules,
-    });
+    if (!selectedPropName || !selectedObjectId) return;
+    saveAlarmConfig(
+      selectedPropName,
+      {
+        enabled: isEnabled,
+        rules,
+      },
+      selectedObjectId,
+      'instance'
+    );
   };
-
-
 
   return (
     <Modal
       isOpen={isAlarmConfigModalOpen}
       onClose={closeAlarmConfigModal}
-      title={`Alarmes da Propriedade - ${editingAlarmProperty.name}`}
-      subtitle={`Configure as condições e regras de monitoramento SCADA para o atributo (${dataType}).`}
+      title="Setup de Alarmes de Processo"
+      subtitle="Configure limites e regras de monitoramento SCADA associadas aos objetos reais da aplicação."
       maxWidth="max-w-4xl"
     >
-      <div className="space-y-6 text-xs text-slate-800 dark:text-slate-200">
+      <div className="space-y-5 text-xs text-slate-800 dark:text-slate-200">
+        {/* Object & Property Selection Header */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <div>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider">
+              <Database className="w-3.5 h-3.5 text-sky-500" />
+              <span>Objeto Real (Equipamento)</span>
+            </label>
+            <select
+              value={selectedObjectId}
+              onChange={(e) => handleObjectChange(e.target.value)}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold outline-none focus:border-sky-500 transition-colors"
+            >
+              {objects.map((obj) => (
+                <option key={obj.id} value={obj.id}>
+                  {obj.name} ({obj.description || 'Equipamento'})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5 flex items-center gap-1.5 uppercase tracking-wider">
+              <Tag className="w-3.5 h-3.5 text-sky-500" />
+              <span>Propriedade Vinculada</span>
+            </label>
+            <select
+              value={selectedPropName}
+              onChange={(e) => handlePropChange(e.target.value)}
+              className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold outline-none focus:border-sky-500 transition-colors"
+            >
+              {availableProperties.map((p) => (
+                <option key={p.name} value={p.name}>
+                  {p.name} ({p.dataType} - {p.description || p.category || 'Atributo'})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         {/* Enable / Disable Alarms Main Toggle */}
         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl">
           <div className="space-y-0.5">
-            <h4 className="font-semibold text-slate-900 dark:text-slate-100">Habilitar Alertas</h4>
-            <p className="text-[11px] text-slate-400">Ativa ou desativa a avaliação de todas as condições configuradas para esta variável.</p>
+            <h4 className="font-semibold text-slate-900 dark:text-slate-100">
+              Habilitar Alarmes para {activeProp?.name ?? 'esta propriedade'}
+            </h4>
+            <p className="text-[11px] text-slate-400">
+              Ativa ou desativa a avaliação contínua pelo simulador global. Tipo de Dado: <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">{dataType}</span>
+            </p>
           </div>
           <button
             type="button"
@@ -176,7 +289,7 @@ export const AlarmConfigModal: React.FC = () => {
               <button
                 type="button"
                 onClick={handleAddRule}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg transition-colors font-medium border border-slate-200 dark:border-slate-700"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors font-semibold shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Adicionar Regra</span>
@@ -190,14 +303,14 @@ export const AlarmConfigModal: React.FC = () => {
                 <p className="text-[11px] text-slate-400 mt-0.5">Clique em "Adicionar Regra" para monitorar esta variável.</p>
               </div>
             ) : (
-              <div className="space-y-4 max-h-[48vh] overflow-y-auto pr-1">
+              <div className="space-y-4 max-h-[45vh] overflow-y-auto pr-1">
                 {rules.map((rule, idx) => (
                   <div
                     key={rule.id}
                     className="p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 rounded-xl shadow-2xs relative group"
                   >
                     {/* Header Controls */}
-                    <div className="flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-850 pb-3 mb-3">
+                    <div className="flex items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-3 mb-3">
                       <div className="flex items-center gap-3">
                         <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-mono font-bold text-[10px] text-slate-400">
                           {idx + 1}
@@ -207,7 +320,7 @@ export const AlarmConfigModal: React.FC = () => {
                         <select
                           value={rule.type}
                           onChange={(e) => handleUpdateRule(rule.id, { type: e.target.value as AlarmConditionType })}
-                          className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-750 rounded-lg outline-none font-semibold text-slate-900 dark:text-slate-100 text-xs focus:border-sky-500"
+                          className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none font-semibold text-slate-900 dark:text-slate-100 text-xs focus:border-sky-500"
                         >
                           {getConditionOptions().map((opt) => (
                             <option key={opt.value} value={opt.value}>
@@ -334,7 +447,7 @@ export const AlarmConfigModal: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3 pt-3 border-t border-slate-100 dark:border-slate-850">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
                       {/* Delays & Hysteresis */}
                       <div>
                         <label className="block text-slate-500 dark:text-slate-400 font-medium mb-1">
@@ -401,7 +514,7 @@ export const AlarmConfigModal: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6 mt-3 pt-3 border-t border-slate-100 dark:border-slate-850 text-[11px]">
+                    <div className="flex items-center gap-6 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px]">
                       {/* Checkboxes for options */}
                       <label className="flex items-center gap-2 cursor-pointer select-none">
                         <input
@@ -441,7 +554,7 @@ export const AlarmConfigModal: React.FC = () => {
           <button
             type="button"
             onClick={closeAlarmConfigModal}
-            className="px-4 py-2 border border-slate-200 dark:border-slate-750 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold transition-colors"
+            className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold transition-colors"
           >
             Cancelar
           </button>

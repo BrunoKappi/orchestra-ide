@@ -21,21 +21,20 @@ interface KpiCardProps {
   highlight?: boolean;
 }
 
-const KpiCard: React.FC<KpiCardProps> = ({ label, value, sub, icon, color, pulse, highlight }) => (
-  <div className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border transition-all
+const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon, color, pulse, highlight }) => (
+  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs whitespace-nowrap transition-all select-none
     ${highlight
-      ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
-      : 'bg-white/60 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/50'
+      ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800'
+      : 'bg-white/80 dark:bg-slate-850 border-slate-200 dark:border-slate-800'
     }`}>
-    <div className={`p-1.5 rounded-lg ${color} shrink-0`}>
+    <div className={`p-1 rounded-md ${color} shrink-0`}>
       <div className={pulse ? 'animate-pulse' : ''}>
         {icon}
       </div>
     </div>
-    <div className="min-w-0">
-      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-none mb-0.5 truncate">{label}</div>
-      <div className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-none">{value}</div>
-      {sub && <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{sub}</div>}
+    <div className="flex items-center gap-1.5">
+      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{label}:</span>
+      <strong className="text-xs font-mono font-bold text-slate-800 dark:text-slate-100">{value}</strong>
     </div>
   </div>
 );

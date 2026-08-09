@@ -2,9 +2,115 @@ import React, { useState } from 'react';
 import { useOmmStore } from '../../store/useOmmStore';
 import {
   Clock, CheckCircle2, AlertCircle, Send, Play, Settings,
-  ChevronDown, ChevronUp, Columns, X,
+  ChevronDown, ChevronUp, Columns, X, Download,
 } from 'lucide-react';
 import type { CutoffStatus, OmmCutoffSnapshot } from '../../types';
+
+// Export Cutoff to printable formatted PDF
+function exportCutoffPdf(co: OmmCutoffSnapshot) {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+
+  const invRowsHtml = co.inventoryByEquipment
+    .map(
+      (inv) => `
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-weight:bold;">${inv.tag}</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;">${inv.volume.toFixed(1)} m³</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;">${(inv.mass / 1000).toFixed(2)} t</td>
+      <td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;">${inv.level.toFixed(1)}%</td>
+    </tr>`
+    )
+    .join('');
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Relatório de Fechamento (Cutoff) ${co.number}</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #0f172a; line-height: 1.5; background: #ffffff; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0284c7; padding-bottom: 12px; margin-bottom: 20px; }
+          .title { font-size: 20px; font-weight: bold; color: #0f172a; }
+          .subtitle { font-size: 11px; color: #64748b; margin-top: 2px; }
+          .badge { display: inline-block; padding: 4px 12px; background: #e0f2fe; color: #0369a1; font-weight: bold; font-size: 12px; border-radius: 6px; font-family: monospace; }
+          .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+          .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
+          .kpi-title { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748b; }
+          .kpi-value { font-size: 16px; font-weight: bold; color: #0f172a; font-family: monospace; margin-top: 4px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+          th { background: #f1f5f9; padding: 8px; text-align: left; font-size: 10px; text-transform: uppercase; color: #475569; border-bottom: 2px solid #cbd5e1; }
+          .section-title { font-size: 13px; font-weight: bold; color: #334155; margin-top: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <div class="title">Relatório de Fechamento de Inventário (Cutoff)</div>
+            <div class="subtitle">Orquestra IDE — Módulo OMM (Oil Movement & Management)</div>
+          </div>
+          <div>
+            <span class="badge">${co.number}</span>
+          </div>
+        </div>
+
+        <div style="font-size:12px;color:#475569;margin-bottom:15px;">
+          <strong>Data/Hora de Execução:</strong> ${co.executedAt ? new Date(co.executedAt).toLocaleString('pt-BR') : 'Pendente'}<br/>
+          <strong>Status do Snapshot:</strong> ${co.status} | <strong>Escopo:</strong> Planta Geral
+        </div>
+
+        <div class="grid">
+          <div class="kpi-card">
+            <div class="kpi-title">Volume Total</div>
+            <div class="kpi-value">${co.totalVolume.toFixed(0)} m³</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Massa Total</div>
+            <div class="kpi-value">${(co.totalMass / 1000).toFixed(2)} kt</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Movimentos Ativos</div>
+            <div class="kpi-value">${co.movementsActive.length}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Cruzando Meia-Noite</div>
+            <div class="kpi-value">${co.movementsCrossing.length}</div>
+          </div>
+        </div>
+
+        <div class="section-title">Inventário Detalhado dos Tanques</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Equipamento (Tag)</th>
+              <th style="text-align:right;">Volume Armazenado</th>
+              <th style="text-align:right;">Massa Efetiva</th>
+              <th style="text-align:right;">Nível (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invRowsHtml || '<tr><td colspan="4" style="text-align:center;padding:10px;color:#94a3b8;">Nenhum inventário disponível.</td></tr>'}
+          </tbody>
+        </table>
+
+        ${co.notes ? `<div style="margin-top:20px;padding:10px;background:#f8fafc;border-left:3px solid #0284c7;font-size:11px;font-style:italic;"><strong>Observações:</strong> ${co.notes}</div>` : ''}
+
+        <div style="margin-top:40px;padding-top:10px;border-top:1px solid #e2e8f0;text-align:center;font-size:10px;color:#94a3b8;">
+          Documento gerado automaticamente pelo Sistema OMM — Orquestra IDE
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
 
 // ─── Status config ───────────────────────────────────────────────────────────
 
@@ -135,6 +241,15 @@ const CutoffCard: React.FC<CutoffCardProps> = ({ co, isExpanded, onToggle, onSel
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* Baixar PDF button */}
+          <button
+            onClick={() => exportCutoffPdf(co)}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
+            title="Baixar Cutoff em PDF formatado"
+          >
+            <Download className="w-3.5 h-3.5 text-sky-500" />
+            <span>Baixar PDF</span>
+          </button>
           <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold ${cfg.color}`}>
             {cfg.icon}
             {cfg.label}

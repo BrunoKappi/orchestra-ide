@@ -4,9 +4,10 @@ import type { OmmMovement, OmmStatus, OmmPriority } from '../../types';
 import { SearchableSelect } from '../../../../components/ui/SearchableSelect';
 import { TankFlowVisualizer } from '../detail/TankFlowVisualizer';
 import { TankTelemetryModal } from './TankTelemetryModal';
+import { TankTelemetryDashboard } from '../../../../components/ui/TankTelemetryDashboard';
 import {
   X, Save, Play, CheckCircle, XCircle, Archive,
-  ArrowRight, Gauge, Settings, Info, Activity,
+  ArrowRight, Gauge, Settings, Info, Activity, ArrowLeftRight,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -38,12 +39,13 @@ const STATUS_COLORS: Record<OmmStatus, string> = {
 // ---------------------------------------------------------------------------
 // Tab types
 // ---------------------------------------------------------------------------
-type ModalTab = 'general' | 'movement' | 'flow' | 'operation' | 'simulation';
+type ModalTab = 'general' | 'movement' | 'flow' | 'comparison' | 'operation' | 'simulation';
 
 const TABS: { id: ModalTab; label: string; icon: React.ReactNode }[] = [
   { id: 'general',    label: 'Geral',      icon: <Info className="w-3.5 h-3.5" /> },
   { id: 'movement',   label: 'Movimento',  icon: <ArrowRight className="w-3.5 h-3.5" /> },
   { id: 'flow',       label: 'Fluxo',      icon: <Activity className="w-3.5 h-3.5" /> },
+  { id: 'comparison', label: 'Comparação', icon: <ArrowLeftRight className="w-3.5 h-3.5" /> },
   { id: 'operation',  label: 'Operação',   icon: <Gauge className="w-3.5 h-3.5" /> },
   { id: 'simulation', label: 'Simulação',  icon: <Settings className="w-3.5 h-3.5" /> },
 ];
@@ -545,7 +547,13 @@ export const MovementModal: React.FC = () => {
                 onChange={(e) => { setSimFlowRate(parseFloat(e.target.value) || 0); mark(); }}
               />
               <button
-                onClick={() => { setMovementFlowRate(currentMovement.id, simFlowRate); setDirty(false); }}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMovementFlowRate(currentMovement.id, simFlowRate);
+                  setDirty(false);
+                }}
                 className="px-3 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm"
               >
                 Aplicar
@@ -560,7 +568,12 @@ export const MovementModal: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => toggleMovementPause(currentMovement.id)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMovementPause(currentMovement.id);
+              }}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm ${
                 currentMovement.simPaused
                   ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
@@ -583,13 +596,61 @@ export const MovementModal: React.FC = () => {
     );
   };
 
+  // ---- Telemetry Comparison Tab ----
+  const renderComparison = () => {
+    if (!originId || !destinationId) {
+      return (
+        <div className="p-8 text-center text-xs text-slate-400 font-mono italic">
+          Selecione um equipamento de Origem e um equipamento de Destino no movimento para visualizar a comparação de telemetria em tempo real.
+        </div>
+      );
+    }
+
+    const originEq = equipments.find((e) => e.id === originId);
+    const destEq = equipments.find((e) => e.id === destinationId);
+
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 h-full overflow-y-auto max-h-[75vh]">
+        {/* Left: Origin Tank */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xs min-h-[480px]">
+          <div className="px-4 py-2 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+            <span className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider">
+              Equipamento de Origem
+            </span>
+            <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
+              {originEq?.tag || originId}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <TankTelemetryDashboard objectId={originId} compact={true} />
+          </div>
+        </div>
+
+        {/* Right: Destination Tank */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xs min-h-[480px]">
+          <div className="px-4 py-2 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+              Equipamento de Destino
+            </span>
+            <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
+              {destEq?.tag || destinationId}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <TankTelemetryDashboard objectId={destinationId} compact={true} />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4"
         onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
       >
-        <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh] text-slate-800 dark:text-slate-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative w-full max-w-6xl h-[85vh] max-h-[900px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-800 dark:text-slate-100 animate-in fade-in zoom-in-95 duration-200">
           {/* Header */}
           <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
             <div>
@@ -646,6 +707,7 @@ export const MovementModal: React.FC = () => {
             {activeTab === 'general'    && renderGeneral()}
             {activeTab === 'movement'   && renderMovement()}
             {activeTab === 'flow'       && renderFlow()}
+            {activeTab === 'comparison' && renderComparison()}
             {activeTab === 'operation'  && renderOperation()}
             {activeTab === 'simulation' && renderSimulation()}
           </div>

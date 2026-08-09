@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Cpu,
   Shapes,
@@ -47,6 +47,7 @@ export const HeaderNavigation = () => {
   ).length;
 
   const location = useLocation();
+  const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -334,10 +335,18 @@ export const HeaderNavigation = () => {
 
         <button
           onClick={handleResetMockData}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium transition-colors bg-emerald-50/30 dark:bg-emerald-950/10"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium transition-colors bg-emerald-50/30 dark:bg-emerald-950/10 cursor-pointer"
           title="Reset e Criar Massa de Dados Customizada (Tanques/Esferas)">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Reset/Mock</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/simulator')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-sky-200 dark:border-sky-800 hover:bg-sky-50 dark:hover:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-medium transition-colors bg-sky-50/30 dark:bg-sky-950/10 cursor-pointer"
+          title="Abrir Simulador Global (Painel de Controle e Simulação de Dados)">
+          <Activity className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
+          <span>Simulador Global</span>
         </button>
 
         <button

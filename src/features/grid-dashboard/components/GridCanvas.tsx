@@ -12,6 +12,7 @@ interface GridCanvasProps {
   onSelectCard: (id: string | null) => void;
   onAddCard: (startRow: number, startCol: number, rowSpan: number, colSpan: number) => void;
   onUpdateCardPosition: (id: string, startRow: number, startCol: number, rowSpan: number, colSpan: number) => void;
+  onExpandTrend?: (card: TankCardData) => void;
 }
 
 interface CellPos {
@@ -27,6 +28,7 @@ export const GridCanvas: React.FC<GridCanvasProps> = ({
   onSelectCard,
   onAddCard,
   onUpdateCardPosition,
+  onExpandTrend,
 }) => {
   const { rows, cols } = config;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -346,6 +348,7 @@ export const GridCanvas: React.FC<GridCanvasProps> = ({
                   isSelected={isSelected}
                   isViewMode={isViewMode}
                   onClick={() => !isViewMode && onSelectCard(card.id)}
+                  onExpand={() => onExpandTrend?.(card)}
                 />
               ) : (
                 <IndustrialTankCard

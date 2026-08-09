@@ -122,14 +122,16 @@ export interface AreaEntity {
 export interface PropertyHistoryConfig {
   enabled: boolean;
   /** 'interval' = fixed sampling period; 'on_change' = record on every value change */
-  collectionMode: 'interval' | 'on_change';
-  intervalMs: number;       // minimum 1000 ms
-  retentionMs: number;      // e.g. 86400000 = 24 h
-  maxSamples: number;       // e.g. 10000
-  deadband: number;         // minimum change magnitude to record a new sample
-  compression: boolean;
-  engineeringUnit: string;
-  notes: string;
+  collectionMode?: 'interval' | 'on_change';
+  intervalMs?: number;       // minimum 1000 ms
+  periodMs?: number;
+  storageType?: string;
+  retentionMs?: number;      // e.g. 86400000 = 24 h
+  maxSamples?: number;       // e.g. 10000
+  deadband?: number;         // minimum change magnitude to record a new sample
+  compression?: boolean;
+  engineeringUnit?: string;
+  notes?: string;
 }
 
 export type SampleQuality = 'Good' | 'Bad' | 'Uncertain';

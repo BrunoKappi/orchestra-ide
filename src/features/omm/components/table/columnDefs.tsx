@@ -160,10 +160,10 @@ const ProgressInline: React.FC<{ pct: number }> = ({ pct }) => {
   const color = clamped >= 90 ? 'bg-emerald-500' : clamped >= 50 ? 'bg-sky-500' : 'bg-amber-500';
   return (
     <div className="flex items-center gap-1.5 min-w-[72px]">
-      <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+      <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
         <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${clamped}%` }} />
       </div>
-      <span className="text-[10px] font-mono text-slate-400 w-7 text-right shrink-0">{clamped.toFixed(0)}%</span>
+      <span className="text-[10px] font-mono text-slate-600 dark:text-slate-400 w-7 text-right shrink-0">{clamped.toFixed(0)}%</span>
     </div>
   );
 };
@@ -201,7 +201,7 @@ const NumberCell: React.FC<{ id: string; number: string }> = ({ id, number }) =>
     <button
       onClick={(e) => { e.stopPropagation(); openMovementModal(id); }}
       title="Abrir movimento"
-      className="group inline-flex items-center gap-1 font-mono text-[11px] font-bold text-sky-400 hover:text-sky-200 hover:underline transition-colors cursor-pointer"
+      className="group inline-flex items-center gap-1 font-mono text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-200 hover:underline transition-colors cursor-pointer"
     >
       {number}
       <ExternalLink className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -215,7 +215,7 @@ const TankCell: React.FC<{ tankId: string; tag: string }> = ({ tankId, tag }) =>
     <button
       onClick={(e) => { e.stopPropagation(); openTelemetryModal(tankId); }}
       title="Abrir telemetria do tanque"
-      className="group inline-flex items-center gap-1 font-mono text-[11px] font-bold text-sky-400 hover:text-sky-200 hover:underline transition-colors cursor-pointer text-left"
+      className="group inline-flex items-center gap-1 font-mono text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-200 hover:underline transition-colors cursor-pointer text-left"
     >
       {tag}
     </button>
@@ -239,7 +239,7 @@ export const movementColumnDefs: ColDef[] = [
   ), 90),
 
   col('orderNumber', 'Ordem', (r) => r.orderNumber, (v) => (
-    <span className="font-mono text-[10px] text-slate-400">{v}</span>
+    <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">{v}</span>
   ), 105),
 
   col('movementTypeName', 'Tipo', (r) => r, (_, row) => (
@@ -267,7 +267,7 @@ export const movementColumnDefs: ColDef[] = [
   ), 130),
 
   col('areaName', 'Área', (r) => r.areaName, (v) => (
-    <span className="text-[10px] text-slate-400 truncate">{v}</span>
+    <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{v}</span>
   ), 130),
 
   col('status', 'Status', (r) => r.status, (_, row) => (
@@ -279,13 +279,13 @@ export const movementColumnDefs: ColDef[] = [
   ), 80),
 
   col('plannedVolume', 'Vol. Plan.', (r) => r.plannedVolume, (v, row) => (
-    <span className="font-mono text-[11px] text-slate-300">
+    <span className="font-mono text-[11px] font-medium text-slate-700 dark:text-slate-300">
       {v >= 1000 ? (v / 1000).toFixed(2) + 'k' : v.toFixed(0)} {row.engUnitSymbol}
     </span>
   ), 90),
 
   col('currentVolume', 'Vol. Mov.', (r) => r.currentVolume, (v, row) => (
-    <span className={`font-mono text-[11px] font-semibold ${v > 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
+    <span className={`font-mono text-[11px] font-semibold ${v > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>
       {v >= 1000 ? (v / 1000).toFixed(2) + 'k' : v.toFixed(0)} {row.engUnitSymbol}
     </span>
   ), 90),
@@ -295,7 +295,7 @@ export const movementColumnDefs: ColDef[] = [
   ), 90),
 
   col('currentFlow', 'Vazão', (r) => r.currentFlow, (v) => (
-    <span className={`font-mono text-[11px] font-semibold ${v > 0 ? 'text-sky-400' : 'text-slate-500'}`}>
+    <span className={`font-mono text-[11px] font-semibold ${v > 0 ? 'text-sky-600 dark:text-sky-400' : 'text-slate-500'}`}>
       {v > 0 ? `${v.toFixed(0)} m³/h` : '—'}
     </span>
   ), 85),

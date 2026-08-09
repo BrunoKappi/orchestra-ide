@@ -302,9 +302,20 @@ export const PlantOverview: React.FC = () => {
           </svg>
 
           {/* Equipment nodes */}
-          {equipments.map((eq) => (
-            <EquipNode key={eq.id} eq={eq} onClick={handleEquipClick} />
-          ))}
+          {equipments.map((eq, idx) => {
+            const row = Math.floor(idx / 4);
+            const col = idx % 4;
+            const fallbackX = 80 + col * 170;
+            const fallbackY = 90 + row * 190;
+            const positionedEq = {
+              ...eq,
+              x: eq.x || fallbackX,
+              y: eq.y || fallbackY,
+              width: eq.width || 95,
+              height: eq.height || 115,
+            };
+            return <EquipNode key={eq.id} eq={positionedEq} onClick={handleEquipClick} />;
+          })}
         </div>
 
         {/* Faceplate overlay */}

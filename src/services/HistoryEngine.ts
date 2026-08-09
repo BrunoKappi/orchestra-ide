@@ -103,27 +103,32 @@ export const historyEngine = {
     const now = Date.now();
     const prevValue = lastRecordedValue.get(k);
 
+    const intervalMs = config.intervalMs ?? config.periodMs ?? 1000;
+    const deadband = config.deadband ?? 0;
+    const retentionMs = config.retentionMs ?? 86400000;
+    const maxSamples = config.maxSamples ?? 5000;
+
     // --- Collection mode check ---
     if (config.collectionMode === 'interval') {
       const last = lastRecordedAt.get(k) ?? 0;
-      if (now - last < config.intervalMs) return false;
+      if (now - last < intervalMs) return false;
 
       // If deadband check is required in interval mode
-      if (prevValue !== undefined && config.deadband > 0) {
+      if (prevValue !== undefined && deadband > 0) {
         const prevNum = parseFloat(prevValue);
         const curNum = parseFloat(value);
         if (!isNaN(prevNum) && !isNaN(curNum)) {
-          if (Math.abs(curNum - prevNum) < config.deadband) return false;
+          if (Math.abs(curNum - prevNum) < deadband) return false;
         }
       }
     } else {
       // on_change mode: only record if value changed (respecting deadband if numeric)
       if (prevValue !== undefined) {
-        if (config.deadband > 0) {
+        if (deadband > 0) {
           const prevNum = parseFloat(prevValue);
           const curNum = parseFloat(value);
           if (!isNaN(prevNum) && !isNaN(curNum)) {
-            if (Math.abs(curNum - prevNum) < config.deadband) return false;
+            if (Math.abs(curNum - prevNum) < deadband) return false;
           } else if (prevValue === value) {
             return false;
           }
@@ -134,7 +139,7 @@ export const historyEngine = {
     }
 
     // --- Purge old samples before inserting ---
-    purgeExpiredSamples(k, config.retentionMs, config.maxSamples);
+    purgeExpiredSamples(k, retentionMs, maxSamples);
 
     const sample: HistorySample = {
       timestamp: new Date(now).toISOString(),

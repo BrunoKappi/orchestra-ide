@@ -8,7 +8,9 @@ import { deploymentRepo } from '../repository/DeploymentRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
 import { alarmRepo } from '../repository/AlarmRepository';
-import type { ProductEntity, AreaEntity, EquipmentGraphicConfig, PropertyEntity } from '../types/domain';
+import type { ProductEntity, AreaEntity, EquipmentGraphicConfig, PropertyEntity, PropertyAlarmConfig } from '../types/domain';
+import { AlarmEngine } from './AlarmEngine';
+import { inheritanceService } from './InheritanceService';
 
 // ---------------------------------------------------------------------------
 // Helper: create a PropertyEntity skeleton
@@ -23,8 +25,9 @@ function makeProp(
   defaultValue: string,
   description: string,
   category?: string,
+  historyConfig?: PropertyEntity['historyConfig'],
 ): PropDef {
-  return { targetId, targetType, name, dataType, defaultValue, description, category };
+  return { targetId, targetType, name, dataType, defaultValue, description, category, historyConfig };
 }
 
 export class SeedService {
@@ -264,17 +267,17 @@ export class SeedService {
       // Estado Operacional
       makeProp(baseTankTplId, 'template', 'Status', 'String', 'Normal', 'Status operacional e de inventário do tanque', 'Status'),
 
-      // Capacidade e Inventário
+      // Capacidade e Inventário (Com Historian/Storyon ativado)
       makeProp(baseTankTplId, 'template', 'Capacity', 'Float', '15000.0', 'Capacidade volumétrica nominal total (m³)', 'Inventário'),
-      makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário'),
-      makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário'),
+      makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³' }),
+      makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '%' }),
       makeProp(baseTankTplId, 'template', 'Mass', 'Float', '0.0', 'Massa total armazenada (toneladas)', 'Inventário'),
       makeProp(baseTankTplId, 'template', 'VCF', 'Float', '1.000', 'Fator de Correção de Volume (Volume Correction Factor)', 'Inventário'),
 
-      // Processo
-      makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo'),
-      makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo'),
-      makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo'),
+      // Processo (Com Historian/Storyon ativado)
+      makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³/h' }),
+      makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '°C' }),
+      makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'bar' }),
       makeProp(baseTankTplId, 'template', 'Density', 'Float', '800.0', 'Densidade operacional do produto (kg/m³)', 'Processo'),
 
       // Limites de Alarme
@@ -615,9 +618,191 @@ export class SeedService {
         makeProp(seed.id, 'instance', 'LowPressure', 'Float', seed.lPress.toString(), 'Limite de baixa pressão (bar)', 'Limites'),
       ];
 
-      instanceProps.forEach((p) =>
-        propertyRepo.save({ id: uuidv4(), ...p, createdAt: now, updatedAt: now })
-      );
+      instanceProps.forEach((p) => {
+        let alarmConfig: PropertyAlarmConfig | undefined = undefined;
+
+        if (seed.id === 'tank-tk-301' && p.name === 'Level') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-301-level-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '70.0',
+                severity: 'high',
+                priority: 75,
+                message: '[TK-301] Alerta: Nível elevado de Nafta (>= 70%)',
+                color: '#f97316',
+                icon: 'AlertTriangle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 1.0,
+                requireAck: true,
+                historical: true,
+              },
+              {
+                id: 'rule-tk-301-level-hh',
+                type: 'HH',
+                enabled: true,
+                blocked: false,
+                compareValue: '85.0',
+                severity: 'critical',
+                priority: 95,
+                message: '[TK-301] ALARME CRÍTICO: Nível Muito Alto de Nafta (>= 85%)',
+                color: '#ef4444',
+                icon: 'ShieldAlert',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 1.0,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-tk-302' && p.name === 'Level') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-302-level-l',
+                type: 'L',
+                enabled: true,
+                blocked: false,
+                compareValue: '20.0',
+                severity: 'low',
+                priority: 25,
+                message: '[TK-302] Aviso: Nível baixo de Nafta (<= 20%)',
+                color: '#3b82f6',
+                icon: 'Bell',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 1.0,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-tk-302' && p.name === 'Flow') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-302-flow-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '100.0',
+                severity: 'medium',
+                priority: 50,
+                message: '[TK-302] Alerta: Vazão de enchimento alta (>= 100 m³/h)',
+                color: '#eab308',
+                icon: 'AlertCircle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 5.0,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-301' && p.name === 'Pressure') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-301-press-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '18.0',
+                severity: 'critical',
+                priority: 90,
+                message: '[V-301] ALARME CRÍTICO: Pressão alta na Esfera de Eteno (>= 18.0 bar)',
+                color: '#ef4444',
+                icon: 'ShieldAlert',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.5,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-401' && p.name === 'Level') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-401-level-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '70.0',
+                severity: 'high',
+                priority: 70,
+                message: '[V-401] Alerta: Nível elevado no Vaso de Propeno (>= 70%)',
+                color: '#f97316',
+                icon: 'AlertTriangle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 1.0,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-401' && p.name === 'Temperature') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-401-temp-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '20.0',
+                severity: 'medium',
+                priority: 55,
+                message: '[V-401] Alerta: Temperatura do Propeno acima do normal (>= 20 °C)',
+                color: '#eab308',
+                icon: 'AlertCircle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.5,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-tk-403' && p.name === 'Pressure') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-403-press-l',
+                type: 'L',
+                enabled: true,
+                blocked: false,
+                compareValue: '1.0',
+                severity: 'low',
+                priority: 30,
+                message: '[TK-403] Aviso: Pressão abaixo do nominal (<= 1.0 bar)',
+                color: '#3b82f6',
+                icon: 'Bell',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.05,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        }
+
+        propertyRepo.save({ id: uuidv4(), ...p, alarmConfig, createdAt: now, updatedAt: now });
+      });
 
       // Save Deployment Node
       deploymentRepo.saveNode({
@@ -631,14 +816,12 @@ export class SeedService {
       });
     });
 
-    // -------------------------------------------------------------------------
-    // 7. Initial OMM Movements
-    // -------------------------------------------------------------------------
+    const n = Date.now();
     const initialMovements = [
       {
-        id: 'mov-1',
-        code: 'MOV-2026-001',
-        description: 'Transferência Interna de Nafta TK-301 -> TK-302',
+        id: 'mov-0001',
+        code: 'MOV-0001',
+        description: 'Transferência de Nafta TK-301 → TK-302',
         sourceTankId: 'tank-tk-301',
         sourceTankTag: 'TK-301',
         destinationTankId: 'tank-tk-302',
@@ -656,56 +839,47 @@ export class SeedService {
         status: 'Active',
         ettc: '12.9h',
         etoc: '12.9h',
-        startTime: new Date(Date.now() - 3600000 * 3.75).toISOString(),
+        startTime: new Date(n - 3600000 * 2).toISOString(),
       },
       {
-        id: 'mov-2',
-        code: 'MOV-2026-002',
-        description: 'Transferência Programada de Nafta TK-302 -> TK-301',
-        sourceTankId: 'tank-tk-302',
-        sourceTankTag: 'TK-302',
-        destinationTankId: 'tank-tk-301',
-        destinationTankTag: 'TK-301',
-        productId: 'prod-naphtha',
-        productName: 'Nafta Petroquímica',
-        via: 'Linha Aromáticos L-401',
-        areaId: 'area-300',
-        operatorId: 'usr-2',
-        operatorName: 'Ana Souza',
-        flowRate: 80.0,
-        plannedVolume: 1500.0,
-        volumeMoved: 0.0,
-        remainingVolume: 1500.0,
-        status: 'Issued',
-        ettc: '18.7h',
-        etoc: '18.7h',
-        startTime: null,
-      },
-      {
-        id: 'mov-3',
-        code: 'MOV-2026-003',
-        description: 'Transferência Concluída Eteno V-301 -> V-302',
-        sourceTankId: 'tank-v-301',
-        sourceTankTag: 'V-301',
-        destinationTankId: 'tank-v-302',
-        destinationTankTag: 'V-302',
-        productId: 'prod-ethene',
-        productName: 'Eteno (Etileno)',
+        id: 'mov-0004',
+        code: 'MOV-0004',
+        description: 'Transferência de Propeno V-401 → V-402',
+        sourceTankId: 'tank-v-401',
+        sourceTankTag: 'V-401',
+        destinationTankId: 'tank-v-402',
+        destinationTankTag: 'V-402',
+        productId: 'prod-propene',
+        productName: 'Propeno (Propileno)',
         via: 'Manifold de Olefinas M-501',
         areaId: 'area-500',
         operatorId: 'usr-3',
         operatorName: 'Roberto Mendes',
-        flowRate: 150.0,
-        plannedVolume: 1000.0,
-        volumeMoved: 1000.0,
-        remainingVolume: 0.0,
-        status: 'Completed',
-        ettc: '0.0h',
-        etoc: '0.0h',
-        startTime: new Date(Date.now() - 86400000).toISOString(),
+        flowRate: 80.0,
+        plannedVolume: 600.0,
+        volumeMoved: 120.0,
+        remainingVolume: 480.0,
+        status: 'Active',
+        ettc: '6.0h',
+        etoc: '6.0h',
+        startTime: new Date(n - 3600000 * 1.5).toISOString(),
       },
     ];
     localStorage.setItem(STORAGE_KEYS.MOVEMENTS, JSON.stringify(initialMovements));
+
+    // Evaluate initial alarms dynamically for all deployed objects
+    const objects = objectRepo.getAll();
+    const simValues: Record<string, string> = {};
+    const allProps = propertyRepo.getAll();
+    allProps.forEach((p) => {
+      simValues[`${p.targetId}:${p.name}`] = p.defaultValue;
+    });
+
+    AlarmEngine.evaluate(
+      simValues,
+      objects,
+      (objectId, type) => inheritanceService.getMergedProperties(objectId, type)
+    );
 
     localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
   }

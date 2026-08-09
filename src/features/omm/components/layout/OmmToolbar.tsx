@@ -9,6 +9,7 @@ import {
   XCircle,
   Search,
   Layers,
+  RotateCw,
 } from "lucide-react";
 
 interface ToolbarButtonProps {
@@ -66,6 +67,7 @@ export const OmmToolbar: React.FC = () => {
   const changeMovementStatus = useOmmStore((s) => s.changeMovementStatus);
   const openOrderDialog = useOmmStore((s) => s.openOrderDialog);
   const openMovementModal = useOmmStore((s) => s.openMovementModal);
+  const refresh = useOmmStore((s) => s.refresh);
 
   const selectedMovement = useOmmStore(
     (s) => s.movements.find((m) => m.id === selectedMovementId) ?? null,
@@ -95,6 +97,13 @@ export const OmmToolbar: React.FC = () => {
           className="pl-8 pr-3 py-1.5 w-40 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-all"
         />
       </div>
+
+      <ToolbarButton
+        icon={<RotateCw className="w-3.5 h-3.5" />}
+        label="Atualizar"
+        onClick={() => refresh()}
+        shortcut="Atualizar movimentos"
+      />
 
       <Separator />
 

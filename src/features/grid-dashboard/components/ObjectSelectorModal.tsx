@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, X, Gauge, Check, TrendingUp, Filter } from 'lucide-react';
+import { Search, X, Gauge, Check, TrendingUp } from 'lucide-react';
 import { useObjectModelStore } from '../../../store/useObjectModelStore';
 import { inheritanceService } from '../../../services/InheritanceService';
 import { cn } from '../../../utils/cn';
@@ -37,7 +37,6 @@ export const ObjectSelectorModal: React.FC<ObjectSelectorModalProps> = ({
   const [activeTab, setActiveTab] = useState<'equipment' | 'trends'>('equipment');
   const [search, setSearch] = useState('');
   const [trendSearch, setTrendSearch] = useState('');
-  const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all');
   
   // Selection state for trend properties
   const [selectedProps, setSelectedProps] = useState<Array<{
@@ -138,48 +137,18 @@ export const ObjectSelectorModal: React.FC<ObjectSelectorModalProps> = ({
     return list;
   }, [objects, simulatedValues]);
 
-  // Trend variables filtering
+  // Trend variables filtering (Global search across object, property, dataType and unit)
   const filteredTrends = useMemo(() => {
-    let result = allPropertiesList;
-
-    // Apply quick filters
-    const filter = activeTypeFilter.toLowerCase();
-    if (filter !== 'all') {
-      if (filter === 'float') {
-        result = result.filter((item) => item.dataType === 'Float');
-      } else if (filter === 'integer') {
-        result = result.filter((item) => item.dataType === 'Integer');
-      } else if (filter === 'level') {
-        result = result.filter(
-          (item) =>
-            item.propertyName.toLowerCase().includes('level') ||
-            item.propertyName.toLowerCase().includes('nível')
-        );
-      } else if (filter === 'pressure') {
-        result = result.filter((item) => item.propertyName.toLowerCase().includes('press'));
-      } else if (filter === 'temperature') {
-        result = result.filter((item) => item.propertyName.toLowerCase().includes('temp'));
-      } else if (filter === 'flow') {
-        result = result.filter(
-          (item) =>
-            item.propertyName.toLowerCase().includes('flow') ||
-            item.propertyName.toLowerCase().includes('vaz')
-        );
-      }
-    }
-
-    const q = trendSearch.toLowerCase();
-    if (q) {
-      result = result.filter(
-        (item) =>
-          item.objectName.toLowerCase().includes(q) ||
-          item.propertyName.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q)
-      );
-    }
-
-    return result;
-  }, [allPropertiesList, activeTypeFilter, trendSearch]);
+    const q = trendSearch.toLowerCase().trim();
+    if (!q) return allPropertiesList;
+    return allPropertiesList.filter(
+      (item) =>
+        item.objectName.toLowerCase().includes(q) ||
+        item.propertyName.toLowerCase().includes(q) ||
+        item.dataType.toLowerCase().includes(q) ||
+        item.unit.toLowerCase().includes(q)
+    );
+  }, [allPropertiesList, trendSearch]);
 
   if (!isOpen) return null;
 
@@ -378,7 +347,7 @@ export const ObjectSelectorModal: React.FC<ObjectSelectorModalProps> = ({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Buscar variável por objeto, propriedade ou descrição (ex: TK-301 Level)..."
+                  placeholder="Buscar por nome da variável, objeto, tipo ou unidade (ex: TK-301, Level, Float, %)..."
                   value={trendSearch}
                   onChange={(e) => setTrendSearch(e.target.value)}
                   className="w-full pl-8 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-sky-500/30 text-slate-800 dark:text-slate-200 placeholder:text-slate-450"
@@ -387,142 +356,121 @@ export const ObjectSelectorModal: React.FC<ObjectSelectorModalProps> = ({
               </div>
             </div>
 
-            {/* Quick Filters */}
-            <div className="px-5 py-2 border-b border-slate-150 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 flex gap-1.5 flex-wrap items-center">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1 mr-1">
-                <Filter className="w-3.5 h-3.5 text-sky-500" /> Filtros:
-              </span>
-              {['All', 'Float', 'Integer', 'Level', 'Pressure', 'Temperature', 'Flow'].map((filterName) => {
-                const isActive = activeTypeFilter.toLowerCase() === filterName.toLowerCase();
-                return (
-                  <button
-                    key={filterName}
-                    onClick={() => setActiveTypeFilter(filterName)}
-                    className={cn(
-                      "px-2.5 py-1 text-[10px] font-bold rounded-full transition-all border cursor-pointer",
-                      isActive
-                        ? "bg-sky-500 text-white border-sky-600 shadow-sm"
-                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-750"
-                    )}
-                  >
-                    {filterName === 'All' ? 'Todos' :
-                     filterName === 'Level' ? 'Nível' :
-                     filterName === 'Pressure' ? 'Pressão' :
-                     filterName === 'Temperature' ? 'Temperatura' :
-                     filterName === 'Flow' ? 'Vazão' : filterName}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Flat list of variables */}
+            {/* Flat compact list of variables */}
             <div className="flex-1 overflow-y-auto px-5 py-3 bg-slate-50/30 dark:bg-slate-900/20">
               {filteredTrends.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-slate-400 dark:text-slate-500">
                   <TrendingUp className="w-10 h-10 mb-3 opacity-30" />
                   <p className="text-xs font-medium">Nenhuma variável de processo encontrada</p>
                   <p className="text-[11px] opacity-60 mt-1 text-center max-w-sm">
-                    Verifique se o termo digitado ou o filtro ativo corresponde a uma propriedade numérica do modelo
+                    Digite o nome de uma variável ou objeto na busca acima para selecionar
                   </p>
                 </div>
               ) : (
-                <div className="border border-slate-200 dark:border-slate-800/80 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
+                <div className="border border-slate-200 dark:border-slate-800/80 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
                   {/* Table Header */}
-                  <div className="grid grid-cols-[auto_1.5fr_1.2fr_0.8fr_0.7fr_1.1fr] gap-3 px-4 py-2.5 bg-slate-50 dark:bg-slate-850/60 border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                    <div></div>
-                    <div>Variável</div>
+                  <div className="grid grid-cols-[auto_1.3fr_1.5fr_0.7fr_0.7fr_1.1fr] gap-3 px-4 py-2 bg-slate-50 dark:bg-slate-850/60 border-b border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    <div className="w-4"></div>
                     <div>Objeto Origem</div>
+                    <div>Variável</div>
                     <div>Tipo</div>
                     <div>Unidade</div>
                     <div className="text-right">Valor Atual</div>
                   </div>
 
-                  {/* Table Body */}
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800 max-h-[42vh] overflow-y-auto">
+                  {/* List Body */}
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800/60 max-h-[44vh] overflow-y-auto">
                     {filteredTrends.map((item) => {
                       const isChecked = selectedProps.some(
                         (p) => p.objectId === item.objectId && p.propertyName === item.propertyName
                       );
+
+                      const toggleCheck = () => {
+                        if (isChecked) {
+                          setSelectedProps((prev) =>
+                            prev.filter(
+                              (p) => !(p.objectId === item.objectId && p.propertyName === item.propertyName)
+                            )
+                          );
+                        } else {
+                          setSelectedProps((prev) => [
+                            ...prev,
+                            {
+                              objectId: item.objectId,
+                              propertyName: item.propertyName,
+                              objectName: item.objectName,
+                              propertyLabel: item.propertyName,
+                            },
+                          ]);
+                        }
+                      };
+
                       return (
-                        <label
+                        <div
                           key={`${item.objectId}-${item.propertyName}`}
+                          onClick={toggleCheck}
                           className={cn(
-                            "grid grid-cols-[auto_1.5fr_1.2fr_0.8fr_0.7fr_1.1fr] gap-3 px-4 py-3 items-center hover:bg-slate-50/60 dark:hover:bg-slate-850/30 cursor-pointer select-none transition-colors",
-                            isChecked && "bg-sky-500/5 dark:bg-sky-500/5"
+                            "grid grid-cols-[auto_1.3fr_1.5fr_0.7fr_0.7fr_1.1fr] gap-3 px-4 py-2.5 items-center hover:bg-sky-500/5 dark:hover:bg-sky-500/10 cursor-pointer select-none transition-colors",
+                            isChecked && "bg-sky-500/10 dark:bg-sky-500/15"
                           )}
                         >
-                          {/* Checkbox */}
+                          {/* Modern Custom Checkbox */}
                           <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => {
-                                if (isChecked) {
-                                  setSelectedProps((prev) =>
-                                    prev.filter(
-                                      (p) => !(p.objectId === item.objectId && p.propertyName === item.propertyName)
-                                    )
-                                  );
-                                } else {
-                                  setSelectedProps((prev) => [
-                                    ...prev,
-                                    {
-                                      objectId: item.objectId,
-                                      propertyName: item.propertyName,
-                                      objectName: item.objectName,
-                                      propertyLabel: item.propertyName,
-                                    },
-                                  ]);
-                                }
-                              }}
-                              className="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 cursor-pointer"
-                            />
-                          </div>
-
-                          {/* Variable Name & Description */}
-                          <div className="min-w-0">
-                            <span className="text-xs font-bold text-slate-750 dark:text-slate-200 block truncate font-mono">
-                              {item.propertyName}
-                            </span>
-                            {item.description && (
-                              <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate block mt-0.5">
-                                {item.description}
-                              </span>
-                            )}
+                            <div
+                              className={cn(
+                                "w-4 h-4 rounded-md border flex items-center justify-center transition-all duration-150 shadow-2xs",
+                                isChecked
+                                  ? "bg-sky-500 border-sky-600 text-white ring-2 ring-sky-500/20"
+                                  : "bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 hover:border-sky-400"
+                              )}
+                            >
+                              {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
                           </div>
 
                           {/* Object Badge */}
-                          <div className="min-w-0 flex">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-sky-500/10 text-sky-650 dark:text-sky-400 border border-sky-500/20 font-mono">
+                          <div className="min-w-0 flex items-center">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 font-mono truncate">
                               {item.objectName}
                             </span>
                           </div>
 
+                          {/* Variable Name */}
+                          <div className="min-w-0 flex items-center">
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate font-mono">
+                              {item.propertyName}
+                            </span>
+                          </div>
+
                           {/* Data Type */}
-                          <div>
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-550 dark:text-slate-400 uppercase font-mono border border-slate-200/50 dark:border-slate-750">
+                          <div className="flex items-center">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 uppercase border border-slate-200 dark:border-slate-700">
                               {item.dataType}
                             </span>
                           </div>
 
                           {/* Unit */}
-                          <div>
+                          <div className="flex items-center">
                             {item.unit ? (
-                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 font-mono">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 {item.unit}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-slate-300 dark:text-slate-700">-</span>
+                              <span className="text-[10px] text-slate-300 dark:text-slate-600 font-mono">-</span>
                             )}
                           </div>
 
                           {/* Current Value (Real-time) */}
                           <div className="text-right font-mono font-bold text-xs text-slate-800 dark:text-slate-100 flex items-center justify-end gap-1">
-                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1 shrink-0" />
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                             {parseFloat(item.currentValue || '0').toFixed(1)}
-                            {item.unit && <span className="text-[10px] font-sans font-medium text-slate-450 dark:text-slate-500 ml-0.5">{item.unit}</span>}
+                            {item.unit && (
+                              <span className="text-[10px] font-sans font-medium text-slate-400 ml-0.5">
+                                {item.unit}
+                              </span>
+                            )}
                           </div>
-                        </label>
+                        </div>
                       );
                     })}
                   </div>

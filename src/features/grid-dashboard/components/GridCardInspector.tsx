@@ -1,7 +1,6 @@
 import React from "react";
-import type { TankCardData, CardStatus } from "../types";
-import { X, Trash2, Sliders, Eye, Palette, TrendingUp } from "lucide-react";
-import { cn } from "../../../utils/cn";
+import type { TankCardData } from "../types";
+import { X, Trash2, Sliders, Eye, TrendingUp } from "lucide-react";
 
 interface GridCardInspectorProps {
   card: TankCardData;
@@ -18,12 +17,6 @@ export const GridCardInspector: React.FC<GridCardInspectorProps> = ({
   onDeleteCard,
   onEditTrendVariables,
 }) => {
-  const handleStatusChange = (status: CardStatus) => {
-    onUpdateCard({
-      ...card,
-      status,
-    });
-  };
 
   return (
     <div className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-[#16171b] flex flex-col h-full shadow-xl z-20 transition-all">
@@ -61,64 +54,11 @@ export const GridCardInspector: React.FC<GridCardInspectorProps> = ({
               className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
           </div>
-
-          {!card.isTrend && (
-            <div>
-              <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">
-                Tag (Código)
-              </label>
-              <input
-                type="text"
-                value={card.tag}
-                onChange={(e) => onUpdateCard({ ...card, tag: e.target.value })}
-                className="w-full px-3 py-1.5 text-xs font-mono rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">
-              Categoria / Tipo
-            </label>
-            <input
-              type="text"
-              value={card.category}
-              onChange={(e) =>
-                onUpdateCard({ ...card, category: e.target.value })
-              }
-              className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-            />
-          </div>
         </div>
 
         {/* Conditional Configuration Sections */}
         {!card.isTrend ? (
           <>
-            {/* Status Operacional */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Palette className="w-3.5 h-3.5 text-sky-500" /> Status Operacional
-              </label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["NORMAL", "ATENÇÃO", "CRITICAL"] as CardStatus[]).map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => handleStatusChange(st)}
-                    className={cn(
-                      "py-1.5 px-2 text-[10px] font-bold rounded-lg border transition-all uppercase font-mono",
-                      card.status === st
-                        ? st === "CRITICAL"
-                          ? "bg-red-500 text-white border-red-600 shadow-sm"
-                          : st === "ATENÇÃO"
-                            ? "bg-amber-500 text-white border-amber-600 shadow-sm"
-                            : "bg-emerald-500 text-white border-emerald-600 shadow-sm"
-                        : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800",
-                    )}>
-                    {st}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Exibição de Campos */}
             <div className="space-y-2.5">

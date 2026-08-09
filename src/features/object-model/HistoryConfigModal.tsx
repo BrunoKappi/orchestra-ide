@@ -43,7 +43,7 @@ export const HistoryConfigModal: React.FC = () => {
   useEffect(() => {
     if (editingHistoryProperty && isHistoryConfigModalOpen) {
       const saved = editingHistoryProperty.historyConfig;
-      setConfig(saved ? { ...saved } : { ...DEFAULT_CONFIG });
+      setConfig(saved ? { ...DEFAULT_CONFIG, ...saved } : { ...DEFAULT_CONFIG });
 
       // Count existing samples
       if (selectedEntity) {
@@ -183,7 +183,7 @@ export const HistoryConfigModal: React.FC = () => {
                   type="number"
                   min={1}
                   max={720}
-                  value={msToHours(config.retentionMs)}
+                  value={msToHours(config.retentionMs ?? 86400000)}
                   onChange={(e) => setConfig((c) => ({ ...c, retentionMs: hoursToMs(Math.max(1, Number(e.target.value))) }))}
                   className={inputCls}
                 />

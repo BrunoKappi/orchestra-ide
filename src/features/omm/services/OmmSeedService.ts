@@ -248,6 +248,20 @@ export function seedOmmData(): void {
                     : productName.includes('Propen') ? 'prod-propene'
                     : productName.includes('Xileno') ? 'prod-paraxylene'
                     : null;
+    const nameUpper = obj.name.toUpperCase();
+    let x = 80;
+    let y = 90;
+    let color = '#3b82f6';
+
+    if (nameUpper.includes('301')) { x = 80; y = 90; color = '#f59e0b'; }
+    else if (nameUpper.includes('302')) { x = 240; y = 90; color = '#f59e0b'; }
+    else if (nameUpper.includes('303')) { x = 400; y = 90; color = '#f59e0b'; }
+    else if (nameUpper.includes('401')) { x = 80; y = 280; color = '#ec4899'; }
+    else if (nameUpper.includes('402')) { x = 240; y = 280; color = '#ec4899'; }
+    else if (nameUpper.includes('403')) { x = 400; y = 280; color = '#ec4899'; }
+    else if (nameUpper.includes('501')) { x = 580; y = 100; color = '#06b6d4'; }
+    else if (nameUpper.includes('502')) { x = 740; y = 100; color = '#3b82f6'; }
+    else if (nameUpper.includes('503')) { x = 660; y = 280; color = '#3b82f6'; }
 
     return {
       id:           obj.id,
@@ -268,6 +282,11 @@ export function seedOmmData(): void {
       isReceiving:  flowIn > 0,
       flowIn,
       flowOut,
+      x,
+      y,
+      width: 90,
+      height: 115,
+      color,
     };
   });
   equipmentRepo.saveAll(ommEquipments);
@@ -415,6 +434,7 @@ export function seedOmmData(): void {
   // -------------------------------------------------------------------------
   // 9. Movements — referencing real Orquestra object IDs
   // -------------------------------------------------------------------------
+  const n = Date.now();
   const movements: OmmMovement[] = [
     {
       id: 'mov-0001',
@@ -433,17 +453,21 @@ export function seedOmmData(): void {
       plannedVolume: 2000,
       plannedFlow: 120,
       engUnitId: 'unit-m3',
-      currentVolume: 450,      // partially transferred
+      currentVolume: 450,
       currentFlow: 120,
       percentComplete: 22.5,
       simFlowRate: 120,
       simPaused: false,
+      issuedAt: new Date(n - 3600000 * 4).toISOString(),
+      activatedAt: new Date(n - 3600000 * 2).toISOString(),
+      plannedStartAt: new Date(n - 3600000 * 4).toISOString(),
+      etoc: new Date(n + 3600000 * 12.9).toISOString(),
       completedAt: null,
       closedAt: null,
       canceledAt: null,
       lastUpdatedAt: now(),
       notes: 'Transferência de equalização de inventário mensal',
-      createdAt: now(),
+      createdAt: new Date(n - 3600000 * 4).toISOString(),
       updatedAt: now(),
     },
     {
@@ -468,12 +492,16 @@ export function seedOmmData(): void {
       percentComplete: 0,
       simFlowRate: 80,
       simPaused: false,
+      issuedAt: new Date(n - 3600000 * 1).toISOString(),
+      activatedAt: null,
+      plannedStartAt: new Date(n + 3600000 * 2).toISOString(),
+      etoc: new Date(n + 3600000 * 20.7).toISOString(),
       completedAt: null,
       closedAt: null,
       canceledAt: null,
       lastUpdatedAt: now(),
       notes: 'Aguardando conclusão do MOV-0001',
-      createdAt: now(),
+      createdAt: new Date(n - 3600000 * 1).toISOString(),
       updatedAt: now(),
     },
     {
@@ -498,12 +526,16 @@ export function seedOmmData(): void {
       percentComplete: 100,
       simFlowRate: 150,
       simPaused: false,
-      completedAt: new Date(Date.now() - 3600000 * 8).toISOString(),
+      issuedAt: new Date(n - 3600000 * 8).toISOString(),
+      activatedAt: new Date(n - 3600000 * 7).toISOString(),
+      plannedStartAt: new Date(n - 3600000 * 8).toISOString(),
+      etoc: new Date(n - 3600000 * 3).toISOString(),
+      completedAt: new Date(n - 3600000 * 3).toISOString(),
       closedAt: null,
       canceledAt: null,
       lastUpdatedAt: now(),
       notes: 'Transferência concluída sem intercorrências',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      createdAt: new Date(n - 3600000 * 8).toISOString(),
       updatedAt: now(),
     },
     {
@@ -528,12 +560,16 @@ export function seedOmmData(): void {
       percentComplete: 20,
       simFlowRate: 80,
       simPaused: false,
+      issuedAt: new Date(n - 3600000 * 3).toISOString(),
+      activatedAt: new Date(n - 3600000 * 1.5).toISOString(),
+      plannedStartAt: new Date(n - 3600000 * 3).toISOString(),
+      etoc: new Date(n + 3600000 * 6).toISOString(),
       completedAt: null,
       closedAt: null,
       canceledAt: null,
       lastUpdatedAt: now(),
       notes: 'Transferência de balanceamento de inventário de propeno',
-      createdAt: now(),
+      createdAt: new Date(n - 3600000 * 3).toISOString(),
       updatedAt: now(),
     },
     {
@@ -558,12 +594,16 @@ export function seedOmmData(): void {
       percentComplete: 100,
       simFlowRate: 100,
       simPaused: false,
-      completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-      closedAt: new Date(Date.now() - 86400000).toISOString(),
+      issuedAt: new Date(n - 3600000 * 12).toISOString(),
+      activatedAt: new Date(n - 3600000 * 10).toISOString(),
+      plannedStartAt: new Date(n - 3600000 * 12).toISOString(),
+      etoc: new Date(n - 3600000 * 6).toISOString(),
+      completedAt: new Date(n - 3600000 * 6).toISOString(),
+      closedAt: new Date(n - 3600000 * 4).toISOString(),
       canceledAt: null,
       lastUpdatedAt: now(),
       notes: 'Movimento encerrado e consolidado no cut-off',
-      createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+      createdAt: new Date(n - 3600000 * 12).toISOString(),
       updatedAt: now(),
     },
     {
@@ -588,12 +628,16 @@ export function seedOmmData(): void {
       percentComplete: 0,
       simFlowRate: 60,
       simPaused: false,
+      issuedAt: new Date(n - 3600000 * 5).toISOString(),
+      activatedAt: null,
+      plannedStartAt: new Date(n - 3600000 * 5).toISOString(),
+      etoc: null,
       completedAt: null,
       closedAt: null,
-      canceledAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+      canceledAt: new Date(n - 3600000 * 2).toISOString(),
       lastUpdatedAt: now(),
       notes: 'Cancelado por falha no alinhamento de dutos',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      createdAt: new Date(n - 3600000 * 5).toISOString(),
       updatedAt: now(),
     },
   ];

@@ -45,6 +45,9 @@ import { propertyBrowserService } from '../services/PropertyBrowserService';
 import { STORAGE_KEYS } from '../repository/storageKey';
 import type { ActiveEventState } from '../types/event';
 import { useOpcStore } from './useOpcStore';
+import { useOmmStore } from '../features/omm/store/useOmmStore';
+import { seedOmmData } from '../features/omm/services/OmmSeedService';
+import { clearAllOmmData } from '../features/omm/repository';
 
 interface ObjectModelStoreState {
   // Navigation & Theme
@@ -252,6 +255,25 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         return;
       }
       seedService.seedInitialDataIfNeeded();
+      
+      // Ensure history is enabled for key process variables in existing storage
+      const props = propertyRepo.getAll();
+      let updatedProps = false;
+      props.forEach((p) => {
+        if (!p.historyConfig?.enabled && (p.name === 'Level' || p.name === 'Volume' || p.name === 'Temperature' || p.name === 'Pressure' || p.name === 'Flow')) {
+          p.historyConfig = {
+            enabled: true,
+            periodMs: 1000,
+            storageType: 'Memory',
+            engineeringUnit: p.name === 'Level' ? '%' : p.name === 'Temperature' ? '°C' : p.name === 'Pressure' ? 'bar' : p.name === 'Flow' ? 'm³/h' : 'm³',
+          };
+          updatedProps = true;
+        }
+      });
+      if (updatedProps) {
+        propertyRepo.saveAll(props);
+      }
+
       historyEngine.init();
       simulationEngine.start(10);
       simulationEngine.subscribe(() => {
@@ -1337,12 +1359,18 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
     resetAllData: () => {
       seedService.seedInitialDataIfNeeded(true);
+      clearAllOmmData();
+      seedOmmData();
       get().init();
+      useOmmStore.getState().refresh();
     },
 
     resetMockData: () => {
       seedService.seedInitialDataIfNeeded(true);
+      clearAllOmmData();
+      seedOmmData();
       get().init();
+      useOmmStore.getState().refresh();
     },
 
     clearAllData: () => {

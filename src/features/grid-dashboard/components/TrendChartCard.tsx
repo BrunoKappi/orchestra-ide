@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { useObjectModelStore } from '../../../store/useObjectModelStore';
 import { inheritanceService } from '../../../services/InheritanceService';
@@ -15,6 +15,7 @@ interface TrendChartCardProps {
   isSelected?: boolean;
   isViewMode?: boolean;
   onClick?: () => void;
+  onExpand?: () => void;
 }
 
 export const TrendChartCard: React.FC<TrendChartCardProps> = ({
@@ -22,10 +23,20 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
   isSelected = false,
   isViewMode = false,
   onClick,
+  onExpand,
 }) => {
   const { simulatedValues, theme } = useObjectModelStore();
   const { elementRef, dimensions } = useResizeObserver<HTMLDivElement>();
-  
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isViewMode && onExpand) {
+      e.stopPropagation();
+      onExpand();
+      return;
+    }
+    if (onClick) onClick();
+  };
+
   // Selection/Hover state for interactive tooltip
   const [hoverData, setHoverData] = useState<{
     x: number;
@@ -104,6 +115,83 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
     return { min: defaultMin, max: defaultMax };
   };
 
+  // Real-time temporal history buffer (max 30 samples window)
+  const [historyBuffer, setHistoryBuffer] = useState<Record<string, Array<{ timestamp: number; value: number }>>>({});
+
+  // Initialize history buffer from historyEngine or baseline on card props change
+  useEffect(() => {
+    const trendProps = card.trendProperties || [];
+    const now = Date.now();
+    const initialBuffer: Record<string, Array<{ timestamp: number; value: number }>> = {};
+
+    trendProps.forEach((prop) => {
+      const key = `${prop.objectId}:${prop.propertyName}`;
+      const props = inheritanceService.getMergedProperties(prop.objectId, 'instance');
+      const propDef = props.find((p) => p.name === prop.propertyName);
+
+      const samples = propDef ? historyEngine.query({ objectId: prop.objectId, propertyId: propDef.id }) : [];
+      let pts = samples.map((s) => ({
+        timestamp: new Date(s.timestamp).getTime(),
+        value: parseFloat(s.value) ?? 0,
+      })).filter((p) => !isNaN(p.value));
+
+      const curRaw = simulatedValues[key];
+      const curVal = curRaw != null ? parseFloat(curRaw) : 0;
+      const startVal = isNaN(curVal) ? 0 : curVal;
+
+      if (pts.length === 0) {
+        // Build 30 baseline temporal points spaced 1.5s apart ending at now
+        pts = Array.from({ length: 30 }, (_, idx) => ({
+          timestamp: now - (29 - idx) * 1500,
+          value: startVal,
+        }));
+      } else if (pts.length < 30) {
+        const firstPt = pts[0];
+        const padCount = 30 - pts.length;
+        const pad = Array.from({ length: padCount }, (_, idx) => ({
+          timestamp: firstPt.timestamp - (padCount - idx) * 1500,
+          value: firstPt.value,
+        }));
+        pts = [...pad, ...pts];
+      } else if (pts.length > 30) {
+        pts = pts.slice(pts.length - 30);
+      }
+
+      initialBuffer[key] = pts;
+    });
+
+    setHistoryBuffer(initialBuffer);
+  }, [card.id, card.trendProperties]);
+
+  // Update history buffer on every global simulator tick (simulatedValues update)
+  useEffect(() => {
+    const trendProps = card.trendProperties || [];
+    if (trendProps.length === 0) return;
+
+    setHistoryBuffer((prev) => {
+      const next = { ...prev };
+      const now = Date.now();
+      let hasUpdates = false;
+
+      trendProps.forEach((prop) => {
+        const key = `${prop.objectId}:${prop.propertyName}`;
+        const curRaw = simulatedValues[key];
+        const val = curRaw != null ? parseFloat(curRaw) : 0;
+        const numVal = isNaN(val) ? 0 : val;
+
+        const currentList = prev[key] ? [...prev[key]] : [];
+        currentList.push({ timestamp: now, value: numVal });
+        if (currentList.length > 30) {
+          currentList.shift();
+        }
+        next[key] = currentList;
+        hasUpdates = true;
+      });
+
+      return hasUpdates ? next : prev;
+    });
+  }, [simulatedValues]);
+
   // Resolve properties and their current values and historical values
   const series = useMemo(() => {
     const trendProps = card.trendProperties || [];
@@ -112,30 +200,9 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
       const currentRaw = simulatedValues[key];
       const currentValue = currentRaw != null ? parseFloat(currentRaw) : 0;
 
-      // 1. Resolve property definitions from object model to get true ID
-      const props = inheritanceService.getMergedProperties(prop.objectId, 'instance');
-      const propDef = props.find((p) => p.name === prop.propertyName);
-      
-      // 2. Fetch central persistent history samples
-      const samples = propDef ? historyEngine.query({ objectId: prop.objectId, propertyId: propDef.id }) : [];
-      
-      // Show last 50 samples for visual performance, falling back to 30 from history
-      const limit = 50;
-      const recentSamples = samples.slice(-limit);
-
-      // Map samples to simple time-value coordinates
-      const points = recentSamples.map((s) => ({
-        timestamp: new Date(s.timestamp).getTime(),
-        value: parseFloat(s.value) ?? 0,
-      }));
-
-      // Fallback if no history exists yet
-      if (points.length === 0) {
-        points.push({
-          timestamp: Date.now(),
-          value: currentValue,
-        });
-      }
+      const points = historyBuffer[key] || [
+        { timestamp: Date.now(), value: currentValue }
+      ];
 
       // Resolve engineering unit
       let unit = '';
@@ -152,6 +219,8 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
         unit = 'm³';
       } else if (nameLower.includes('mass')) {
         unit = 't';
+      } else if (nameLower.includes('density') || nameLower.includes('dens')) {
+        unit = 'kg/m³';
       }
 
       return {
@@ -161,7 +230,7 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
         unit,
       };
     });
-  }, [card.trendProperties, simulatedValues]);
+  }, [card.trendProperties, simulatedValues, historyBuffer]);
 
   // Compute X and Y axis scale bounds across all series
   const { minTime, maxTime, ranges, shareYScale } = useMemo(() => {
@@ -176,17 +245,12 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
     });
 
     const now = Date.now();
-    if (minTime === Infinity) minTime = now - 60000;
+    if (minTime === Infinity) minTime = now - 45000;
     if (maxTime === -Infinity) maxTime = now;
 
-    // Minimum 1 minute X width to prevent division by zero
-    if (maxTime === minTime) {
-      minTime -= 30000;
-      maxTime += 30000;
-    } else if (maxTime - minTime < 60000) {
-      const diff = 60000 - (maxTime - minTime);
-      minTime -= diff / 2;
-      maxTime += diff / 2;
+    // Ensure minTime and maxTime span exactly the samples' range so points fill 100% of chart width
+    if (maxTime <= minTime) {
+      maxTime = minTime + 1000;
     }
 
     // Determine if all series share the same unit
@@ -372,7 +436,7 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
 
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       style={{ borderColor: card.borderColor || '#0284c740' }}
       className={cn(
         'relative w-full h-full rounded-xl flex flex-col overflow-hidden transition-all duration-200 select-none group',
@@ -380,7 +444,7 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
         isSelected
           ? 'border-sky-500 dark:border-sky-400 ring-2 ring-sky-500/20 z-10'
           : 'hover:border-slate-350 dark:hover:border-slate-700',
-        !isViewMode && 'cursor-pointer'
+        (isViewMode || !isViewMode) && 'cursor-pointer'
       )}
     >
       {/* Decorative left accent bar */}
@@ -401,8 +465,8 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
             </h4>
           </div>
           
-          {/* Live Values Grid */}
-          {!isCompact && (
+          {/* Live Values Grid (Only rendered when EXACTLY 1 variable is selected to keep header visual stability) */}
+          {!isCompact && series.length === 1 && (
             <div className="flex flex-wrap gap-x-2 gap-y-0.5 justify-end text-[10px] font-bold font-mono text-right max-w-[60%]">
               {series.map((s) => (
                 <span
