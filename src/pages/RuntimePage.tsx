@@ -69,18 +69,25 @@ export const RuntimePage: React.FC = () => {
 
   // Saved views state with persistence
   const [savedViews, setSavedViews] = useState<SavedView[]>(() => {
+    const defaultViews: SavedView[] = [
+      { id: 'view-1', name: 'Tanque TK-301 + TK-302', objectIds: ['tank-tk-301', 'tank-tk-302'], createdAt: new Date().toISOString() },
+      { id: 'view-2', name: 'Esfera V-301 + V-302', objectIds: ['tank-v-301', 'tank-v-302'], createdAt: new Date().toISOString() },
+      { id: 'view-3', name: 'Tanque TK-403 + TK-404', objectIds: ['tank-tk-403', 'tank-tk-404'], createdAt: new Date().toISOString() },
+    ];
     const raw = safeGetItem('runtime_saved_views');
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed: SavedView[] = JSON.parse(raw);
+        // Ensure parsed views contain valid object IDs
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasInvalid = parsed.some(v => v.objectIds.some(id => id.startsWith('obj_')));
+          if (!hasInvalid) return parsed;
+        }
       } catch {
         // fallback
       }
     }
-    return [
-      { id: 'view-1', name: 'Tanque 101 + Tanque 102', objectIds: ['obj_tank_101', 'obj_tank_102'], createdAt: new Date().toISOString() },
-      { id: 'view-2', name: 'Esfera 301 + Tanque 103', objectIds: ['obj_sphere_301', 'obj_tank_103'], createdAt: new Date().toISOString() },
-    ];
+    return defaultViews;
   });
 
   const [newViewName, setNewViewName] = useState('');
@@ -738,6 +745,15 @@ export const RuntimePage: React.FC = () => {
                       Limpar tudo
                     </button>
                   )}
+
+                  <button
+                    onClick={handleSaveCurrentView}
+                    title="Salvar seleção atual como uma View"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-2xs ml-2"
+                  >
+                    <Bookmark className="w-3.5 h-3.5 fill-white" />
+                    <span>Salvar visão</span>
+                  </button>
                 </div>
               )}
             </div>

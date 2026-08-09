@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSecurityStore } from '../../../store/useSecurityStore';
 import { Modal } from '../../../components/ui/Modal';
-import { User, Mail, Shield, Briefcase, MapPin, RefreshCw } from 'lucide-react';
+import { User, Mail, Shield, Briefcase, MapPin } from 'lucide-react';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -54,15 +54,10 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, userId })
         setStatus('Ativo');
         setLanguage('pt-BR');
         setPreferredTheme('light');
-        setAvatarUrl('https://api.dicebear.com/7.x/bottts/svg?seed=' + Math.random().toString(36).substring(7));
+        setAvatarUrl('');
       }
     }
   }, [isOpen, userId, users, profiles, roles]);
-
-  const generateNewAvatar = () => {
-    const seed = login.trim() || Math.random().toString(36).substring(7);
-    setAvatarUrl(`https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,32 +107,14 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, userId })
       maxWidth="max-w-2xl"
     >
       <form onSubmit={handleSubmit} className="space-y-5 text-slate-700 dark:text-slate-200">
-        {/* Profile Card / Avatar section */}
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <div className="relative group shrink-0">
-            <img
-              src={avatarUrl || 'https://api.dicebear.com/7.x/bottts/svg?seed=placeholder'}
-              alt="Avatar"
-              className="w-16 h-16 rounded-xl bg-slate-200 dark:bg-slate-800 border-2 border-sky-500/20 object-contain p-1"
-            />
-            <button
-              type="button"
-              onClick={generateNewAvatar}
-              className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white shadow-md transition-colors"
-              title="Gerar novo avatar"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
+        {/* Header Icon Card */}
+        <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div className="w-10 h-10 rounded-lg bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200 dark:border-sky-900/40">
+            <User className="w-5 h-5" />
           </div>
-          <div className="flex-1 space-y-2">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400">URL do Avatar</label>
-            <input
-              type="text"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://api.dicebear.com/..."
-              className="w-full px-3 py-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
-            />
+          <div>
+            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Perfil e Credenciais do Usuário</h4>
+            <p className="text-[11px] text-slate-400">Insira as informações essenciais de acesso e perfil organizacional.</p>
           </div>
         </div>
 
@@ -145,7 +122,7 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, userId })
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-              Nome Completo <span className="text-rose-500">*</span>
+              Nome <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <User className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -251,57 +228,33 @@ export const UserModal: React.FC<UserModalProps> = ({ isOpen, onClose, userId })
           </div>
         </div>
 
-        {/* Preferências e Status */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/60">
+        {/* Status */}
+        <div className="p-3.5 rounded-xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Idioma</label>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 cursor-pointer"
-            >
-              <option value="pt-BR">Português (pt-BR)</option>
-              <option value="en-US">English (en-US)</option>
-              <option value="es-ES">Español (es-ES)</option>
-            </select>
+            <span className="block text-xs font-bold text-slate-700 dark:text-slate-300">Status da Conta</span>
+            <span className="text-[11px] text-slate-400">Usuários inativos têm seu acesso bloqueado ao sistema.</span>
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Tema Preferido</label>
-            <select
-              value={preferredTheme}
-              onChange={(e) => setPreferredTheme(e.target.value as 'light' | 'dark')}
-              className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 cursor-pointer"
-            >
-              <option value="light">Light Theme</option>
-              <option value="dark">Dark Theme</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Status</label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="radio"
-                  name="status"
-                  checked={status === 'Ativo'}
-                  onChange={() => setStatus('Ativo')}
-                  className="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500"
-                />
-                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Ativo</span>
-              </label>
-              <label className="flex items-center gap-1.5 text-xs cursor-pointer">
-                <input
-                  type="radio"
-                  name="status"
-                  checked={status === 'Inativo'}
-                  onChange={() => setStatus('Inativo')}
-                  className="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500"
-                />
-                <span className="text-rose-600 dark:text-rose-455 font-semibold">Inativo</span>
-              </label>
-            </div>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                checked={status === 'Ativo'}
+                onChange={() => setStatus('Ativo')}
+                className="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500"
+              />
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Ativo</span>
+            </label>
+            <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                checked={status === 'Inativo'}
+                onChange={() => setStatus('Inativo')}
+                className="w-4 h-4 text-sky-600 border-slate-300 focus:ring-sky-500"
+              />
+              <span className="text-rose-600 dark:text-rose-455 font-semibold">Inativo</span>
+            </label>
           </div>
         </div>
 

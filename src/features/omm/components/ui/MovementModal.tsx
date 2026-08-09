@@ -610,9 +610,9 @@ export const MovementModal: React.FC = () => {
     const destEq = equipments.find((e) => e.id === destinationId);
 
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 h-full overflow-y-auto max-h-[75vh]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 h-full overflow-hidden max-h-[75vh]">
         {/* Left: Origin Tank */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xs min-h-[480px]">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xs h-[520px]">
           <div className="px-4 py-2 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
             <span className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider">
               Equipamento de Origem
@@ -621,13 +621,13 @@ export const MovementModal: React.FC = () => {
               {originEq?.tag || originId}
             </span>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-hidden min-h-0">
             <TankTelemetryDashboard objectId={originId} compact={true} />
           </div>
         </div>
 
         {/* Right: Destination Tank */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xs min-h-[480px]">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-2xs h-[520px]">
           <div className="px-4 py-2 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
               Equipamento de Destino
@@ -636,7 +636,7 @@ export const MovementModal: React.FC = () => {
               {destEq?.tag || destinationId}
             </span>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-hidden min-h-0">
             <TankTelemetryDashboard objectId={destinationId} compact={true} />
           </div>
         </div>

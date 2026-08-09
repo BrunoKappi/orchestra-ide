@@ -55,64 +55,22 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
   const isCompact = card.rowSpan < 2 || card.colSpan < 2;
   const isDark = theme === 'dark';
 
-  // Helper to determine natural property limits for industrial variables
-  const getPropertyRange = (propertyName: string, points: number[], objectId: string) => {
-    const nameLower = propertyName.toLowerCase();
-    let defaultMin = 0;
-    let defaultMax = 100;
-    
-    if (nameLower.includes('level') || nameLower.includes('percent')) {
-      return { min: 0, max: 100 };
-    }
-    
-    // Resolve object capacity
-    const props = inheritanceService.getMergedProperties(objectId, 'instance');
-    if (nameLower.includes('pressure') || nameLower.includes('press')) {
-      const hpProp = props.find(p => p.name === 'HighPressure');
-      const lpProp = props.find(p => p.name === 'LowPressure');
-      const hp = hpProp ? parseFloat(hpProp.defaultValue) : 2.5;
-      const lp = lpProp ? parseFloat(lpProp.defaultValue) : 0.0;
-      defaultMin = Math.max(0, lp - 0.2);
-      defaultMax = hp + 0.5;
-    } else if (nameLower.includes('temp')) {
-      defaultMin = 0;
-      defaultMax = 100;
-    } else if (nameLower.includes('flow') || nameLower.includes('vaz')) {
-      defaultMin = -200;
-      defaultMax = 1000;
-    } else if (nameLower.includes('volume')) {
-      const capProp = props.find(p => p.name === 'Capacity');
-      const capacity = capProp ? parseFloat(capProp.defaultValue) : 15000;
-      defaultMin = 0;
-      defaultMax = capacity;
-      return { min: defaultMin, max: defaultMax };
-    } else if (nameLower.includes('mass')) {
-      const capProp = props.find(p => p.name === 'Capacity');
-      const densityProp = props.find(p => p.name === 'Density');
-      const capacity = capProp ? parseFloat(capProp.defaultValue) : 15000;
-      const density = densityProp ? parseFloat(densityProp.defaultValue) : 800;
-      defaultMin = 0;
-      defaultMax = (capacity * density) / 1000;
-      return { min: defaultMin, max: defaultMax };
-    }
-
+  // Helper to determine dynamic property limits based on current sample window
+  const getPropertyRange = (_propertyName: string, points: number[]) => {
     if (points.length > 0) {
       const dataMin = Math.min(...points);
       const dataMax = Math.max(...points);
-      let min = Math.min(defaultMin, dataMin);
-      let max = Math.max(defaultMax, dataMax);
-      const range = max - min;
+      const range = dataMax - dataMin;
       if (range === 0) {
-        min -= 1;
-        max += 1;
-      } else {
-        min = Math.max(0, min - range * 0.05);
-        max = max + range * 0.05;
+        const span = Math.max(1.0, Math.abs(dataMin) * 0.05);
+        return { min: dataMin - span, max: dataMax + span };
       }
-      return { min, max };
+      return {
+        min: dataMin - range * 0.1,
+        max: dataMax + range * 0.1,
+      };
     }
-
-    return { min: defaultMin, max: defaultMax };
+    return { min: 0, max: 100 };
   };
 
   // Real-time temporal history buffer (max 30 samples window)
@@ -262,7 +220,7 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
       let globalMin = Infinity;
       let globalMax = -Infinity;
       series.forEach((s) => {
-        const r = getPropertyRange(s.propertyName, s.points.map(p => p.value), s.objectId);
+        const r = getPropertyRange(s.propertyName, s.points.map(p => p.value));
         if (r.min < globalMin) globalMin = r.min;
         if (r.max > globalMax) globalMax = r.max;
       });
@@ -274,7 +232,7 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
       });
     } else {
       series.forEach((s) => {
-        const r = getPropertyRange(s.propertyName, s.points.map(p => p.value), s.objectId);
+        const r = getPropertyRange(s.propertyName, s.points.map(p => p.value));
         ranges.set(`${s.objectId}:${s.propertyName}`, r);
       });
     }

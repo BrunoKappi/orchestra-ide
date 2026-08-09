@@ -4,44 +4,28 @@ import type { PermissionAction, PermissionValue, PermissionMatrix } from '../../
 import { Check, X, ShieldAlert, Users, User, Shield, Info } from 'lucide-react';
 
 const MODULES = [
-  'Orquestra IDE',
-  'Deployment',
-  'Objetos',
-  'Templates',
-  'Componentes Gráficos',
-  'Designer de Telas',
+  'Grid Designer',
   'Runtime',
-  'Banco de Dados',
-  'Simulador',
-  'Alarmes',
-  'Histórico',
-  'Faceplates',
-  'Fluxogramas',
-  'OMM',
-  'KPI Dashboard',
-  'Operations Center',
-  'Quality Management',
-  'Event Engine',
-  'OPC Browser',
-  'Property Browser'
+  'Movimentação & OMM',
+  'Historian',
+  'Gerenciamento de Alarmes',
+  'Estúdio de Conectividade (OPC)',
+  'Modelo de Objetos',
+  'Designer de Telas & Fluxogramas',
+  'Usuários & Segurança',
 ];
 
 const ACTIONS: PermissionAction[] = [
   'Visualizar',
-  'Criar',
   'Editar',
-  'Excluir',
-  'Importar',
-  'Exportar',
   'Executar',
-  'Configurar',
-  'Administrar'
+  'Administrar',
 ];
 
 export const PermissionMatrixView: React.FC = () => {
   const { profiles, groups, users, permissionConfigs, savePermissionConfig } = useSecurityStore();
 
-  const [targetType, setTargetType] = useState<'profile' | 'group' | 'user'>('profile');
+  const [targetType, setTargetType] = useState<'group' | 'user' | 'profile'>('group');
   const [targetId, setTargetId] = useState('');
   const [matrix, setMatrix] = useState<PermissionMatrix>({});
 
@@ -140,16 +124,7 @@ export const PermissionMatrixView: React.FC = () => {
 
         {/* Selection / Filtering */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex rounded-lg border border-slate-250 dark:border-slate-800 p-0.5 bg-slate-100 dark:bg-slate-950 text-xs font-semibold">
-            <button
-              onClick={() => setTargetType('profile')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md cursor-pointer transition-colors ${
-                targetType === 'profile' ? 'bg-white dark:bg-slate-900 shadow-sm text-sky-600 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'
-              }`}
-            >
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>Perfis</span>
-            </button>
+          <div className="flex rounded-lg border border-slate-200 dark:border-slate-800 p-0.5 bg-slate-100 dark:bg-slate-950 text-xs font-semibold">
             <button
               onClick={() => setTargetType('group')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md cursor-pointer transition-colors ${
@@ -157,7 +132,7 @@ export const PermissionMatrixView: React.FC = () => {
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Grupos</span>
+              <span>Por Grupo</span>
             </button>
             <button
               onClick={() => setTargetType('user')}
@@ -166,7 +141,16 @@ export const PermissionMatrixView: React.FC = () => {
               }`}
             >
               <User className="w-3.5 h-3.5" />
-              <span>Usuário</span>
+              <span>Por Usuário</span>
+            </button>
+            <button
+              onClick={() => setTargetType('profile')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md cursor-pointer transition-colors ${
+                targetType === 'profile' ? 'bg-white dark:bg-slate-900 shadow-sm text-sky-600 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Por Perfil</span>
             </button>
           </div>
 

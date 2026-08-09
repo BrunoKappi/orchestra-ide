@@ -445,7 +445,7 @@ export const SecurityPage: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Pesquisar por nome, login, e-mail, cargo, área..."
-                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
+                    className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
                   />
                 </div>
 
@@ -456,7 +456,7 @@ export const SecurityPage: React.FC = () => {
                   <select
                     value={filterProfile}
                     onChange={(e) => setFilterProfile(e.target.value)}
-                    className="px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-lg outline-none cursor-pointer text-slate-600 dark:text-slate-350"
+                    className="px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none cursor-pointer text-slate-600 dark:text-slate-350"
                   >
                     <option value="all">Todos Perfis</option>
                     {profiles.map((p) => (
@@ -469,7 +469,7 @@ export const SecurityPage: React.FC = () => {
                   <select
                     value={filterGroup}
                     onChange={(e) => setFilterGroup(e.target.value)}
-                    className="px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-lg outline-none cursor-pointer text-slate-600 dark:text-slate-350"
+                    className="px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none cursor-pointer text-slate-600 dark:text-slate-350"
                   >
                     <option value="all">Todos Grupos</option>
                     {groups.map((g) => (
@@ -482,7 +482,7 @@ export const SecurityPage: React.FC = () => {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-lg outline-none cursor-pointer text-slate-600 dark:text-slate-350"
+                    className="px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg outline-none cursor-pointer text-slate-600 dark:text-slate-350"
                   >
                     <option value="all">Todos Status</option>
                     <option value="Ativo">Ativos</option>
@@ -496,7 +496,7 @@ export const SecurityPage: React.FC = () => {
                 <div className="flex-1 overflow-auto">
                   <table className="w-full border-collapse text-left text-xs">
                     <thead>
-                      <tr className="sticky top-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-250 dark:border-slate-800 z-10 text-slate-500 font-bold">
+                      <tr className="sticky top-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10 text-slate-500 font-bold">
                         <th onClick={() => handleSort('name')} className="px-4 py-3 cursor-pointer hover:text-slate-800 select-none">
                           Usuário {sortField === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
                         </th>
@@ -514,7 +514,6 @@ export const SecurityPage: React.FC = () => {
                         <th onClick={() => handleSort('status')} className="px-4 py-3 cursor-pointer hover:text-slate-800 select-none">
                           Status {sortField === 'status' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
                         </th>
-                        <th className="px-4 py-3">Prefs (Lang/Tema)</th>
                         <th className="px-4 py-3 text-center">Ações</th>
                       </tr>
                     </thead>
@@ -527,13 +526,11 @@ export const SecurityPage: React.FC = () => {
                           <tr key={user.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition-colors">
                             <td className="px-4 py-2.5">
                               <div className="flex items-center gap-2.5">
-                                <img
-                                  src={user.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.login}`}
-                                  alt=""
-                                  className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 object-contain p-0.5 shrink-0 border border-slate-200/50 dark:border-slate-700/50"
-                                />
+                                <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-slate-800 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-100 dark:border-slate-700">
+                                  <UserIcon className="w-4 h-4" />
+                                </div>
                                 <div>
-                                  <span className="font-semibold text-slate-950 dark:text-slate-200 block">{user.name}</span>
+                                  <span className="font-semibold text-slate-900 dark:text-slate-200 block">{user.name}</span>
                                   <span className="text-[10px] text-slate-400 block">Último Acesso: {user.lastAccess}</span>
                                 </div>
                               </div>
@@ -541,7 +538,7 @@ export const SecurityPage: React.FC = () => {
                             <td className="px-4 py-2.5 font-mono text-[11px] text-slate-500">@{user.login}</td>
                             <td className="px-4 py-2.5 font-medium">{user.email}</td>
                             <td className="px-4 py-2.5">
-                              <span className="font-medium text-slate-950 dark:text-slate-200 block">{user.role || '-'}</span>
+                              <span className="font-medium text-slate-900 dark:text-slate-200 block">{user.role || '-'}</span>
                               <span className="text-[10px] text-slate-400 block">{user.area || '-'}</span>
                             </td>
                             <td className="px-4 py-2.5">
@@ -549,7 +546,7 @@ export const SecurityPage: React.FC = () => {
                                 {userGroups.map((ug) => (
                                   <span
                                     key={ug.id}
-                                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold text-white ${ug.color || 'bg-slate-455'}`}
+                                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold text-white ${ug.color || 'bg-slate-500'}`}
                                   >
                                     {ug.name}
                                   </span>
@@ -558,16 +555,16 @@ export const SecurityPage: React.FC = () => {
                               </div>
                             </td>
                             <td className="px-4 py-2.5">
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350 border border-slate-200 dark:border-slate-750">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350 border border-slate-200 dark:border-slate-700">
                                 {userProfile ? userProfile.name : 'Nenhum'}
                               </span>
                             </td>
                             <td className="px-4 py-2.5">
                               <span
-                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                   user.status === 'Ativo'
-                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-455'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40'
+                                    : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40'
                                 }`}
                               >
                                 {user.status === 'Ativo' ? (
@@ -583,16 +580,11 @@ export const SecurityPage: React.FC = () => {
                                 )}
                               </span>
                             </td>
-                            <td className="px-4 py-2.5">
-                              <span className="text-[10px] bg-slate-50 dark:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-200/50 dark:border-slate-850 text-slate-500 font-medium">
-                                {user.language} / {user.preferredTheme}
-                              </span>
-                            </td>
                             <td className="px-4 py-2.5 text-center">
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => handleEditUser(user.id)}
-                                  className="p-1 rounded-lg border border-slate-200 dark:border-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-550 dark:text-slate-350 transition-colors cursor-pointer"
+                                  className="p-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-350 transition-colors cursor-pointer"
                                   title="Editar Usuário"
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
@@ -603,7 +595,7 @@ export const SecurityPage: React.FC = () => {
                                       deleteUser(user.id);
                                     }
                                   }}
-                                  className="p-1 rounded-lg border border-slate-200 dark:border-slate-850 hover:bg-rose-500/10 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                                  className="p-1 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-rose-500/10 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
                                   title="Deletar Usuário"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -615,7 +607,7 @@ export const SecurityPage: React.FC = () => {
                       })}
                       {filteredUsers.length === 0 && (
                         <tr>
-                          <td colSpan={9} className="px-4 py-8 text-center text-slate-400">
+                          <td colSpan={8} className="px-4 py-8 text-center text-slate-400">
                             Nenhum usuário correspondente aos filtros foi encontrado.
                           </td>
                         </tr>

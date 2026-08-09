@@ -211,6 +211,40 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
     );
   };
 
+  // Wheel zoom (Ctrl + Wheel) & Pan (Wheel)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+
+      const isCtrl = e.ctrlKey || e.metaKey;
+      if (isCtrl) {
+        // Ctrl + Wheel: Zoom In / Zoom Out temporal scale
+        const zoomFactor = e.deltaY < 0 ? 0.8 : 1.25;
+        const rect = el.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const relativeMouse = Math.max(0, Math.min(1, (mx - CHART_PADDING.left) / Math.max(1, innerW)));
+        const mouseTs = fromMs + relativeMouse * timeRange;
+
+        const newDuration = timeRange * zoomFactor;
+        const newFromMs = mouseTs - relativeMouse * newDuration;
+        const newToMs = mouseTs + (1 - relativeMouse) * newDuration;
+
+        onViewRangeChange(new Date(newFromMs), new Date(newToMs));
+      } else {
+        // Normal Wheel: Shift time range left/right (pan)
+        const deltaPixels = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+        const timeShift = (deltaPixels / Math.max(1, innerW)) * timeRange * 0.25;
+        onViewRangeChange(new Date(fromMs + timeShift), new Date(toMs + timeShift));
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [fromMs, toMs, timeRange, innerW, onViewRangeChange]);
+
   if (data.length === 0 || data.every((d) => d.samples.length === 0)) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-3">

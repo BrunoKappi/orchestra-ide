@@ -5,7 +5,6 @@ import { historyEngine } from '../../services/HistoryEngine';
 import { TankGeometrySvg } from '../TankGeometrySvg';
 import { MiniTrendChart } from './MiniTrendChart';
 import { Thermometer, Gauge, Droplets, Activity, Percent, Database, HelpCircle } from 'lucide-react';
-import { cn } from '../../utils/cn';
 
 
 interface TankTelemetryDashboardProps {
@@ -178,14 +177,115 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
     };
   });
 
+  if (compact) {
+    return (
+      <div className="flex flex-col h-full w-full bg-slate-50/30 dark:bg-slate-950/20 text-slate-900 dark:text-slate-100 overflow-hidden select-none p-3 space-y-3">
+        {/* Top Header Card: Tank Icon + Volume & Capacity Info */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-2xs">
+          {/* Left: Compact Tank Icon */}
+          <div className="relative flex items-center justify-center shrink-0 w-20 h-24 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800/80 p-1">
+            <TankGeometrySvg
+              geometry={geometryType}
+              levelPercent={currentLevel}
+              fillColor="#0284c7"
+              width={50}
+              height={75}
+              className="z-10 drop-shadow-xs"
+            />
+            <div className="absolute bottom-1 bg-slate-900/90 text-white font-mono text-[9px] font-bold px-1.5 py-0.2 rounded z-20">
+              {currentLevel.toFixed(1)}%
+            </div>
+          </div>
+
+          {/* Right: Tag, Name, Product, Volume & Capacity */}
+          <div className="flex-1 ml-3 min-w-0 flex flex-col justify-center space-y-1.5 select-text">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-mono text-[10px] font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/40 px-1.5 py-0.2 rounded">
+                {tag}
+              </span>
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-150 truncate">
+                {objectDetail.name}
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-400 truncate">
+              Produto: <span className="font-semibold text-slate-600 dark:text-slate-300">{product}</span>
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-100 dark:border-slate-800">
+              <div>
+                <span className="text-slate-400 text-[9px] uppercase font-bold tracking-wider block">Volume</span>
+                <strong className="font-mono text-xs font-bold text-slate-700 dark:text-slate-200">
+                  {currentVolume.toFixed(1)} m³
+                </strong>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[9px] uppercase font-bold tracking-wider block">Capacidade</span>
+                <strong className="font-mono text-xs font-bold text-slate-700 dark:text-slate-200">
+                  {capacity.toFixed(0)} m³
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Process Variables List: Stacked vertically with smooth scrolling */}
+        <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex flex-col shadow-2xs overflow-hidden min-h-0">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 mb-2 shrink-0">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-150">
+              Variáveis de Processo
+            </h3>
+            <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 font-semibold px-1.5 py-0.2 border border-emerald-100 dark:border-emerald-900/40 rounded-full flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              Tempo Real
+            </span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto pr-1 space-y-3">
+            {mappedVariables.map((v) => (
+              <div key={v.name} className="border border-slate-100 dark:border-slate-800 rounded-lg p-2.5 bg-slate-50/50 dark:bg-slate-950/40 select-text">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1 rounded bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                      <v.icon className="w-3.5 h-3.5" style={{ color: v.color }} />
+                    </div>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      {v.label}
+                    </span>
+                  </div>
+                  <div className="text-right font-mono select-none">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {(v.values[v.values.length - 1] ?? 0).toFixed(1)}
+                    </span>
+                    <span className="text-[10px] text-slate-400 ml-1">
+                      {v.unit}
+                    </span>
+                  </div>
+                </div>
+                <div className="h-12 w-full">
+                  <MiniTrendChart values={v.values} color={v.color} />
+                </div>
+              </div>
+            ))}
+
+            {mappedVariables.length === 0 && (
+              <div className="py-6 text-center text-slate-400 italic text-xs">
+                Nenhuma variável de processo disponível.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full w-full bg-slate-50/30 dark:bg-slate-950/20 text-slate-900 dark:text-slate-100 overflow-hidden select-none">
       
       {/* Upper Telemetry Overview Grid */}
-      <div className={`grid grid-cols-1 ${compact ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-5 p-4 sm:p-5 flex-1 overflow-y-auto`}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 p-4 sm:p-5 flex-1 overflow-y-auto">
         
         {/* Left Column: 3D tank visualization */}
-        <div className={`${compact ? '' : 'lg:col-span-1'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-between shadow-2xs relative`}>
+        <div className="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-between shadow-2xs relative">
           
           <div className="w-full text-center border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
             <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/40 px-2 py-0.5 rounded-full inline-block mb-1.5">
@@ -200,17 +300,14 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
           </div>
 
           {/* 3D Cylinder Tank Rendering */}
-          <div className={cn(
-            "relative flex items-center justify-center my-2 group",
-            compact ? "w-36 h-40" : "w-52 h-64 sm:w-60 sm:h-72"
-          )}>
+          <div className="relative flex items-center justify-center my-2 group w-52 h-64 sm:w-60 sm:h-72">
             {/* Render geometry component with appropriate dimensions */}
             <TankGeometrySvg
               geometry={geometryType}
               levelPercent={currentLevel}
               fillColor="#0284c7"
-              width={compact ? 85 : 145}
-              height={compact ? 120 : 210}
+              width={145}
+              height={210}
               className="z-10 drop-shadow-md transition-all duration-300 scale-105"
             />
 
@@ -239,7 +336,7 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
         </div>
 
         {/* Right Columns (2/3): Real-time scrolling charts */}
-        <div className={`${compact ? '' : 'lg:col-span-2'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col shadow-2xs overflow-hidden`}>
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col shadow-2xs overflow-hidden">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-4 shrink-0">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-150">
               Variáveis de Processo
@@ -250,8 +347,8 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
             </span>
           </div>
 
-          {/* Scrolling Variable Trends - Hidden scrollbar visually, scroll still working */}
-          <div className="flex-1 overflow-y-auto pr-1 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {/* Scrolling Variable Trends */}
+          <div className="flex-1 overflow-y-auto pr-1 space-y-4">
             {mappedVariables.map((v) => (
               <div key={v.name} className="border border-slate-100 dark:border-slate-800 rounded-xl p-3 hover:bg-slate-50/50 dark:hover:bg-slate-950/20 transition-all select-text">
                 <div className="flex items-center justify-between mb-2">
