@@ -32,6 +32,7 @@ export const STORAGE_KEYS = {
   AREAS: 'archestra_db_areas_v1',
   MOVEMENTS: 'archestra_db_movements_v1',
   GRID_SCREENS: 'archestra_db_grid_screens_v1',
+  LOGS: 'archestra_db_logs_v1',
 } as const;
 
 

@@ -23,7 +23,7 @@ export const TrendChartExpandedModal: React.FC<TrendChartExpandedModalProps> = (
   const { simulatedValues, theme } = useObjectModelStore();
   const { elementRef, dimensions } = useResizeObserver<HTMLDivElement>();
 
-  const [timeWindow, setTimeWindow] = useState<TimeWindow>('15m');
+  const [timeWindow, setTimeWindow] = useState<TimeWindow>('1m');
   const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
   const [hoverData, setHoverData] = useState<{
     x: number;
@@ -181,13 +181,13 @@ export const TrendChartExpandedModal: React.FC<TrendChartExpandedModalProps> = (
         pts = [s.points[s.points.length - 1]];
       }
       
-      // If pts spans less than the window, interpolate backwards to start of window
+      // If pts spans less than the window, interpolate backwards to start of window using stable flat line
       if (pts.length > 0 && pts[0].timestamp > minTime + 2000) {
         const firstVal = pts[0].value;
-        const padPts = Array.from({ length: 15 }, (_, i) => ({
-          timestamp: minTime + (i / 15) * (pts[0].timestamp - minTime),
-          value: firstVal + (Math.random() - 0.5) * (firstVal * 0.005 || 0.1),
-        }));
+        const padPts = [
+          { timestamp: minTime, value: firstVal },
+          { timestamp: pts[0].timestamp - 1000, value: firstVal }
+        ];
         pts = [...padPts, ...pts];
       }
 
@@ -197,11 +197,31 @@ export const TrendChartExpandedModal: React.FC<TrendChartExpandedModalProps> = (
       };
     });
 
+    // Determine if all series share the same unit
+    const firstUnit = filteredSeries[0]?.unit || '';
+    const shareYScale = filteredSeries.every((s) => s.unit === firstUnit);
+
     const ranges = new Map<string, { min: number; max: number }>();
-    filteredSeries.forEach((s) => {
-      const r = getPropertyRange(s.propertyName, s.points.map((p) => p.value));
-      ranges.set(s.key, r);
-    });
+    if (shareYScale && filteredSeries.length > 0) {
+      let globalMin = Infinity;
+      let globalMax = -Infinity;
+      filteredSeries.forEach((s) => {
+        const r = getPropertyRange(s.propertyName, s.points.map((p) => p.value));
+        if (r.min < globalMin) globalMin = r.min;
+        if (r.max > globalMax) globalMax = r.max;
+      });
+      if (globalMin === Infinity) globalMin = 0;
+      if (globalMax === -Infinity) globalMax = 100;
+
+      filteredSeries.forEach((s) => {
+        ranges.set(s.key, { min: globalMin, max: globalMax });
+      });
+    } else {
+      filteredSeries.forEach((s) => {
+        const r = getPropertyRange(s.propertyName, s.points.map((p) => p.value));
+        ranges.set(s.key, r);
+      });
+    }
 
     return { minTime, maxTime, filteredSeries, ranges };
   }, [series, timeWindow]);

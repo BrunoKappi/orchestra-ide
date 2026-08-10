@@ -43,6 +43,7 @@ import { AlarmEngine } from '../services/AlarmEngine';
 import { historyEngine } from '../services/HistoryEngine';
 import { propertyBrowserService } from '../services/PropertyBrowserService';
 import { STORAGE_KEYS } from '../repository/storageKey';
+import { useLogStore } from './useLogStore';
 import type { ActiveEventState } from '../types/event';
 import { useOpcStore } from './useOpcStore';
 import { useOmmStore } from '../features/omm/store/useOmmStore';
@@ -303,6 +304,19 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     setSearchQuery: (query) => set((state) => { state.searchQuery = query; }),
 
     saveEquipmentGraphicConfig: (id: string, type: EntityType, config: EquipmentGraphicConfig) => {
+      const name = type === 'template' ? templateRepo.getById(id)?.name : objectRepo.getById(id)?.name;
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: type === 'template' ? 'Template' : 'Objeto',
+        operation: 'CONFIGURE',
+        action: 'Configuração Gráfica Alterada',
+        description: `Configurações gráficas do equipamento "${name || id}" modificadas.`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+      });
       if (type === 'template') {
         const tpl = templateRepo.getById(id);
         if (tpl) {
@@ -454,6 +468,17 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
     toggleSimulation: (running) => set((state) => {
       state.isSimulating = running !== undefined ? running : !state.isSimulating;
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Simulador',
+        entity: 'Simulador',
+        operation: 'EXECUTE',
+        action: state.isSimulating ? 'Simulador Global Iniciado' : 'Simulador Global Pausado',
+        description: `Simulador global ${state.isSimulating ? 'iniciado' : 'pausado'} pelo operador.`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+      });
       try {
         localStorage.setItem(STORAGE_KEYS.SIMULATOR_SETTINGS, JSON.stringify({
           isSimulating: state.isSimulating,
@@ -465,7 +490,19 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     }),
 
     setSimulationSpeed: (speedMs) => set((state) => {
+      const prevSpeed = state.simulationSpeedMs;
       state.simulationSpeedMs = speedMs;
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Simulador',
+        entity: 'Simulador',
+        operation: 'CONFIGURE',
+        action: 'Velocidade do Simulador Alterada',
+        description: `Velocidade da simulação alterada de ${prevSpeed}ms para ${speedMs}ms por ciclo.`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+      });
       try {
         localStorage.setItem(STORAGE_KEYS.SIMULATOR_SETTINGS, JSON.stringify({
           isSimulating: state.isSimulating,
@@ -666,9 +703,26 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         if (obj) {
           const props = inheritanceService.getMergedProperties(objectId, 'instance');
           const prop = props.find((p) => p.name === propName);
+          const prevVal = get().simulatedValues[key] ?? prop?.defaultValue ?? '-';
           if (prop?.historyConfig?.enabled) {
             historyEngine.record(objectId, prop.id, value, prop.historyConfig, 'runtime');
           }
+
+          // Register central log for manual update
+          useLogStore.getState().addLog({
+            user: 'Bruno Kappi',
+            module: 'Runtime',
+            entity: 'Propriedade',
+            operation: 'UPDATE',
+            action: 'Alteração Manual de Valor',
+            description: `Operador alterou manualmente a propriedade "${propName}" do objeto "${obj.name}" de "${prevVal}" para "${value}".`,
+            severity: 'Informação',
+            result: 'Sucesso',
+            origin: 'manual',
+            targetId: objectId,
+            previousValue: prevVal,
+            newValue: value,
+          });
         }
       }
 
@@ -728,6 +782,21 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       const activeId = targetId || get().selectedEntity?.id;
       const activeType = targetType || get().selectedEntity?.type;
       if (!activeId || !activeType) return;
+
+      const targetName = activeType === 'template' ? templateRepo.getById(activeId)?.name : objectRepo.getById(activeId)?.name;
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Alarmes',
+        entity: 'Alarme',
+        operation: 'CONFIGURE',
+        action: 'Configuração de Alarme Modificada',
+        description: `Configuração de alarme para a propriedade "${propertyName}" do equipamento "${targetName || activeId}" atualizada.`,
+        severity: 'Aviso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: activeId,
+        newValue: JSON.stringify(configData),
+      });
 
       const properties = propertyRepo.getByTargetId(activeId);
       const prop = properties.find((p) => p.name === propertyName);
@@ -806,10 +875,30 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       get().refreshData();
     },
 
-    acknowledgeAlarms: (ids, username = 'Operator') => {
+    acknowledgeAlarms: (ids, username = 'Bruno Kappi') => {
       const all = alarmRepo.getAll();
       const now = new Date().toISOString();
       let changed = false;
+
+      // Log manual alarm ack
+      ids.forEach((id) => {
+        const alarm = all.find((evt) => evt.id === id);
+        if (alarm) {
+          useLogStore.getState().addLog({
+            user: username,
+            module: 'Alarmes',
+            entity: 'Alarme',
+            operation: 'ACKNOWLEDGE',
+            action: 'Alarme Reconhecido',
+            description: `Alarme de severidade "${alarm.severity}" da propriedade "${alarm.propertyName}" no objeto "${alarm.objectName || alarm.objectId}" reconhecido pelo operador.`,
+            severity: 'Sucesso',
+            result: 'Sucesso',
+            origin: 'manual',
+            targetId: alarm.objectId,
+            metadata: { alarmId: alarm.id, eventState: alarm.status }
+          });
+        }
+      });
 
       const updated = all.map((evt) => {
         if (ids.includes(evt.id)) {
@@ -843,6 +932,17 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     },
 
     clearAlarmHistory: () => {
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Alarmes',
+        entity: 'Histórico de Alarmes',
+        operation: 'DELETE',
+        action: 'Limpeza de Histórico',
+        description: 'Histórico de alarmes resolvidos e reconhecidos limpo pelo operador.',
+        severity: 'Aviso',
+        result: 'Sucesso',
+        origin: 'manual',
+      });
       const all = alarmRepo.getAll();
       const unresolved = all.filter((evt) => evt.status !== 'Cleared Acknowledged');
       alarmRepo.saveAll(unresolved);
@@ -863,6 +963,20 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         createdAt: now,
         updatedAt: now,
       });
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: 'Template',
+        operation: 'CREATE',
+        action: 'Template Criado',
+        description: `Template base "${name}" criado com sucesso.`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+      });
+
       get().refreshData();
       get().selectEntity(id, 'template');
       return id;
@@ -881,6 +995,19 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         description: parent ? `Derived from ${parent.name}` : '',
         createdAt: now,
         updatedAt: now,
+      });
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: 'Template',
+        operation: 'CREATE',
+        action: 'Template Derivado Criado',
+        description: `Template derivado "${templateName}" criado a partir de "${parent?.name || 'Desconhecido'}".`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
       });
 
       get().refreshData();
@@ -905,6 +1032,19 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         updatedAt: now,
       });
 
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: 'Objeto',
+        operation: 'CREATE',
+        action: 'Objeto Criado',
+        description: `Objeto "${instanceName}" derivado do template "${t?.name || 'Desconhecido'}" criado com sucesso.`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+      });
+
       get().refreshData();
       get().selectEntity(id, 'instance');
       return id;
@@ -916,39 +1056,78 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
     updateEntityDetails: (id, type, updates) => {
       const now = new Date().toISOString();
+      let prevName = '';
+      let prevDesc = '';
       if (type === 'template') {
         const t = templateRepo.getById(id);
         if (t) {
+          prevName = t.name;
+          prevDesc = t.description;
           templateRepo.save({ ...t, ...updates, updatedAt: now });
         }
       } else {
         const o = objectRepo.getById(id);
         if (o) {
+          prevName = o.name;
+          prevDesc = o.description;
           objectRepo.save({ ...o, ...updates, updatedAt: now });
         }
       }
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: type === 'template' ? 'Template' : 'Objeto',
+        operation: 'UPDATE',
+        action: 'Informações Editadas',
+        description: `Alteração de dados cadastrais de "${prevName || id}". Updates: ${JSON.stringify(updates)}`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+        previousValue: JSON.stringify({ name: prevName, description: prevDesc }),
+        newValue: JSON.stringify(updates),
+      });
+
       get().refreshData();
     },
 
     duplicateEntity: (id, type) => {
+      let newId = '';
       if (type === 'template') {
         const payload = exportImportService.exportEntity(id, 'template');
         payload.rootEntity.data.name = `${payload.rootEntity.data.name}_Copy`;
         const result = exportImportService.importPayload(payload);
+        newId = result.importedRootId;
         get().refreshData();
-        get().selectEntity(result.importedRootId, 'template');
-        return result.importedRootId;
+        get().selectEntity(newId, 'template');
       } else {
         const payload = exportImportService.exportEntity(id, 'instance');
         payload.rootEntity.data.name = `${payload.rootEntity.data.name}_Copy`;
         const result = exportImportService.importPayload(payload);
+        newId = result.importedRootId;
         get().refreshData();
-        get().selectEntity(result.importedRootId, 'instance');
-        return result.importedRootId;
+        get().selectEntity(newId, 'instance');
       }
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: type === 'template' ? 'Template' : 'Objeto',
+        operation: 'CREATE',
+        action: 'Entidade Duplicada',
+        description: `Duplicação da entidade "${id}" efetuada com sucesso (Novo ID: "${newId}").`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: newId,
+      });
+
+      return newId;
     },
 
     deleteEntity: (id, type) => {
+      const name = type === 'template' ? templateRepo.getById(id)?.name : objectRepo.getById(id)?.name;
       if (type === 'template') {
         const collectDescendantTemplates = (tid: string): string[] => {
           const children = templateRepo.getAll().filter((x) => x.parentTemplateId === tid);
@@ -982,6 +1161,19 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         deploymentRepo.deleteNodeByTargetId(id);
         objectRepo.delete(id);
       }
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: type === 'template' ? 'Template' : 'Objeto',
+        operation: 'DELETE',
+        action: 'Entidade Excluída',
+        description: `Entidade "${name || id}" do tipo "${type}" removida com sucesso da base de dados.`,
+        severity: 'Aviso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+      });
 
       get().refreshData();
 
@@ -1019,6 +1211,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
       const editing = get().editingProperty;
       const now = new Date().toISOString();
+      const targetName = sel.type === 'template' ? templateRepo.getById(sel.id)?.name : objectRepo.getById(sel.id)?.name;
 
       if (editing && !editing.isInherited) {
         propertyRepo.save({
@@ -1034,9 +1227,25 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           createdAt: editing.createdAt,
           updatedAt: now,
         });
+
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Orquestra',
+          entity: 'Propriedade',
+          operation: 'UPDATE',
+          action: 'Propriedade Editada',
+          description: `Propriedade "${data.name}" editada no equipamento "${targetName}".`,
+          severity: 'Informação',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: sel.id,
+          previousValue: editing.defaultValue,
+          newValue: data.defaultValue,
+        });
       } else {
+        const newId = uuidv4();
         propertyRepo.save({
-          id: uuidv4(),
+          id: newId,
           targetId: sel.id,
           targetType: sel.type,
           name: data.name,
@@ -1048,6 +1257,20 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           createdAt: now,
           updatedAt: now,
         });
+
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Orquestra',
+          entity: 'Propriedade',
+          operation: 'CREATE',
+          action: 'Propriedade Criada',
+          description: `Nova propriedade "${data.name}" adicionada ao equipamento "${targetName}".`,
+          severity: 'Sucesso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: sel.id,
+          newValue: data.defaultValue,
+        });
       }
 
       get().closePropertyModal();
@@ -1057,7 +1280,23 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
 
 
     deleteProperty: (propertyId) => {
+      const prop = propertyRepo.getById(propertyId);
       propertyRepo.delete(propertyId);
+      if (prop) {
+        const targetName = prop.targetType === 'template' ? templateRepo.getById(prop.targetId)?.name : objectRepo.getById(prop.targetId)?.name;
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Orquestra',
+          entity: 'Propriedade',
+          operation: 'DELETE',
+          action: 'Propriedade Excluída',
+          description: `Propriedade "${prop.name}" excluída do equipamento "${targetName}".`,
+          severity: 'Aviso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: prop.targetId,
+        });
+      }
       get().refreshData();
     },
 
@@ -1083,8 +1322,26 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
     bindOpcTagToProperty: (propertyId, opcTagPath) => {
       const prop = propertyRepo.getById(propertyId);
       if (prop) {
+        const prevPath = prop.opcTagPath || 'Nenhum';
         prop.opcTagPath = opcTagPath;
         propertyRepo.save(prop);
+
+        const targetName = prop.targetType === 'template' ? templateRepo.getById(prop.targetId)?.name : objectRepo.getById(prop.targetId)?.name;
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Orquestra',
+          entity: 'Binding OPC',
+          operation: 'CONFIGURE',
+          action: 'Tag OPC Vinculada',
+          description: `Propriedade "${prop.name}" de "${targetName}" vinculada à tag OPC "${opcTagPath}".`,
+          severity: 'Informação',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: prop.targetId,
+          previousValue: prevPath,
+          newValue: opcTagPath,
+        });
+
         get().refreshData();
       }
     },
@@ -1290,6 +1547,18 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           isDeployed: true,
           updatedAt: new Date().toISOString(),
         });
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Orquestra',
+          entity: 'Deploy',
+          operation: 'EXECUTE',
+          action: 'Equipamento Implantado',
+          description: `Implantação (Deploy) do objeto "${obj.name}" executada no Runtime.`,
+          severity: 'Sucesso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: objectId,
+        });
         get().refreshData();
       }
     },
@@ -1301,6 +1570,18 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
           ...obj,
           isDeployed: false,
           updatedAt: new Date().toISOString(),
+        });
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Orquestra',
+          entity: 'Deploy',
+          operation: 'EXECUTE',
+          action: 'Equipamento Desimplantado',
+          description: `Remoção de implantação (Undeploy) do objeto "${obj.name}" executada no Runtime.`,
+          severity: 'Aviso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: objectId,
         });
         get().refreshData();
       }

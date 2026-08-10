@@ -15,6 +15,7 @@ import { OpcBrowserPage } from './pages/OpcBrowserPage';
 import { SecurityPage } from './pages/SecurityPage';
 import { ConnectivityStudioPage } from './pages/ConnectivityStudioPage';
 import { GridDashboardPage } from './pages/GridDashboardPage';
+import { LogsPage } from './pages/LogsPage';
 
 import { useObjectModelStore } from './store/useObjectModelStore';
 
@@ -85,6 +86,9 @@ export function App() {
     } else if (path === '/grid-dashboard' || path === '/grid-designer') {
       title = 'Grid Designer - Serrano';
       emoji = '📐';
+    } else if (path === '/logs') {
+      title = 'Logs & Rastreabilidade - Serrano';
+      emoji = '📋';
     }
 
     document.title = title;
@@ -115,6 +119,7 @@ export function App() {
         <Route path="/connectivity" element={<ConnectivityStudioPage />} />
         <Route path="/grid-dashboard" element={<GridDashboardPage />} />
         <Route path="/grid-designer" element={<GridDashboardPage />} />
+        <Route path="/logs" element={<LogsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowV2EditorModal />

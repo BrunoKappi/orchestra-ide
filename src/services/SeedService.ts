@@ -272,21 +272,12 @@ export class SeedService {
       makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³' }),
       makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '%' }),
       makeProp(baseTankTplId, 'template', 'Mass', 'Float', '0.0', 'Massa total armazenada (toneladas)', 'Inventário'),
-      makeProp(baseTankTplId, 'template', 'VCF', 'Float', '1.000', 'Fator de Correção de Volume (Volume Correction Factor)', 'Inventário'),
 
       // Processo (Com Historian/Storyon ativado)
       makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³/h' }),
       makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '°C' }),
       makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'bar' }),
       makeProp(baseTankTplId, 'template', 'Density', 'Float', '800.0', 'Densidade operacional do produto (kg/m³)', 'Processo'),
-
-      // Limites de Alarme
-      makeProp(baseTankTplId, 'template', 'HighHighLevel', 'Float', '90.0', 'Limite de alarme Nível Muito Alto - HH (%)', 'Limites'),
-      makeProp(baseTankTplId, 'template', 'HighLevel', 'Float', '80.0', 'Limite de alarme Nível Alto - H (%)', 'Limites'),
-      makeProp(baseTankTplId, 'template', 'LowLevel', 'Float', '15.0', 'Limite de alarme Nível Baixo - L (%)', 'Limites'),
-      makeProp(baseTankTplId, 'template', 'LowLowLevel', 'Float', '5.0', 'Limite de alarme Nível Muito Baixo - LL (%)', 'Limites'),
-      makeProp(baseTankTplId, 'template', 'HighPressure', 'Float', '2.5', 'Limite de alarme Pressão Alta (bar)', 'Limites'),
-      makeProp(baseTankTplId, 'template', 'LowPressure', 'Float', '0.9', 'Limite de alarme Pressão Baixa (bar)', 'Limites'),
     ];
 
     baseTplProps.forEach((p) =>
@@ -608,14 +599,7 @@ export class SeedService {
         makeProp(seed.id, 'instance', 'Pressure', 'Float', seed.press.toString(), 'Pressão (bar)', 'Processo'),
         makeProp(seed.id, 'instance', 'Flow', 'Float', seed.flow.toString(), 'Vazão (m³/h)', 'Processo'),
         makeProp(seed.id, 'instance', 'Density', 'Float', seed.density.toString(), 'Densidade (kg/m³)', 'Processo'),
-        makeProp(seed.id, 'instance', 'VCF', 'Float', '0.994', 'Fator de Correção de Volume', 'Inventário'),
         makeProp(seed.id, 'instance', 'Mass', 'Float', mass.toFixed(1), 'Massa total armazenada (t)', 'Inventário'),
-        makeProp(seed.id, 'instance', 'HighHighLevel', 'Float', seed.hhLevel.toString(), 'Limite HH de nível (%)', 'Limites'),
-        makeProp(seed.id, 'instance', 'HighLevel', 'Float', seed.hLevel.toString(), 'Limite H de nível (%)', 'Limites'),
-        makeProp(seed.id, 'instance', 'LowLevel', 'Float', seed.lLevel.toString(), 'Limite L de nível (%)', 'Limites'),
-        makeProp(seed.id, 'instance', 'LowLowLevel', 'Float', seed.llLevel.toString(), 'Limite LL de nível (%)', 'Limites'),
-        makeProp(seed.id, 'instance', 'HighPressure', 'Float', seed.hPress.toString(), 'Limite de alta pressão (bar)', 'Limites'),
-        makeProp(seed.id, 'instance', 'LowPressure', 'Float', seed.lPress.toString(), 'Limite de baixa pressão (bar)', 'Limites'),
       ];
 
       instanceProps.forEach((p) => {

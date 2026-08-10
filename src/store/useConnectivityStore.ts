@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { v4 as uuidv4 } from 'uuid';
+import { useLogStore } from './useLogStore';
 import type {
   ConnectivityConnection,
   ConnectivityFlow,
@@ -1918,26 +1919,69 @@ export const useConnectivityStore = create<ConnectivityStoreState>()(
           };
           state.connections.unshift(newConn);
           saveState(state as any);
+
+          useLogStore.getState().addLog({
+            user: 'Bruno Kappi',
+            module: 'Connectivity Studio',
+            entity: 'Conexão',
+            operation: 'CREATE',
+            action: 'Conexão Criada',
+            description: `Nova conexão de dados "${newConn.name}" (Tipo: ${newConn.type}) criada.`,
+            severity: 'Sucesso',
+            result: 'Sucesso',
+            origin: 'manual',
+            targetId: newConn.id,
+          });
         }),
 
       updateConnection: (id, connData) =>
         set((state) => {
           const idx = state.connections.findIndex((c) => c.id === id);
           if (idx !== -1) {
+            const prevConn = state.connections[idx];
             state.connections[idx] = {
               ...state.connections[idx],
               ...connData,
               updatedAt: new Date().toISOString(),
             };
             saveState(state as any);
+
+            useLogStore.getState().addLog({
+              user: 'Bruno Kappi',
+              module: 'Connectivity Studio',
+              entity: 'Conexão',
+              operation: 'UPDATE',
+              action: 'Conexão Atualizada',
+              description: `Conexão de dados "${prevConn.name}" atualizada pelo operador.`,
+              severity: 'Informação',
+              result: 'Sucesso',
+              origin: 'manual',
+              targetId: id,
+            });
           }
         }),
 
       deleteConnection: (id) =>
         set((state) => {
+          const target = state.connections.find((c) => c.id === id);
           state.connections = state.connections.filter((c) => c.id !== id);
           if (state.selectedConnectionId === id) state.selectedConnectionId = null;
           saveState(state as any);
+
+          if (target) {
+            useLogStore.getState().addLog({
+              user: 'Bruno Kappi',
+              module: 'Connectivity Studio',
+              entity: 'Conexão',
+              operation: 'DELETE',
+              action: 'Conexão Excluída',
+              description: `Conexão de dados "${target.name}" excluída com sucesso.`,
+              severity: 'Aviso',
+              result: 'Sucesso',
+              origin: 'manual',
+              targetId: id,
+            });
+          }
         }),
 
       duplicateConnection: (id) =>
@@ -1953,6 +1997,19 @@ export const useConnectivityStore = create<ConnectivityStoreState>()(
             };
             state.connections.unshift(duplicated);
             saveState(state as any);
+
+            useLogStore.getState().addLog({
+              user: 'Bruno Kappi',
+              module: 'Connectivity Studio',
+              entity: 'Conexão',
+              operation: 'CREATE',
+              action: 'Conexão Duplicada',
+              description: `Conexão de dados "${conn.name}" duplicada. Cópia: "${duplicated.name}".`,
+              severity: 'Sucesso',
+              result: 'Sucesso',
+              origin: 'manual',
+              targetId: duplicated.id,
+            });
           }
         }),
 
@@ -2022,26 +2079,71 @@ export const useConnectivityStore = create<ConnectivityStoreState>()(
           state.flows.unshift(newFlow);
           state.selectedFlowId = newFlow.id;
           saveState(state as any);
+
+          useLogStore.getState().addLog({
+            user: 'Bruno Kappi',
+            module: 'Connectivity Studio',
+            entity: 'Fluxo',
+            operation: 'CREATE',
+            action: 'Fluxo Criado',
+            description: `Novo fluxo de dados "${newFlow.name}" criado no Connectivity Studio.`,
+            severity: 'Sucesso',
+            result: 'Sucesso',
+            origin: 'manual',
+            targetId: newFlow.id,
+          });
         }),
 
       updateFlow: (id, flowData) =>
         set((state) => {
           const idx = state.flows.findIndex((f) => f.id === id);
           if (idx !== -1) {
+            const prevFlow = state.flows[idx];
             state.flows[idx] = {
               ...state.flows[idx],
               ...flowData,
               updatedAt: new Date().toISOString(),
             };
             saveState(state as any);
+
+            if (flowData.name !== undefined || flowData.description !== undefined || flowData.status !== undefined) {
+              useLogStore.getState().addLog({
+                user: 'Bruno Kappi',
+                module: 'Connectivity Studio',
+                entity: 'Fluxo',
+                operation: 'UPDATE',
+                action: 'Fluxo Atualizado',
+                description: `Fluxo de dados "${flowData.name || prevFlow.name}" atualizado. Status: ${flowData.status || prevFlow.status}.`,
+                severity: 'Informação',
+                result: 'Sucesso',
+                origin: 'manual',
+                targetId: id,
+              });
+            }
           }
         }),
 
       deleteFlow: (id) =>
         set((state) => {
+          const target = state.flows.find((f) => f.id === id);
           state.flows = state.flows.filter((f) => f.id !== id);
           if (state.selectedFlowId === id) state.selectedFlowId = state.flows[0]?.id || null;
           saveState(state as any);
+
+          if (target) {
+            useLogStore.getState().addLog({
+              user: 'Bruno Kappi',
+              module: 'Connectivity Studio',
+              entity: 'Fluxo',
+              operation: 'DELETE',
+              action: 'Fluxo Excluído',
+              description: `Fluxo de dados "${target.name}" excluído.`,
+              severity: 'Aviso',
+              result: 'Sucesso',
+              origin: 'manual',
+              targetId: id,
+            });
+          }
         }),
 
       duplicateFlow: (id) =>
@@ -2079,6 +2181,19 @@ export const useConnectivityStore = create<ConnectivityStoreState>()(
 
         const duration = Math.floor(Math.random() * 20) + 5;
         const newTraceId = `trace-${uuidv4().slice(0, 8)}`;
+
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Connectivity Studio',
+          entity: 'Pipeline',
+          operation: 'EXECUTE',
+          action: 'Pipeline Executado Manualmente',
+          description: `Simulação manual do pipeline "${flow.name}" executada com sucesso em ${duration}ms.`,
+          severity: 'Sucesso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: id,
+        });
 
         const newTrace: ConnectivityMessageTrace = {
           id: newTraceId,

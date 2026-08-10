@@ -20,9 +20,11 @@ import {
   Shield,
   Sparkles,
   LayoutGrid,
+  History,
 } from "lucide-react";
 
 import { useSecurityStore } from "../../store/useSecurityStore";
+import { useLogStore } from "../../store/useLogStore";
 
 import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { useWidgetStore } from "../../store/useWidgetStore";
@@ -33,7 +35,11 @@ import { Modal } from "../ui/Modal";
 import { cn } from "../../utils/cn";
 
 export const HeaderNavigation = () => {
-  const { theme, toggleTheme, alarmEvents } = useObjectModelStore();
+  const { theme, toggleTheme, alarmEvents, init } = useObjectModelStore();
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("archestra_navbar_collapsed") === "true";
@@ -160,6 +166,13 @@ export const HeaderNavigation = () => {
       colorClass: "text-amber-500",
       activeTextClass: "text-amber-600 dark:text-amber-400",
     },
+    {
+      to: "/logs",
+      label: "Logs e Auditoria",
+      icon: History,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
   ];
 
   const currentPath = location.pathname;
@@ -215,6 +228,7 @@ export const HeaderNavigation = () => {
     useScreenStore.getState().clearAllData();
     useFlowStore.getState().clearAllData();
     useSecurityStore.getState().clearAllData();
+    useLogStore.getState().clearLogs();
     // Clear OMM-specific namespace
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -239,6 +253,7 @@ export const HeaderNavigation = () => {
     useWidgetStore.getState().init();
     useScreenStore.getState().init();
     useFlowStore.getState().init();
+    useLogStore.getState().resetMockLogs();
     setIsResetMockConfirmOpen(false);
   };
 

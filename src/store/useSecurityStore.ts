@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { v4 as uuidv4 } from 'uuid';
 import { STORAGE_KEYS } from '../repository/storageKey';
+import { useLogStore } from './useLogStore';
 import type {
   SecurityUser,
   SecurityGroup,
@@ -324,18 +325,46 @@ export const useSecurityStore = create<SecurityStore>()(
       permissionConfigs: loadFromStorage(STORAGE_KEYS.SECURITY_PERMISSION_CONFIGS, []),
       auditLogs: loadFromStorage(STORAGE_KEYS.SECURITY_AUDIT_LOGS, DEFAULT_AUDITS),
 
-      addAuditLog: (action, target, description) => set((state) => {
-        const newLog: SecurityAuditLog = {
-          id: `audit-${uuidv4()}`,
-          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-          user: 'Bruno Kappi', // Responsável simulado
-          action,
-          target,
-          description
-        };
-        state.auditLogs.unshift(newLog);
-        saveToStorage(STORAGE_KEYS.SECURITY_AUDIT_LOGS, state.auditLogs);
-      }),
+      addAuditLog: (action, target, description) => {
+        let op: any = 'UPDATE';
+        if (action === 'Criar') op = 'CREATE';
+        else if (action === 'Editar') op = 'UPDATE';
+        else if (action === 'Excluir') op = 'DELETE';
+        else if (action === 'Configuração') op = 'CONFIGURE';
+
+        let entity = 'Segurança';
+        if (target.startsWith('Usuário:')) entity = 'Usuário';
+        else if (target.startsWith('Grupo:')) entity = 'Grupo';
+        else if (target.startsWith('Perfil:')) entity = 'Perfil';
+        else if (target.startsWith('Função:')) entity = 'Função';
+        else if (target.startsWith('Permissões:')) entity = 'Permissões';
+
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Segurança',
+          entity,
+          operation: op,
+          action: `${action} ${entity}`,
+          description,
+          severity: 'Sucesso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: target,
+        });
+
+        set((state) => {
+          const newLog: SecurityAuditLog = {
+            id: `audit-${uuidv4()}`,
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+            user: 'Bruno Kappi',
+            action: action as any,
+            target,
+            description
+          };
+          state.auditLogs.unshift(newLog);
+          saveToStorage(STORAGE_KEYS.SECURITY_AUDIT_LOGS, state.auditLogs);
+        });
+      },
 
       addUser: (user) => set((state) => {
         const newUser: SecurityUser = {

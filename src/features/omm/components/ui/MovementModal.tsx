@@ -5,6 +5,7 @@ import { SearchableSelect } from '../../../../components/ui/SearchableSelect';
 import { TankFlowVisualizer } from '../detail/TankFlowVisualizer';
 import { TankTelemetryModal } from './TankTelemetryModal';
 import { TankTelemetryDashboard } from '../../../../components/ui/TankTelemetryDashboard';
+import { TankGeometrySvg } from '../../../../components/TankGeometrySvg';
 import {
   X, Save, Play, CheckCircle, XCircle, Archive,
   ArrowRight, Gauge, Settings, Info, Activity, ArrowLeftRight,
@@ -39,15 +40,16 @@ const STATUS_COLORS: Record<OmmStatus, string> = {
 // ---------------------------------------------------------------------------
 // Tab types
 // ---------------------------------------------------------------------------
-type ModalTab = 'general' | 'movement' | 'flow' | 'comparison' | 'operation' | 'simulation';
+type ModalTab = 'general' | 'movement' | 'flow' | 'comparison' | 'operation' | 'simulation' | 'previsibilidade';
 
 const TABS: { id: ModalTab; label: string; icon: React.ReactNode }[] = [
-  { id: 'general',    label: 'Geral',      icon: <Info className="w-3.5 h-3.5" /> },
-  { id: 'movement',   label: 'Movimento',  icon: <ArrowRight className="w-3.5 h-3.5" /> },
-  { id: 'flow',       label: 'Fluxo',      icon: <Activity className="w-3.5 h-3.5" /> },
-  { id: 'comparison', label: 'Comparação', icon: <ArrowLeftRight className="w-3.5 h-3.5" /> },
-  { id: 'operation',  label: 'Operação',   icon: <Gauge className="w-3.5 h-3.5" /> },
-  { id: 'simulation', label: 'Simulação',  icon: <Settings className="w-3.5 h-3.5" /> },
+  { id: 'general',        label: 'Geral',          icon: <Info className="w-3.5 h-3.5" /> },
+  { id: 'movement',       label: 'Movimento',      icon: <ArrowRight className="w-3.5 h-3.5" /> },
+  { id: 'flow',           label: 'Fluxo',          icon: <Activity className="w-3.5 h-3.5" /> },
+  { id: 'comparison',     label: 'Comparação',     icon: <ArrowLeftRight className="w-3.5 h-3.5" /> },
+  { id: 'previsibilidade', label: 'Previsibilidade', icon: <Gauge className="w-3.5 h-3.5" /> },
+  { id: 'operation',      label: 'Operação',       icon: <Gauge className="w-3.5 h-3.5" /> },
+  { id: 'simulation',     label: 'Simulação',      icon: <Settings className="w-3.5 h-3.5" /> },
 ];
 
 // ---------------------------------------------------------------------------
@@ -644,6 +646,205 @@ export const MovementModal: React.FC = () => {
     );
   };
 
+  // ---- Previsibilidade Tab ----
+  const renderPrevisibilidade = () => {
+    if (!originId || !destinationId) {
+      return (
+        <div className="p-8 text-center text-xs text-slate-400 font-mono italic">
+          Selecione Origem e Destino para calcular a previsibilidade do movimento.
+        </div>
+      );
+    }
+
+    const originEq = equipments.find((e) => e.id === originId);
+    const destEq = equipments.find((e) => e.id === destinationId);
+
+    if (!originEq || !destEq) {
+      return (
+        <div className="p-8 text-center text-xs text-slate-400 font-mono italic">
+          Equipamentos não encontrados.
+        </div>
+      );
+    }
+
+    // Planned flow rate or current flow rate (use simFlowRate first, then plannedFlow)
+    const currentFlowRate = simFlowRate || plannedFlow || 100;
+    const currentMoved = currentMovement ? currentMovement.currentVolume : 0;
+    const remainingToMove = Math.max(0, plannedVolume - currentMoved);
+
+    // Remaining time in hours
+    const hoursRemaining = currentFlowRate > 0 ? remainingToMove / currentFlowRate : 0;
+    const minutesRemaining = Math.round(hoursRemaining * 60);
+    const formatTimeRemaining = () => {
+      if (currentFlowRate <= 0) return 'Infinito (Sem Vazão)';
+      const hrs = Math.floor(minutesRemaining / 60);
+      const mins = minutesRemaining % 60;
+      if (hrs > 0) return `${hrs}h ${mins}min`;
+      return `${mins} min`;
+    };
+
+    // Calculate final levels and volumes
+    // Origin will DECREASE by remainingToMove
+    const finalOriginVol = Math.max(0, originEq.currentVolume - remainingToMove);
+    const finalOriginLevel = (finalOriginVol / originEq.capacity) * 100;
+
+    // Destination will INCREASE by remainingToMove
+    const finalDestVol = Math.min(destEq.capacity, destEq.currentVolume + remainingToMove);
+    const finalDestLevel = (finalDestVol / destEq.capacity) * 100;
+
+    // Product name
+    const productObj = products.find((p) => p.id === productId);
+    const prodColor = productObj ? productObj.color : '#3b82f6';
+
+    return (
+      <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1: Vazão e Tempo */}
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-2xs">
+            <div>
+              <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Parâmetros de Simulação</span>
+              <h4 className="text-sm font-bold text-slate-850 dark:text-slate-100 mt-1">Tempo e Velocidade</h4>
+            </div>
+            <div className="my-3 space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500">Vazão Atual:</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{currentFlowRate} m³/h</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500">Falta Transferir:</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{remainingToMove.toFixed(1)} m³</span>
+              </div>
+            </div>
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-2 flex items-center justify-between">
+              <span className="text-xs text-slate-500">Tempo Restante:</span>
+              <span className="text-sm font-bold text-sky-600 dark:text-sky-400 font-mono">{formatTimeRemaining()}</span>
+            </div>
+          </div>
+
+          {/* Card 2: Origem Final */}
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-2xs">
+            <div>
+              <span className="text-[9px] uppercase tracking-wider font-bold text-rose-500">Origem final estimada</span>
+              <h4 className="text-sm font-bold text-slate-855 dark:text-slate-100 mt-1">{originEq.tag}</h4>
+            </div>
+            <div className="my-3 space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500">Volume Inicial:</span>
+                <span className="font-mono text-slate-800 dark:text-slate-200">{originEq.currentVolume.toFixed(1)} m³ ({originEq.currentLevel.toFixed(1)}%)</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500">Volume Final Est.:</span>
+                <span className="font-mono font-bold text-rose-600 dark:text-rose-450">{finalOriginVol.toFixed(1)} m³ ({finalOriginLevel.toFixed(1)}%)</span>
+              </div>
+            </div>
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-2">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div className="bg-rose-500 h-full rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, finalOriginLevel))}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Destino Final */}
+          <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between shadow-2xs">
+            <div>
+              <span className="text-[9px] uppercase tracking-wider font-bold text-emerald-500">Destino final estimado</span>
+              <h4 className="text-sm font-bold text-slate-855 dark:text-slate-100 mt-1">{destEq.tag}</h4>
+            </div>
+            <div className="my-3 space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500">Volume Inicial:</span>
+                <span className="font-mono text-slate-800 dark:text-slate-200">{destEq.currentVolume.toFixed(1)} m³ ({destEq.currentLevel.toFixed(1)}%)</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500">Volume Final Est.:</span>
+                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-450">{finalDestVol.toFixed(1)} m³ ({finalDestLevel.toFixed(1)}%)</span>
+              </div>
+            </div>
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-2">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div className="bg-emerald-500 h-full rounded-full transition-all duration-300" style={{ width: `${Math.max(0, Math.min(100, finalDestLevel))}%` }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Visual comparison of levels */}
+        <div className="bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-550 mb-4">Comparativo Visual de Níveis (Atual vs. Final Estimado)</h4>
+          <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
+            {/* Origin Tank Visual */}
+            <div className="flex flex-col items-center p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-rose-500 mb-2">ORIGEM: {originEq.tag}</span>
+              <div className="flex gap-4 items-center justify-center my-2">
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-slate-400 font-mono">Atual</span>
+                  <div className="w-16 h-24 bg-slate-100 dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-800 p-0.5 flex items-center justify-center relative mt-1">
+                    <TankGeometrySvg
+                      geometry={originEq.type === 'Sphere' ? 'spherical' : originEq.type === 'Vessel' ? 'pressurized' : 'vertical_cylindrical'}
+                      levelPercent={originEq.currentLevel}
+                      fillColor={prodColor}
+                      width={45}
+                      height={75}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold mt-1 text-slate-700 dark:text-slate-300">{originEq.currentLevel.toFixed(0)}%</span>
+                </div>
+                <div className="text-slate-300 dark:text-slate-700 font-bold">➔</div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-slate-400 font-mono">Final</span>
+                  <div className="w-16 h-24 bg-slate-100 dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-800 p-0.5 flex items-center justify-center relative mt-1">
+                    <TankGeometrySvg
+                      geometry={originEq.type === 'Sphere' ? 'spherical' : originEq.type === 'Vessel' ? 'pressurized' : 'vertical_cylindrical'}
+                      levelPercent={finalOriginLevel}
+                      fillColor="#f43f5e"
+                      width={45}
+                      height={75}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold mt-1 text-rose-500">{finalOriginLevel.toFixed(0)}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Destination Tank Visual */}
+            <div className="flex flex-col items-center p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] font-bold text-emerald-500 mb-2">DESTINO: {destEq.tag}</span>
+              <div className="flex gap-4 items-center justify-center my-2">
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-slate-400 font-mono">Atual</span>
+                  <div className="w-16 h-24 bg-slate-100 dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-800 p-0.5 flex items-center justify-center relative mt-1">
+                    <TankGeometrySvg
+                      geometry={destEq.type === 'Sphere' ? 'spherical' : destEq.type === 'Vessel' ? 'pressurized' : 'vertical_cylindrical'}
+                      levelPercent={destEq.currentLevel}
+                      fillColor={prodColor}
+                      width={45}
+                      height={75}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold mt-1 text-slate-700 dark:text-slate-300">{destEq.currentLevel.toFixed(0)}%</span>
+                </div>
+                <div className="text-slate-300 dark:text-slate-700 font-bold">➔</div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[9px] text-slate-400 font-mono">Final</span>
+                  <div className="w-16 h-24 bg-slate-100 dark:bg-slate-950 rounded border border-slate-200 dark:border-slate-800 p-0.5 flex items-center justify-center relative mt-1">
+                    <TankGeometrySvg
+                      geometry={destEq.type === 'Sphere' ? 'spherical' : destEq.type === 'Vessel' ? 'pressurized' : 'vertical_cylindrical'}
+                      levelPercent={finalDestLevel}
+                      fillColor="#10b981"
+                      width={45}
+                      height={75}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold mt-1 text-emerald-500">{finalDestLevel.toFixed(0)}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div
@@ -704,10 +905,11 @@ export const MovementModal: React.FC = () => {
 
           {/* Tab content */}
           <div className="flex-1 overflow-y-auto min-h-[300px]">
-            {activeTab === 'general'    && renderGeneral()}
+             {activeTab === 'general'    && renderGeneral()}
             {activeTab === 'movement'   && renderMovement()}
             {activeTab === 'flow'       && renderFlow()}
             {activeTab === 'comparison' && renderComparison()}
+            {activeTab === 'previsibilidade' && renderPrevisibilidade()}
             {activeTab === 'operation'  && renderOperation()}
             {activeTab === 'simulation' && renderSimulation()}
           </div>

@@ -26,7 +26,6 @@ const PROPERTY_UNITS: Record<string, string> = {
   Pressure: 'bar',
   Density: 'kg/m³',
   Mass: 't',
-  VCF: '',
 };
 
 const DEFAULT_FIELD_BINDINGS: FieldBinding[] = [

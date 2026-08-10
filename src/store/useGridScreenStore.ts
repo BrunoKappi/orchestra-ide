@@ -5,6 +5,7 @@ import type { GridScreenEntity, TankCardData } from '../features/grid-dashboard/
 import { gridScreenRepo } from '../repository/GridScreenRepository';
 import { useObjectModelStore } from './useObjectModelStore';
 import { propertyRepo } from '../repository/PropertyRepository';
+import { useLogStore } from './useLogStore';
 
 interface GridScreenStoreState {
   screens: GridScreenEntity[];
@@ -187,6 +188,7 @@ export const useGridScreenStore = create<GridScreenStoreState>()(
     isViewMode: false,
 
     init: () => {
+      useObjectModelStore.getState().init();
       let screens = gridScreenRepo.getAll();
       if (screens.length === 0) {
         const seeded = createDefaultSeededScreen();
@@ -225,6 +227,19 @@ export const useGridScreenStore = create<GridScreenStoreState>()(
 
       gridScreenRepo.save(newScreen);
 
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Grid Designer',
+        entity: 'Tela',
+        operation: 'CREATE',
+        action: 'Tela Criada',
+        description: `Nova tela sinóptica "${name}" criada no Grid Designer.`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: newScreen.id,
+      });
+
       set((state) => {
         state.screens.push(newScreen);
         state.activeScreenId = newScreen.id;
@@ -239,8 +254,24 @@ export const useGridScreenStore = create<GridScreenStoreState>()(
       const target = screens.find((s) => s.id === id);
       if (!target) return;
 
+      const prevName = target.name;
       const updated = { ...target, name: newName, updatedAt: new Date().toISOString() };
       gridScreenRepo.save(updated);
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Grid Designer',
+        entity: 'Tela',
+        operation: 'UPDATE',
+        action: 'Tela Renomeada',
+        description: `Tela sinóptica "${prevName}" renomeada para "${newName}".`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+        previousValue: prevName,
+        newValue: newName,
+      });
 
       set((state) => {
         const sc = state.screens.find((s) => s.id === id);
@@ -265,6 +296,19 @@ export const useGridScreenStore = create<GridScreenStoreState>()(
 
       gridScreenRepo.save(duplicate);
 
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Grid Designer',
+        entity: 'Tela',
+        operation: 'CREATE',
+        action: 'Tela Duplicada',
+        description: `Tela sinóptica "${original.name}" duplicada com sucesso. Cópia: "${duplicate.name}".`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: duplicate.id,
+      });
+
       set((state) => {
         state.screens.push(duplicate);
         state.activeScreenId = duplicate.id;
@@ -275,7 +319,23 @@ export const useGridScreenStore = create<GridScreenStoreState>()(
     },
 
     deleteScreen: (id) => {
+      const target = get().screens.find((s) => s.id === id);
       gridScreenRepo.delete(id);
+
+      if (target) {
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Grid Designer',
+          entity: 'Tela',
+          operation: 'DELETE',
+          action: 'Tela Excluída',
+          description: `Tela sinóptica "${target.name}" deletada com sucesso.`,
+          severity: 'Aviso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: id,
+        });
+      }
 
       set((state) => {
         state.screens = state.screens.filter((s) => s.id !== id);
@@ -317,6 +377,19 @@ export const useGridScreenStore = create<GridScreenStoreState>()(
       };
 
       gridScreenRepo.save(updated);
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Grid Designer',
+        entity: 'Configuração de Layout',
+        operation: 'CONFIGURE',
+        action: 'Layout da Tela Atualizado',
+        description: `Dimensões da tela "${activeScreen.name}" configuradas para ${rows} linhas e ${cols} colunas.`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: activeScreen.id,
+      });
 
       set((state) => {
         if (state.activeScreen) {

@@ -51,10 +51,23 @@ export class BaseRepository<T extends { id: string }> {
   }
 
   private persist(data: T[]): void {
-    try {
-      localStorage.setItem(this.storageKey, JSON.stringify(data));
-    } catch (e) {
-      console.error(`[OmmRepo] Failed to persist to ${this.storageKey}`, e);
+    let attempts = 0;
+    let currentData = [...data];
+    while (attempts < 3) {
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(currentData));
+        return;
+      } catch (e: any) {
+        if ((e.name === 'QuotaExceededError' || e.code === 22) && currentData.length > 10) {
+          console.warn(`[OmmRepo] Quota excedida para ${this.storageKey}. Removendo os 20% mais antigos.`);
+          const dropCount = Math.max(1, Math.floor(currentData.length * 0.2));
+          currentData = currentData.slice(dropCount);
+          attempts++;
+        } else {
+          console.error(`[OmmRepo] Failed to persist to ${this.storageKey}`, e);
+          break;
+        }
+      }
     }
   }
 }

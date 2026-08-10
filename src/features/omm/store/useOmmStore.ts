@@ -39,6 +39,7 @@ import { ommSimulationEngine } from '../services/OmmSimulationEngine';
 import { simulationEngine } from '../../../services/simulationEngine';
 import { propertyRepo as globalPropertyRepo } from '../../../repository/PropertyRepository';
 import { STORAGE_KEYS } from '../../../repository/storageKey';
+import { useLogStore } from '../../../store/useLogStore';
 
 // ---------------------------------------------------------------------------
 // Security users type (from Security module)
@@ -518,13 +519,15 @@ export const useOmmStore = create<OmmStore>()(
       // Guard: do not change status of Closed or Canceled movements via simulator
       // (this action is always manual from UI, so it's always allowed)
       const ts = new Date().toISOString();
+      const simTime = get().simulatorState.simulatedTime || ts;
       const update: Partial<OmmMovement> = { status, updatedAt: ts, lastUpdatedAt: ts };
       if (status === 'Active') {
         // Activating: reset flow but keep currentVolume
         update.currentFlow = existing.simFlowRate || existing.plannedFlow || 100;
+        update.activatedAt = simTime;
       }
       if (status === 'Completed') {
-        update.completedAt = ts;
+        update.completedAt = simTime;
         update.currentFlow = 0;
       }
       if (status === 'Closed') {
@@ -843,6 +846,45 @@ export const useOmmStore = create<OmmStore>()(
       };
       const existing = auditRepo.getAll();
       auditRepo.saveAll([...existing, full].slice(-1000));
+
+      // Map to centralized useLogStore
+      const actionStr = (entry.action || '') as string;
+      let op: any = 'UPDATE';
+      if (actionStr === 'CREATE') op = 'CREATE';
+      else if (actionStr === 'DELETE') op = 'DELETE';
+      else if (actionStr === 'ACTIVATE') op = 'ACTIVATE';
+      else if (actionStr === 'PAUSE') op = 'UPDATE';
+      else if (actionStr === 'CLOSE') op = 'CLOSE';
+      else if (actionStr === 'CANCEL') op = 'CANCEL';
+      else if (actionStr === 'ACKNOWLEDGE') op = 'ACKNOWLEDGE';
+      else if (actionStr === 'CUTOFF') op = 'EXECUTE';
+      else if (actionStr === 'TRIAL_DENIED') op = 'ACTIVATE';
+
+      let sev: any = 'Informação';
+      let res: any = 'Sucesso';
+      if (actionStr === 'TRIAL_DENIED') {
+        sev = 'Erro';
+        res = 'Bloqueado';
+      } else if (['CREATE', 'ACTIVATE', 'CLOSE', 'CUTOFF'].includes(actionStr)) {
+        sev = 'Sucesso';
+      } else if (actionStr === 'DELETE' || actionStr === 'CANCEL') {
+        sev = 'Aviso';
+      }
+
+      useLogStore.getState().addLog({
+        user: entry.operator === 'Operador' ? 'Bruno Kappi' : (entry.operator || 'Sistema'),
+        module: entry.entityType === 'Cutoff' ? 'Cut-off' : 'OMM',
+        entity: entry.entityType ?? 'Movimento',
+        operation: op,
+        action: entry.description ?? 'Ação OMM',
+        description: entry.description ?? '',
+        severity: sev,
+        result: res,
+        origin: entry.source === 'UI' ? 'manual' : 'sistema',
+        targetId: entry.entityId || entry.entityNumber || undefined,
+        previousValue: entry.oldValue || undefined,
+        newValue: entry.newValue || undefined,
+      });
     },
 
     // -------------------------------------------------------------------------

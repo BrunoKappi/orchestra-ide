@@ -14,6 +14,7 @@ import { flowchartRepo } from '../repository/FlowchartRepository';
 import { FlowValidationEngine } from '../services/FlowValidationEngine';
 import { propertyRepo } from '../repository/PropertyRepository';
 import { useObjectModelStore } from './useObjectModelStore';
+import { useLogStore } from './useLogStore';
 
 export const mapIndustrialTypeToBpmnType = (type: IndustrialNodeType): string => {
   switch (type) {
@@ -472,6 +473,19 @@ export const useFlowStore = create<FlowStoreState>()(
 
       flowchartRepo.create(newFc);
 
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Fluxogramas',
+        entity: 'Fluxograma',
+        operation: 'CREATE',
+        action: 'Fluxograma Criado',
+        description: `Novo fluxograma lógica "${name}" criado com sucesso.`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: newFc.id,
+      });
+
       set((state) => {
         state.flowcharts.push(newFc);
       });
@@ -480,7 +494,24 @@ export const useFlowStore = create<FlowStoreState>()(
     },
 
     updateFlowchart: (id, updates) => {
+      const existing = flowchartRepo.getById(id);
       flowchartRepo.update(id, updates);
+
+      // Only log significant changes to avoid spamming on drag and drop ticks
+      if (existing && (updates.name !== undefined || updates.description !== undefined || updates.bpmnXml !== undefined)) {
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Fluxogramas',
+          entity: 'Fluxograma',
+          operation: 'UPDATE',
+          action: 'Fluxograma Editado',
+          description: `Alteração realizada no fluxograma "${updates.name || existing.name}".`,
+          severity: 'Informação',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: id,
+        });
+      }
 
       set((state) => {
         const idx = state.flowcharts.findIndex((f) => f.id === id);
@@ -505,7 +536,23 @@ export const useFlowStore = create<FlowStoreState>()(
     },
 
     deleteFlowchart: (id) => {
+      const target = flowchartRepo.getById(id);
       flowchartRepo.delete(id);
+
+      if (target) {
+        useLogStore.getState().addLog({
+          user: 'Bruno Kappi',
+          module: 'Fluxogramas',
+          entity: 'Fluxograma',
+          operation: 'DELETE',
+          action: 'Fluxograma Excluído',
+          description: `Fluxograma lógica "${target.name}" deletado com sucesso.`,
+          severity: 'Aviso',
+          result: 'Sucesso',
+          origin: 'manual',
+          targetId: id,
+        });
+      }
 
       set((state) => {
         state.flowcharts = state.flowcharts.filter((f) => f.id !== id);
@@ -530,6 +577,19 @@ export const useFlowStore = create<FlowStoreState>()(
       };
 
       flowchartRepo.create(duplicate);
+
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Fluxogramas',
+        entity: 'Fluxograma',
+        operation: 'CREATE',
+        action: 'Fluxograma Duplicado',
+        description: `Fluxograma lógica "${source.name}" duplicado para "${duplicate.name}".`,
+        severity: 'Sucesso',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: duplicate.id,
+      });
 
       set((state) => {
         state.flowcharts.push(duplicate);

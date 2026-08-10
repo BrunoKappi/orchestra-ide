@@ -5,13 +5,13 @@
     "semantic_hash": "02ef106cff22fb2250a1d1618a4751c8"
   },
   "src/App.tsx": {
-    "mtime": 1786124168.2051473,
-    "ast_hash": "e794c4a47efa7e7998edb457a97786d6",
+    "mtime": 1786360727.1207309,
+    "ast_hash": "6a432245a2c1e34b5d97e0e2baa7370f",
     "semantic_hash": ""
   },
   "src/components/navigation/HeaderNavigation.tsx": {
-    "mtime": 1786234727.2765055,
-    "ast_hash": "54066331e25506a1ccc4c3dd31cbb901",
+    "mtime": 1786361598.3832264,
+    "ast_hash": "6822d4655fff3ec3628e3cc52dd17ddc",
     "semantic_hash": ""
   },
   "src/components/ui/ContextMenu.tsx": {
@@ -190,8 +190,8 @@
     "semantic_hash": "88e0988192709b355c6c0d6ae264d314"
   },
   "src/repository/storageKey.ts": {
-    "mtime": 1786233982.8765242,
-    "ast_hash": "214fc27cc9aead6c81bca37cc9c459c3",
+    "mtime": 1786360690.953534,
+    "ast_hash": "cf5c12bc53b62de077ef8abcfac0dd71",
     "semantic_hash": ""
   },
   "src/services/ExportImportService.ts": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "src/services/SeedService.ts": {
-    "mtime": 1786236812.3607736,
-    "ast_hash": "e761cb9cfe5c817a77bc331d4e469a4f",
+    "mtime": 1786361647.93372,
+    "ast_hash": "38f7bca0f2a249b406ba013170e10479",
     "semantic_hash": ""
   },
   "src/services/WidgetSeedService.ts": {
@@ -220,8 +220,8 @@
     "semantic_hash": "c47fd4ae8dd9c3b1c210e5baf0b40564"
   },
   "src/store/useObjectModelStore.ts": {
-    "mtime": 1786236824.5230029,
-    "ast_hash": "d02735004e8e755d082b8c6fc7f6114c",
+    "mtime": 1786360894.443832,
+    "ast_hash": "72ed249d05f566b49ae172b90f868a2c",
     "semantic_hash": ""
   },
   "src/store/useWidgetStore.ts": {
@@ -385,9 +385,9 @@
     "semantic_hash": "3b2bba8f01464cb232cdd3fd5f0384f6"
   },
   "src/store/useFlowStore.ts": {
-    "mtime": 1785266620.1937683,
-    "ast_hash": "ce588f3a07a2a473e2a9f402a67c0975",
-    "semantic_hash": "ce588f3a07a2a473e2a9f402a67c0975"
+    "mtime": 1786360942.472022,
+    "ast_hash": "9f39a067910a94af0fc46bfeadf54e9a",
+    "semantic_hash": ""
   },
   "src/types/flow.ts": {
     "mtime": 1785268665.6879513,
@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "src/features/omm/repository/BaseRepository.ts": {
-    "mtime": 1785090682.7186522,
-    "ast_hash": "f1b48a98de690a06a4f13fe59d8f1be8",
-    "semantic_hash": "f1b48a98de690a06a4f13fe59d8f1be8"
+    "mtime": 1786362395.409196,
+    "ast_hash": "81408c7b7be8446e918531428257cbff",
+    "semantic_hash": ""
   },
   "src/features/omm/repository/index.ts": {
     "mtime": 1786120254.0233612,
@@ -470,8 +470,8 @@
     "semantic_hash": ""
   },
   "src/features/omm/store/useOmmStore.ts": {
-    "mtime": 1786128257.379002,
-    "ast_hash": "128b3490e74509dc138c7ad03f5c1cfc",
+    "mtime": 1786362774.8214104,
+    "ast_hash": "963893a80d77c6826944b966b6c93867",
     "semantic_hash": ""
   },
   "src/features/omm/types/index.ts": {
@@ -520,8 +520,8 @@
     "semantic_hash": "dce6bef9eb3cd5e9710e127f3b3e60fc"
   },
   "src/pages/SecurityPage.tsx": {
-    "mtime": 1786237954.882338,
-    "ast_hash": "dfd658dc2d3a8128060b406c8a4c6420",
+    "mtime": 1786361028.7555215,
+    "ast_hash": "5dcc9c6e3ad770c8cc7de7c08c26ef2b",
     "semantic_hash": ""
   },
   "src/repository/OpcRepository.ts": {
@@ -535,8 +535,8 @@
     "semantic_hash": "aad7fcf17b2b80f10091186fa62acbfe"
   },
   "src/store/useSecurityStore.ts": {
-    "mtime": 1786122763.4417424,
-    "ast_hash": "547f2a61086374b171df0ad0b190bab9",
+    "mtime": 1786360746.9873497,
+    "ast_hash": "26ed6498498e22bf4ef3b577502f4ce0",
     "semantic_hash": ""
   },
   "src/types/opc.ts": {
@@ -695,9 +695,9 @@
     "semantic_hash": "cf6d88052a60534993587976313a3ec2"
   },
   "src/store/useConnectivityStore.ts": {
-    "mtime": 1785267347.6992497,
-    "ast_hash": "2176e3e49bcc060e07794793888619c0",
-    "semantic_hash": "2176e3e49bcc060e07794793888619c0"
+    "mtime": 1786360985.079295,
+    "ast_hash": "c30fbfe396a2206b557c07d0ad2637ea",
+    "semantic_hash": ""
   },
   "src/types/connectivity.ts": {
     "mtime": 1785421805.7022333,
@@ -735,8 +735,8 @@
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/GridDashboardHeader.tsx": {
-    "mtime": 1786234080.7084022,
-    "ast_hash": "60a06ea8c8a6a3a15e689a9fb3aa2e66",
+    "mtime": 1786361616.5387127,
+    "ast_hash": "ac70bc3f80235053756a8590b06d2f35",
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/GridSettingsModal.tsx": {
@@ -765,8 +765,8 @@
     "semantic_hash": ""
   },
   "src/features/object-model/EquipmentGraphicConfigEditor.tsx": {
-    "mtime": 1786119003.265187,
-    "ast_hash": "f1fdf104cf6f86858d71466c22161d9d",
+    "mtime": 1786361657.255371,
+    "ast_hash": "c635cfa9269a0e5f5fdfd0381528c7ca",
     "semantic_hash": ""
   },
   "src/services/simulationEngine.ts": {
@@ -790,8 +790,8 @@
     "semantic_hash": ""
   },
   "src/features/omm/components/ui/MovementModal.tsx": {
-    "mtime": 1786238008.371638,
-    "ast_hash": "d66ccaf955f1e8abd4c84bfd2e58000d",
+    "mtime": 1786362904.9566984,
+    "ast_hash": "70165117bd8270cb23f08deffbf46af0",
     "semantic_hash": ""
   },
   "src/components/ui/SearchableSelect.tsx": {
@@ -835,8 +835,8 @@
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/TrendChartExpandedModal.tsx": {
-    "mtime": 1786237895.3506608,
-    "ast_hash": "3bc6ccb2d16531cfba4b09f5499932b9",
+    "mtime": 1786361632.3252816,
+    "ast_hash": "6fb303efc4b2538b19ebe4699f8dca7a",
     "semantic_hash": ""
   },
   "src/repository/GridScreenRepository.ts": {
@@ -845,8 +845,23 @@
     "semantic_hash": ""
   },
   "src/store/useGridScreenStore.ts": {
-    "mtime": 1786234002.7698495,
-    "ast_hash": "844ecefc7280eb2b208301aa054e3143",
+    "mtime": 1786361607.3706975,
+    "ast_hash": "de7d795d2127f15ba1459105527ba3ec",
+    "semantic_hash": ""
+  },
+  "src/pages/LogsPage.tsx": {
+    "mtime": 1786362844.258994,
+    "ast_hash": "2410bd235077151c092079301acce516",
+    "semantic_hash": ""
+  },
+  "src/store/useLogStore.ts": {
+    "mtime": 1786362833.2260778,
+    "ast_hash": "59744a71b469918920f881236dedadf7",
+    "semantic_hash": ""
+  },
+  "src/types/log.ts": {
+    "mtime": 1786360683.337304,
+    "ast_hash": "b29df09e0e3d2b9ec10fb8ded46fb246",
     "semantic_hash": ""
   }
 }

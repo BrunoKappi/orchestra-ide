@@ -162,22 +162,23 @@ export const GridDashboardHeader: React.FC<GridDashboardHeaderProps> = ({
         {/* Modo Edição vs Visualização Toggle */}
         <button
           onClick={onToggleMode}
+          title={isViewMode ? "Alternar para o Modo de Edição" : "Alternar para o Modo de Visualização"}
           className={cn(
             "py-1.5 px-3.5 rounded-lg border text-xs font-bold flex items-center gap-2 transition-all shadow-sm cursor-pointer",
             isViewMode
-              ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-600 ring-2 ring-amber-500/20"
-              : "bg-sky-500 hover:bg-sky-600 text-white border-sky-600 ring-2 ring-sky-500/20"
+              ? "bg-sky-500 hover:bg-sky-600 text-white border-sky-600 ring-2 ring-sky-500/20"
+              : "bg-amber-500 hover:bg-amber-600 text-white border-amber-600 ring-2 ring-amber-500/20"
           )}
         >
           {isViewMode ? (
             <>
-              <Eye className="w-4 h-4" />
-              <span>Modo Visualização</span>
+              <Edit3 className="w-4 h-4" />
+              <span>Editar</span>
             </>
           ) : (
             <>
-              <Edit3 className="w-4 h-4" />
-              <span>Modo Edição</span>
+              <Eye className="w-4 h-4" />
+              <span>Visualizar</span>
             </>
           )}
         </button>

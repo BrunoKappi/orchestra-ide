@@ -10,7 +10,6 @@ import {
   Users,
   User as UserIcon,
   Shield,
-  History,
   Briefcase,
   Search,
   Plus,
@@ -28,7 +27,6 @@ export const SecurityPage: React.FC = () => {
     groups,
     profiles,
     roles,
-    auditLogs,
     deleteUser,
     addGroup,
     updateGroup,
@@ -43,7 +41,7 @@ export const SecurityPage: React.FC = () => {
 
   const theme = useObjectModelStore((s) => s.theme);
 
-  const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'profiles' | 'roles' | 'permissions' | 'audit' | 'active_directory'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'groups' | 'profiles' | 'roles' | 'permissions' | 'active_directory'>('users');
 
   // Users Table States
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,8 +77,7 @@ export const SecurityPage: React.FC = () => {
   const [roleName, setRoleName] = useState('');
   const [roleDesc, setRoleDesc] = useState('');
 
-  // Audit Filter
-  const [auditSearch, setAuditSearch] = useState('');
+
 
   // Apply dark/light theme classes on load or store sync
   useEffect(() => {
@@ -289,20 +286,7 @@ export const SecurityPage: React.FC = () => {
     setIsRoleEditorOpen(false);
   };
 
-  // ----------------------------------------------------
-  // AUDIT LOGS FILTER
-  // ----------------------------------------------------
-  const filteredAudits = useMemo(() => {
-    if (!auditSearch) return auditLogs;
-    const q = auditSearch.toLowerCase();
-    return auditLogs.filter(
-      (log) =>
-        log.user.toLowerCase().includes(q) ||
-        log.action.toLowerCase().includes(q) ||
-        log.target.toLowerCase().includes(q) ||
-        log.description.toLowerCase().includes(q)
-    );
-  }, [auditLogs, auditSearch]);
+
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
@@ -403,17 +387,7 @@ export const SecurityPage: React.FC = () => {
               <span>Active Directory</span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('audit')}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full transition-all cursor-pointer ${
-                activeTab === 'audit'
-                  ? 'bg-slate-500/10 text-slate-700 dark:text-slate-300 font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <History className="w-4 h-4 shrink-0 text-slate-500" />
-              <span>Auditoria</span>
-            </button>
+
           </nav>
         </div>
 
@@ -855,75 +829,7 @@ export const SecurityPage: React.FC = () => {
             </div>
           )}
 
-          {/* TAB CONTENT: AUDIT */}
-          {activeTab === 'audit' && (
-            <div className="flex-1 flex flex-col overflow-hidden space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
-                <div>
-                  <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">Log de Auditoria</h1>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Histórico completo de alterações realizadas nas credenciais e regras de acesso do sistema.</p>
-                </div>
 
-                <div className="relative w-full sm:w-64">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    value={auditSearch}
-                    onChange={(e) => setAuditSearch(e.target.value)}
-                    placeholder="Filtrar por ação, alvo, descrição..."
-                    className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none focus:border-sky-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Log Table */}
-              <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col">
-                <div className="flex-1 overflow-auto">
-                  <table className="w-full border-collapse text-left text-xs">
-                    <thead>
-                      <tr className="sticky top-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10 text-slate-500 font-bold">
-                        <th className="px-4 py-3 min-w-[140px]">Data e Hora</th>
-                        <th className="px-4 py-3 min-w-[120px]">Usuário Responsável</th>
-                        <th className="px-4 py-3 min-w-[90px]">Operação</th>
-                        <th className="px-4 py-3 min-w-[150px]">Alvo</th>
-                        <th className="px-4 py-3">Descrição da Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-350">
-                      {filteredAudits.map((log) => {
-                        let actionBadge = 'bg-slate-100 text-slate-600 dark:bg-slate-850 dark:text-slate-400';
-                        if (log.action === 'Criar') actionBadge = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
-                        if (log.action === 'Editar') actionBadge = 'bg-sky-500/10 text-sky-600 dark:text-sky-400';
-                        if (log.action === 'Excluir') actionBadge = 'bg-rose-500/10 text-rose-600 dark:text-rose-455';
-                        if (log.action === 'Configuração') actionBadge = 'bg-amber-500/10 text-amber-600 dark:text-amber-400';
-
-                        return (
-                          <tr key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition-colors">
-                            <td className="px-4 py-2.5 font-mono text-slate-400">{log.timestamp}</td>
-                            <td className="px-4 py-2.5 font-semibold text-slate-800 dark:text-slate-200">{log.user}</td>
-                            <td className="px-4 py-2.5">
-                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${actionBadge}`}>
-                                {log.action}
-                              </span>
-                            </td>
-                            <td className="px-4 py-2.5 font-medium text-slate-800 dark:text-slate-200">{log.target}</td>
-                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400 leading-normal">{log.description}</td>
-                          </tr>
-                        );
-                      })}
-                      {filteredAudits.length === 0 && (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
-                            Nenhum registro de auditoria encontrado.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* TAB CONTENT: ACTIVE DIRECTORY */}
           {activeTab === 'active_directory' && (
