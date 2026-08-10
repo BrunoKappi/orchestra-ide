@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { GridConfig } from '../types';
 import { Modal } from '../../../components/ui/Modal';
 import { LayoutGrid } from 'lucide-react';
@@ -25,6 +25,15 @@ export const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
   const [activePreset, setActivePreset] = useState<string>(
     `${initialConfig.rows}x${initialConfig.cols}`
   );
+
+  useEffect(() => {
+    if (isOpen) {
+      setScreenName(initialConfig.screenName || '');
+      setRows(initialConfig.rows || 8);
+      setCols(initialConfig.cols || 8);
+      setActivePreset(`${initialConfig.rows}x${initialConfig.cols}`);
+    }
+  }, [isOpen, initialConfig]);
 
   const presets = [
     { label: '6x6', r: 6, c: 6 },

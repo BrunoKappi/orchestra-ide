@@ -1,11 +1,11 @@
 # Graph Report - MVP 2  (2026-08-10)
 
 ## Corpus Check
-- 176 files · ~194,850 words
+- 176 files · ~194,852 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1082 nodes · 3039 edges · 43 communities (38 shown, 5 thin omitted)
+- 1082 nodes · 3039 edges · 44 communities (39 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -27,6 +27,7 @@
 - [[_COMMUNITY_Community 9|Community 9]]
 - [[_COMMUNITY_Community 10|Community 10]]
 - [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
 - [[_COMMUNITY_Community 13|Community 13]]
 - [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 15|Community 15]]
@@ -85,7 +86,7 @@
 ## Import Cycles
 - 3-file cycle: `src/features/widget-editor/Dynamics/FillDynamicEditor.tsx -> src/features/widget-editor/WidgetInspectorPanel.tsx -> src/features/widget-editor/Dynamics/StrokeDynamicEditor.tsx -> src/features/widget-editor/Dynamics/FillDynamicEditor.tsx`
 
-## Communities (43 total, 5 thin omitted)
+## Communities (44 total, 5 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.16
@@ -96,7 +97,7 @@ Cohesion: 0.05
 Nodes (53): AnalyticsTab(), ConnectionDesignerTab(), CustomFlowNode, nodeIcons, categoryIcons, DataSourcesTab(), BlockDefinition, FlowBlockLibrary() (+45 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.23
+Cohesion: 0.15
 Nodes (13): screenFolderRepo, ContextMenuState, RenameState, ScreenStoreState, ScreenToolType, AlarmConditionType, FillLevelConfig, ScreenElement (+5 more)
 
 ### Community 3 - "Community 3"
@@ -108,8 +109,8 @@ Cohesion: 0.09
 Nodes (54): alarmRepo, alignmentRepo, areaRepo, auditRepo, clearAllOmmData(), cutoffRepo, defaultSimState, engUnitRepo (+46 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.11
-Nodes (17): ScreenLayout(), WidgetLayout(), ScreenDesignerPage(), WidgetsPage(), ScreenCanvasEditor(), ScreenElementInspector(), ScreenTree(), buildTree() (+9 more)
+Cohesion: 0.12
+Nodes (22): UniversalMappingTab(), ScreenLayout(), WidgetLayout(), ScreenDesignerPage(), WidgetsPage(), ScreenCanvasEditor(), WidgetInstanceRenderer(), ScreenElementInspector() (+14 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.05
@@ -131,6 +132,10 @@ Nodes (53): edgeTypes, FlowV2Canvas(), FlowV2CanvasProps, nodeTypes, FlowV2Edito
 Cohesion: 0.24
 Nodes (9): CellPos, GridCanvas(), GridCanvasProps, GridDashboardHeader(), GridDashboardHeaderProps, GridSettingsModal(), GridSettingsModalProps, GridConfig (+1 more)
 
+### Community 12 - "Community 12"
+Cohesion: 0.20
+Nodes (10): InspectorTabType, ToolType, WidgetStoreState, WidgetBindingProperty, WidgetCustomPropertyDataType, WidgetElement, WidgetElementBinding, WidgetElementType (+2 more)
+
 ### Community 13 - "Community 13"
 Cohesion: 0.42
 Nodes (3): DeploymentRepository, DeploymentFolderEntity, DeploymentNodeEntity
@@ -148,8 +153,8 @@ Cohesion: 0.08
 Nodes (26): OmmLayout(), VIEW_TABS, KpiCardProps, OmmKpiHeader(), GROUP_BY_OPTIONS, GroupByOption, OmmToolbar(), ToolbarButton() (+18 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.15
-Nodes (16): widgetFolderRepo, WidgetFolderRepository, widgetRepo, WidgetSeedService, InspectorTabType, ToolType, WidgetStoreState, WidgetBindingProperty (+8 more)
+Cohesion: 0.30
+Nodes (6): widgetFolderRepo, WidgetFolderRepository, widgetRepo, WidgetSeedService, WidgetFolderEntity, WidgetNodeEntity
 
 ### Community 18 - "Community 18"
 Cohesion: 0.29
@@ -232,8 +237,8 @@ Cohesion: 0.60
 Nodes (4): getLevelColor(), IndustrialTankCard(), IndustrialTankCardProps, resolveObjectPropValue()
 
 ### Community 47 - "Community 47"
-Cohesion: 0.16
-Nodes (14): UniversalMappingTab(), WidgetInstanceRenderer(), ExplorerTab, ScreenExplorerPanel(), useOpcStore, extractPropertyName(), FillLevelStyle, resolveColorDynamic() (+6 more)
+Cohesion: 0.33
+Nodes (9): extractPropertyName(), FillLevelStyle, resolveColorDynamic(), resolveCustomPropValue(), ResolvedWidgetElementStyle, resolveFillLevelDynamic(), resolveVisibilityDynamic(), resolveWidgetElementStyle() (+1 more)
 
 ## Knowledge Gaps
 - **261 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+256 more)
@@ -243,17 +248,17 @@ Nodes (14): UniversalMappingTab(), WidgetInstanceRenderer(), ExplorerTab, Screen
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Community 8` to `Community 0`, `Community 34`, `Community 35`, `Community 2`, `Community 5`, `Community 38`, `Community 10`, `Community 11`, `Community 42`, `Community 46`, `Community 47`, `Community 17`, `Community 19`, `Community 20`, `Community 25`, `Community 28`?**
+- **Why does `cn()` connect `Community 8` to `Community 0`, `Community 34`, `Community 35`, `Community 2`, `Community 5`, `Community 38`, `Community 10`, `Community 11`, `Community 42`, `Community 12`, `Community 46`, `Community 19`, `Community 20`, `Community 25`, `Community 28`?**
   _High betweenness centrality (0.084) - this node is a cross-community bridge._
 - **Why does `useOmmStore` connect `Community 16` to `Community 33`, `Community 4`, `Community 8`, `Community 9`, `Community 15`, `Community 20`, `Community 25`, `Community 29`?**
   _High betweenness centrality (0.067) - this node is a cross-community bridge._
-- **Why does `useObjectModelStore` connect `Community 8` to `Community 34`, `Community 35`, `Community 5`, `Community 38`, `Community 7`, `Community 9`, `Community 10`, `Community 11`, `Community 46`, `Community 47`, `Community 28`?**
+- **Why does `useObjectModelStore` connect `Community 8` to `Community 34`, `Community 35`, `Community 2`, `Community 5`, `Community 38`, `Community 7`, `Community 9`, `Community 10`, `Community 11`, `Community 46`, `Community 28`?**
   _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **What connects `name`, `private`, `version` to the rest of the system?**
   _261 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.05348101265822785 - nodes in this community are weakly interconnected._
+- **Should `Community 2` be split into smaller, more focused modules?**
+  _Cohesion score 0.14624505928853754 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._
-- **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.08649912331969609 - nodes in this community are weakly interconnected._

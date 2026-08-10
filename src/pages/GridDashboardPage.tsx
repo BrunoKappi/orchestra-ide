@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Edit3 } from 'lucide-react';
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
 import type { GridConfig, TankCardData } from '../features/grid-dashboard/types';
 import { GridCanvas } from '../features/grid-dashboard/components/GridCanvas';
@@ -25,7 +26,6 @@ export const GridDashboardPage = () => {
     updateCard,
     deleteCardFromActiveScreen,
     clearActiveScreenCards,
-    saveActiveScreen,
   } = useGridScreenStore();
 
   const { objects, isSimulating, simulationSpeedMs, tickSimulation } = useObjectModelStore();
@@ -73,11 +73,6 @@ export const GridDashboardPage = () => {
     cols: activeScreen?.cols || 8,
   };
 
-  const handleSaveLayout = () => {
-    saveActiveScreen();
-    showToast('✓ Layout da tela salvo com sucesso!');
-  };
-
   const handleConfirmNewScreen = (newConfig: GridConfig) => {
     createScreen(newConfig.screenName);
     updateActiveScreenConfig(newConfig.rows, newConfig.cols, newConfig.screenName);
@@ -87,7 +82,7 @@ export const GridDashboardPage = () => {
   };
 
   const handleConfirmChangeGrid = (newConfig: GridConfig) => {
-    updateActiveScreenConfig(newConfig.rows, newConfig.cols);
+    updateActiveScreenConfig(newConfig.rows, newConfig.cols, newConfig.screenName);
     setIsChangeGridModalOpen(false);
     showToast(`✓ Grade alterada para ${newConfig.rows}x${newConfig.cols}`);
   };
@@ -209,28 +204,42 @@ export const GridDashboardPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-[#0b0c0e] text-slate-900 dark:text-slate-100 transition-colors">
-      <HeaderNavigation />
+      {!isViewMode && <HeaderNavigation />}
 
-      <GridDashboardHeader
-        config={config}
-        isViewMode={isViewMode}
-        cardCount={cards.length}
-        onOpenScreenManager={() => setIsScreenManagerOpen(true)}
-        onRenameScreen={(newName) => {
-          if (activeScreen) {
-            renameScreen(activeScreen.id, newName);
-            showToast(`✓ Tela renomeada para "${newName}"`);
-          }
-        }}
-        onNewScreen={() => setIsNewScreenModalOpen(true)}
-        onSaveLayout={handleSaveLayout}
-        onChangeGrid={() => setIsChangeGridModalOpen(true)}
-        onClearScreen={handleClearScreen}
-        onToggleMode={() => {
-          toggleViewMode();
-          setSelectedCardId(null);
-        }}
-      />
+      {!isViewMode && (
+        <GridDashboardHeader
+          config={config}
+          isViewMode={isViewMode}
+          cardCount={cards.length}
+          onOpenScreenManager={() => setIsScreenManagerOpen(true)}
+          onRenameScreen={(newName) => {
+            if (activeScreen) {
+              renameScreen(activeScreen.id, newName);
+              showToast(`✓ Tela renomeada para "${newName}"`);
+            }
+          }}
+          onChangeGrid={() => setIsChangeGridModalOpen(true)}
+          onClearScreen={handleClearScreen}
+          onToggleMode={() => {
+            toggleViewMode();
+            setSelectedCardId(null);
+          }}
+        />
+      )}
+
+      {isViewMode && (
+        <button
+          onClick={() => {
+            toggleViewMode();
+            setSelectedCardId(null);
+          }}
+          className="fixed top-4 right-4 z-50 py-2 px-3.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 border border-amber-600 shadow-md ring-2 ring-amber-500/20 hover:scale-105 transition-all cursor-pointer"
+          title="Voltar para o Modo de Edição"
+        >
+          <Edit3 className="w-4 h-4" />
+          <span>Voltar para Edição</span>
+        </button>
+      )}
 
       {toastMessage && (
         <div className="fixed bottom-6 right-6 bg-slate-900/90 dark:bg-slate-100/90 text-white dark:text-slate-900 text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl z-50 flex items-center gap-2 border border-slate-700 dark:border-slate-300 animate-in fade-in-50 slide-in-from-bottom-2 duration-200">

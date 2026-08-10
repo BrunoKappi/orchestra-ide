@@ -1008,7 +1008,7 @@
       "source_file": "src/features/connectivity/UniversalMappingTab.tsx",
       "source_location": "L1",
       "id": "connectivity_universalmappingtab",
-      "community": 47,
+      "community": 5,
       "norm_label": "universalmappingtab.tsx"
     },
     {
@@ -1017,7 +1017,7 @@
       "source_file": "src/features/connectivity/UniversalMappingTab.tsx",
       "source_location": "L9",
       "id": "connectivity_universalmappingtab_universalmappingtab",
-      "community": 47,
+      "community": 5,
       "norm_label": "universalmappingtab()"
     },
     {
@@ -3870,7 +3870,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L1",
       "id": "screen_designer_screencanvaseditor",
-      "community": 47,
+      "community": 5,
       "norm_label": "screencanvaseditor.tsx"
     },
     {
@@ -3879,7 +3879,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L33",
       "id": "screen_designer_screencanvaseditor_widgetinstancerenderer",
-      "community": 47,
+      "community": 5,
       "norm_label": "widgetinstancerenderer()"
     },
     {
@@ -3888,7 +3888,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L140",
       "id": "screen_designer_screencanvaseditor_variabledisplayrenderer",
-      "community": 47,
+      "community": 5,
       "norm_label": "variabledisplayrenderer()"
     },
     {
@@ -3897,7 +3897,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L181",
       "id": "screen_designer_screencanvaseditor_elementrenderer",
-      "community": 47,
+      "community": 5,
       "norm_label": "elementrenderer()"
     },
     {
@@ -3915,7 +3915,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L1",
       "id": "screen_designer_screenelementinspector",
-      "community": 5,
+      "community": 2,
       "norm_label": "screenelementinspector.tsx"
     },
     {
@@ -3924,7 +3924,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L24",
       "id": "screen_designer_screenelementinspector_colorinput",
-      "community": 5,
+      "community": 2,
       "norm_label": "colorinput()"
     },
     {
@@ -3933,7 +3933,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L50",
       "id": "screen_designer_screenelementinspector_numberinput",
-      "community": 5,
+      "community": 2,
       "norm_label": "numberinput()"
     },
     {
@@ -3942,7 +3942,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L72",
       "id": "screen_designer_screenelementinspector_textinput",
-      "community": 5,
+      "community": 2,
       "norm_label": "textinput()"
     },
     {
@@ -3951,7 +3951,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L90",
       "id": "screen_designer_screenelementinspector_selectinput",
-      "community": 5,
+      "community": 2,
       "norm_label": "selectinput()"
     },
     {
@@ -3960,7 +3960,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L110",
       "id": "screen_designer_screenelementinspector_sectiontitle",
-      "community": 5,
+      "community": 2,
       "norm_label": "sectiontitle()"
     },
     {
@@ -3969,7 +3969,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L114",
       "id": "screen_designer_screenelementinspector_genericwidgetmappingeditor",
-      "community": 5,
+      "community": 2,
       "norm_label": "genericwidgetmappingeditor()"
     },
     {
@@ -3987,7 +3987,7 @@
       "source_file": "src/features/screen-designer/ScreenExplorerPanel.tsx",
       "source_location": "L1",
       "id": "screen_designer_screenexplorerpanel",
-      "community": 47,
+      "community": 5,
       "norm_label": "screenexplorerpanel.tsx"
     },
     {
@@ -3996,7 +3996,7 @@
       "source_file": "src/features/screen-designer/ScreenExplorerPanel.tsx",
       "source_location": "L25",
       "id": "screen_designer_screenexplorerpanel_explorertab",
-      "community": 47,
+      "community": 5,
       "norm_label": "explorertab"
     },
     {
@@ -4005,7 +4005,7 @@
       "source_file": "src/features/screen-designer/ScreenExplorerPanel.tsx",
       "source_location": "L27",
       "id": "screen_designer_screenexplorerpanel_screenexplorerpanel",
-      "community": 47,
+      "community": 5,
       "norm_label": "screenexplorerpanel()"
     },
     {
@@ -4266,7 +4266,7 @@
       "source_file": "src/features/widget-editor/WidgetCanvasEditor.tsx",
       "source_location": "L1",
       "id": "widget_editor_widgetcanvaseditor",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetcanvaseditor.tsx"
     },
     {
@@ -4275,7 +4275,7 @@
       "source_file": "src/features/widget-editor/WidgetCanvasEditor.tsx",
       "source_location": "L30",
       "id": "widget_editor_widgetcanvaseditor_getvariabledisplaytext",
-      "community": 17,
+      "community": 12,
       "norm_label": "getvariabledisplaytext()"
     },
     {
@@ -4284,7 +4284,7 @@
       "source_file": "src/features/widget-editor/WidgetCanvasEditor.tsx",
       "source_location": "L93",
       "id": "widget_editor_widgetcanvaseditor_evaluatebinding",
-      "community": 17,
+      "community": 12,
       "norm_label": "evaluatebinding()"
     },
     {
@@ -4302,7 +4302,7 @@
       "source_file": "src/features/widget-editor/WidgetCanvasEditor.tsx",
       "source_location": "L926",
       "id": "widget_editor_widgetcanvaseditor_toolbuttonprops",
-      "community": 17,
+      "community": 12,
       "norm_label": "toolbuttonprops"
     },
     {
@@ -4311,7 +4311,7 @@
       "source_file": "src/features/widget-editor/WidgetCanvasEditor.tsx",
       "source_location": "L933",
       "id": "widget_editor_widgetcanvaseditor_toolbutton",
-      "community": 17,
+      "community": 12,
       "norm_label": "toolbutton()"
     },
     {
@@ -4696,7 +4696,7 @@
       "label": "LogsPage()",
       "file_type": "code",
       "source_file": "src/pages/LogsPage.tsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "id": "pages_logspage_logspage",
       "community": 8,
       "norm_label": "logspage()"
@@ -7128,7 +7128,7 @@
       "source_file": "src/store/useOpcStore.ts",
       "source_location": "L42",
       "id": "store_useopcstore_useopcstore",
-      "community": 47,
+      "community": 5,
       "norm_label": "useopcstore"
     },
     {
@@ -7335,7 +7335,7 @@
       "source_file": "src/store/useWidgetStore.ts",
       "source_location": "L1",
       "id": "store_usewidgetstore",
-      "community": 17,
+      "community": 12,
       "norm_label": "usewidgetstore.ts"
     },
     {
@@ -7344,7 +7344,7 @@
       "source_file": "src/store/useWidgetStore.ts",
       "source_location": "L19",
       "id": "store_usewidgetstore_tooltype",
-      "community": 17,
+      "community": 12,
       "norm_label": "tooltype"
     },
     {
@@ -7353,7 +7353,7 @@
       "source_file": "src/store/useWidgetStore.ts",
       "source_location": "L32",
       "id": "store_usewidgetstore_inspectortabtype",
-      "community": 17,
+      "community": 12,
       "norm_label": "inspectortabtype"
     },
     {
@@ -7362,7 +7362,7 @@
       "source_file": "src/store/useWidgetStore.ts",
       "source_location": "L34",
       "id": "store_usewidgetstore_widgetstorestate",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetstorestate"
     },
     {
@@ -7821,7 +7821,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L278",
       "id": "types_domain_widgetcustompropertydatatype",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetcustompropertydatatype"
     },
     {
@@ -7839,7 +7839,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L296",
       "id": "types_domain_widgetelementtype",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetelementtype"
     },
     {
@@ -7848,7 +7848,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L308",
       "id": "types_domain_widgetbindingproperty",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetbindingproperty"
     },
     {
@@ -7857,7 +7857,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L315",
       "id": "types_domain_widgetelementbinding",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetelementbinding"
     },
     {
@@ -7893,7 +7893,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L350",
       "id": "types_domain_widgetelement",
-      "community": 17,
+      "community": 12,
       "norm_label": "widgetelement"
     },
     {
@@ -11612,9 +11612,9 @@
       "source_file": "src/pages/LogsPage.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pages_logspage",
-      "target": "ui_modal",
-      "confidence_score": 1.0
+      "target": "ui_modal"
     },
     {
       "relation": "contains",
@@ -11797,9 +11797,9 @@
       "source_file": "src/pages/LogsPage.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pages_logspage",
-      "target": "ui_modal_modal",
-      "confidence_score": 1.0
+      "target": "ui_modal_modal"
     },
     {
       "relation": "calls",

@@ -850,8 +850,8 @@
     "semantic_hash": ""
   },
   "src/pages/LogsPage.tsx": {
-    "mtime": 1786367738.0434346,
-    "ast_hash": "42ac60d001a281b4caeb3980d79d57c0",
+    "mtime": 1786369017.5848916,
+    "ast_hash": "5c29c8359067a5c7bda8c66e10296b85",
     "semantic_hash": ""
   },
   "src/store/useLogStore.ts": {

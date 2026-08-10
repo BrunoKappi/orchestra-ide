@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { GridConfig } from '../types';
-import { PlusCircle, Save, Grid, Trash2, Eye, Edit3, LayoutGrid, FolderKanban, Check } from 'lucide-react';
+import { Grid, Trash2, Eye, Edit3, LayoutGrid, FolderKanban, Check } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
 interface GridDashboardHeaderProps {
@@ -9,8 +9,6 @@ interface GridDashboardHeaderProps {
   cardCount: number;
   onOpenScreenManager: () => void;
   onRenameScreen: (newName: string) => void;
-  onNewScreen: () => void;
-  onSaveLayout: () => void;
   onChangeGrid: () => void;
   onClearScreen: () => void;
   onToggleMode: () => void;
@@ -22,8 +20,6 @@ export const GridDashboardHeader: React.FC<GridDashboardHeaderProps> = ({
   cardCount,
   onOpenScreenManager,
   onRenameScreen,
-  onNewScreen,
-  onSaveLayout,
   onChangeGrid,
   onClearScreen,
   onToggleMode,
@@ -115,26 +111,6 @@ export const GridDashboardHeader: React.FC<GridDashboardHeaderProps> = ({
         >
           <FolderKanban className="w-4 h-4 text-sky-500" />
           <span className="hidden sm:inline">Minhas Telas</span>
-        </button>
-
-        {/* Nova Tela */}
-        <button
-          onClick={onNewScreen}
-          className="py-1.5 px-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-sky-500 dark:hover:border-sky-500 bg-slate-50 dark:bg-slate-800/80 hover:bg-sky-50 dark:hover:bg-sky-500/10 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-          title="Criar nova tela"
-        >
-          <PlusCircle className="w-3.5 h-3.5 text-sky-500" />
-          <span className="hidden md:inline">Nova Tela</span>
-        </button>
-
-        {/* Salvar Layout */}
-        <button
-          onClick={onSaveLayout}
-          className="py-1.5 px-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-          title="Salvar layout da tela atual"
-        >
-          <Save className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="hidden md:inline">Salvar Layout</span>
         </button>
 
         {/* Alterar Grade */}
