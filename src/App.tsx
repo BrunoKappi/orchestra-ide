@@ -16,6 +16,7 @@ import { SecurityPage } from './pages/SecurityPage';
 import { ConnectivityStudioPage } from './pages/ConnectivityStudioPage';
 import { GridDashboardPage } from './pages/GridDashboardPage';
 import { LogsPage } from './pages/LogsPage';
+import { DatabaseAnalyticsPage } from './pages/DatabaseAnalyticsPage';
 
 import { useObjectModelStore } from './store/useObjectModelStore';
 
@@ -89,6 +90,9 @@ export function App() {
     } else if (path === '/logs') {
       title = 'Logs & Rastreabilidade - Serrano';
       emoji = '📋';
+    } else if (path === '/database-analytics') {
+      title = 'Database Analytics - Serrano';
+      emoji = '🗄️';
     }
 
     document.title = title;
@@ -120,6 +124,7 @@ export function App() {
         <Route path="/grid-dashboard" element={<GridDashboardPage />} />
         <Route path="/grid-designer" element={<GridDashboardPage />} />
         <Route path="/logs" element={<LogsPage />} />
+        <Route path="/database-analytics" element={<DatabaseAnalyticsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowV2EditorModal />

@@ -21,6 +21,7 @@ import {
   Sparkles,
   LayoutGrid,
   History,
+  Database,
 } from "lucide-react";
 
 import { useSecurityStore } from "../../store/useSecurityStore";
@@ -172,6 +173,13 @@ export const HeaderNavigation = () => {
       icon: History,
       colorClass: "text-sky-500",
       activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/database-analytics",
+      label: "Database & Performance",
+      icon: Database,
+      colorClass: "text-indigo-500",
+      activeTextClass: "text-indigo-600 dark:text-indigo-400",
     },
   ];
 

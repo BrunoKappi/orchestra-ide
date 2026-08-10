@@ -5,13 +5,13 @@
     "semantic_hash": "02ef106cff22fb2250a1d1618a4751c8"
   },
   "src/App.tsx": {
-    "mtime": 1786360727.1207309,
-    "ast_hash": "6a432245a2c1e34b5d97e0e2baa7370f",
+    "mtime": 1786389266.6357803,
+    "ast_hash": "fb0643015f16a60cb7f68fba888ddb6b",
     "semantic_hash": ""
   },
   "src/components/navigation/HeaderNavigation.tsx": {
-    "mtime": 1786361598.3832264,
-    "ast_hash": "6822d4655fff3ec3628e3cc52dd17ddc",
+    "mtime": 1786389275.273248,
+    "ast_hash": "1aaab5f9f1819db1ee27451ec14cc19f",
     "semantic_hash": ""
   },
   "src/components/ui/ContextMenu.tsx": {
@@ -735,14 +735,14 @@
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/GridDashboardHeader.tsx": {
-    "mtime": 1786361616.5387127,
-    "ast_hash": "ac70bc3f80235053756a8590b06d2f35",
+    "mtime": 1786381347.6503727,
+    "ast_hash": "8337d660c57f013b1508d2eb61d41dc0",
     "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/GridSettingsModal.tsx": {
-    "mtime": 1785430963.0370176,
-    "ast_hash": "d200cff19ba3da458b796195216eef05",
-    "semantic_hash": "d200cff19ba3da458b796195216eef05"
+    "mtime": 1786381295.6016939,
+    "ast_hash": "f931dacbaba3a6eb1cd3121aaf166a75",
+    "semantic_hash": ""
   },
   "src/features/grid-dashboard/components/IndustrialTankCard.tsx": {
     "mtime": 1786119061.4644408,
@@ -760,8 +760,8 @@
     "semantic_hash": ""
   },
   "src/pages/GridDashboardPage.tsx": {
-    "mtime": 1786234928.3174853,
-    "ast_hash": "99b56e2777a5a260aacdb9a71702ed9d",
+    "mtime": 1786381355.1012397,
+    "ast_hash": "ca1852c0ddde19e23bbd379ca1597d85",
     "semantic_hash": ""
   },
   "src/features/object-model/EquipmentGraphicConfigEditor.tsx": {
@@ -877,6 +877,11 @@
   "src/features/omm/components/flow/OmmTankNode.tsx": {
     "mtime": 1786365956.3662646,
     "ast_hash": "8bce1dc9081e27f290e6ed4a1cfb6f46",
+    "semantic_hash": ""
+  },
+  "src/pages/DatabaseAnalyticsPage.tsx": {
+    "mtime": 1786389323.7972288,
+    "ast_hash": "db5a096476f8dd4ab4e55bf787961d52",
     "semantic_hash": ""
   }
 }
