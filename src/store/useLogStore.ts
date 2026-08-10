@@ -444,6 +444,9 @@ export const useLogStore = create<LogStore>()(
     },
 
     addLog: (logInput) => {
+      // Garante que o histórico de logs/mock seja carregado antes de adicionar novos registros
+      get().init();
+
       const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
       const newLog: AuditLog = {
         id: `log-${uuidv4()}`,

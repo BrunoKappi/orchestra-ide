@@ -44,8 +44,8 @@ export const simStateRepo = new SingletonRepository<OmmSimulatorState>(
   defaultSimState,
 );
 
-// Seeded flag
-export const OMM_SEEDED_KEY = `${NS}_seeded`;
+// Seeded flag — bumped to v3 to force re-seed with corrected equipment type mapping
+export const OMM_SEEDED_KEY = `${NS}_seeded_v3`;
 export function isOmmSeeded(): boolean {
   return localStorage.getItem(OMM_SEEDED_KEY) === 'true';
 }
@@ -68,4 +68,6 @@ export function clearAllOmmData(): void {
   cutoffRepo.clear();
   simStateRepo.clear();
   localStorage.removeItem(OMM_SEEDED_KEY);
+  // Also clear legacy v2 seed flag
+  localStorage.removeItem(`${NS}_seeded`);
 }

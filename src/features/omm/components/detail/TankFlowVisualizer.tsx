@@ -1,15 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  ReactFlowProvider,
+  BackgroundVariant,
+  useNodesState,
+  useEdgesState,
+  type Node,
+  type Edge,
+  MarkerType,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 import { useOmmStore } from '../../store/useOmmStore';
 import { TankGeometrySvg } from '../../../../components/TankGeometrySvg';
 import { Activity } from 'lucide-react';
 import { cn } from '../../../../utils/cn';
+import { OmmTankNode, type OmmTankNodeData } from '../flow/OmmTankNode';
+import { OmmFlowEdge, type OmmFlowEdgeData } from '../flow/OmmFlowEdge';
+import type { OmmStatus } from '../../types';
 
+// ---------------------------------------------------------------------------
+// XYFlow type registries (module-scoped, stable references)
+// ---------------------------------------------------------------------------
+const nodeTypes = { ommTank: OmmTankNode };
+const edgeTypes = { ommFlow: OmmFlowEdge };
+
+// ---------------------------------------------------------------------------
+// Props
+// ---------------------------------------------------------------------------
 interface TankFlowVisualizerProps {
   originId: string;
   destinationId: string;
   movementId: string | null;
 }
 
+// ---------------------------------------------------------------------------
+// Internal TrendChart (kept for the "3d" view, unchanged)
+// ---------------------------------------------------------------------------
 const TrendChart: React.FC<{
   title: string;
   tag: string;
@@ -57,12 +85,10 @@ const TrendChart: React.FC<{
             </linearGradient>
           </defs>
           <line x1="0" y1={height * 0.25} x2={width} y2={height * 0.25} stroke="currentColor" className="text-slate-100 dark:text-slate-800/40" strokeDasharray="3 3" />
-          <line x1="0" y1={height * 0.5} x2={width} y2={height * 0.5} stroke="currentColor" className="text-slate-100 dark:text-slate-800/40" strokeDasharray="3 3" />
+          <line x1="0" y1={height * 0.5}  x2={width} y2={height * 0.5}  stroke="currentColor" className="text-slate-100 dark:text-slate-800/40" strokeDasharray="3 3" />
           <line x1="0" y1={height * 0.75} x2={width} y2={height * 0.75} stroke="currentColor" className="text-slate-100 dark:text-slate-800/40" strokeDasharray="3 3" />
-
           <path d={areaD} fill={`url(#grad-${tag})`} />
           <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-
           {points.length > 0 && (
             <circle
               cx={width}
@@ -78,29 +104,151 @@ const TrendChart: React.FC<{
   );
 };
 
+// ---------------------------------------------------------------------------
+// XYFlow "Diagrama Interativo" inner canvas
+// ---------------------------------------------------------------------------
+const InteractiveDiagramCanvas: React.FC<{
+  originId: string;
+  destinationId: string;
+  movementId: string | null;
+}> = ({ originId, destinationId, movementId }) => {
+  const equipments = useOmmStore((s) => s.equipments);
+  const movements  = useOmmStore((s) => s.movements);
+  const products   = useOmmStore((s) => s.products);
+
+  const originTank      = equipments.find((e) => e.id === originId) ?? null;
+  const destinationTank = equipments.find((e) => e.id === destinationId) ?? null;
+  const movement        = movements.find((m) => m.id === movementId) ?? null;
+
+  const product      = products.find((p) => p.id === (movement?.productId ?? originTank?.productId ?? '')) ?? null;
+  const productColor = product?.color ?? '#3b82f6';
+  const isActive     = movement?.status === 'Active' && !movement.simPaused;
+
+  // Build nodes
+  const nodes = useMemo<Node<OmmTankNodeData>[]>(() => {
+    const result: Node<OmmTankNodeData>[] = [];
+    if (originTank) {
+      result.push({
+        id: originTank.id,
+        type: 'ommTank',
+        position: { x: 60, y: 80 },
+        draggable: false,
+        data: { equipment: originTank, product, compact: false, movementRole: 'origin' },
+      });
+    }
+    if (destinationTank) {
+      result.push({
+        id: destinationTank.id,
+        type: 'ommTank',
+        position: { x: 520, y: 80 },
+        draggable: false,
+        data: { equipment: destinationTank, product, compact: false, movementRole: 'destination' },
+      });
+    }
+    return result;
+  }, [originTank, destinationTank, product]);
+
+  // Build edge
+  const edges = useMemo<Edge<OmmFlowEdgeData>[]>(() => {
+    if (!originTank || !destinationTank || !movement) return [];
+    return [{
+      id: `edge-${movement.id}`,
+      source: originTank.id,
+      target: destinationTank.id,
+      sourceHandle: 'right',
+      targetHandle: 'left',
+      type: 'ommFlow',
+      animated: isActive,
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        width: 16,
+        height: 16,
+        color: isActive ? '#10b981' : '#94a3b8',
+      },
+      data: {
+        status:       (movement.status as OmmStatus),
+        currentFlow:  movement.currentFlow,
+        productName:  product?.name ?? '',
+        productColor: productColor,
+        simPaused:    movement.simPaused,
+      },
+    }];
+  }, [originTank, destinationTank, movement, product, productColor, isActive]);
+
+  const [rfNodes, , onNodesChange] = useNodesState(nodes as Node[]);
+  const [rfEdges, , onEdgesChange] = useEdgesState(edges as Edge[]);
+
+  // Keep node data in sync with live store values
+  const syncedNodes = useMemo(() =>
+    rfNodes.map((n) => {
+      const storeNode = nodes.find((sn) => sn.id === n.id);
+      return storeNode ? { ...n, data: storeNode.data } : n;
+    }),
+  [rfNodes, nodes]);
+
+  return (
+    <div className="w-full h-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+      <ReactFlow
+        nodes={syncedNodes as Node[]}
+        edges={(rfEdges.length > 0 ? rfEdges.map((e) => {
+          const se = edges.find((se) => se.id === e.id);
+          return se ? { ...e, data: se.data } : e;
+        }) : edges) as Edge[]}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.4}
+        maxZoom={2}
+        proOptions={{ hideAttribution: true }}
+        className="bg-slate-50 dark:bg-slate-950"
+      >
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={20}
+          size={1}
+          color="rgb(148 163 184 / 0.3)"
+        />
+        <Controls
+          className="!bg-white dark:!bg-slate-900 !border-slate-200 dark:!border-slate-700 !shadow-md !rounded-xl overflow-hidden"
+          showInteractive={false}
+        />
+      </ReactFlow>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Main exported component
+// ---------------------------------------------------------------------------
 export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
   originId,
   destinationId,
   movementId,
 }) => {
   const equipments = useOmmStore((s) => s.equipments);
-  const movements = useOmmStore((s) => s.movements);
-  const products = useOmmStore((s) => s.products);
+  const movements  = useOmmStore((s) => s.movements);
+  const products   = useOmmStore((s) => s.products);
 
-  const [viewMode, setViewMode] = useState<'3d' | 'pfd'>('3d');
+  const [viewMode, setViewMode] = useState<'3d' | 'pfd' | 'xyflow'>('3d');
 
   // Resolve tanks
-  const originTank = equipments.find((e) => e.id === originId) ?? null;
+  const originTank      = equipments.find((e) => e.id === originId) ?? null;
   const destinationTank = equipments.find((e) => e.id === destinationId) ?? null;
-  const movement = movements.find((m) => m.id === movementId) ?? null;
+  const movement        = movements.find((m) => m.id === movementId) ?? null;
 
   // Resolve product info
-  const product = products.find((p) => p.id === (movement?.productId ?? originTank?.productId ?? '')) ?? null;
+  const product      = products.find((p) => p.id === (movement?.productId ?? originTank?.productId ?? '')) ?? null;
   const productColor = product?.color ?? '#3b82f6';
   const isFlowActive = movement?.status === 'Active' && !movement.simPaused;
 
   const [originHistory, setOriginHistory] = useState<number[]>([]);
-  const [destHistory, setDestHistory] = useState<number[]>([]);
+  const [destHistory,   setDestHistory]   = useState<number[]>([]);
 
   useEffect(() => {
     if (!originTank || !destinationTank) return;
@@ -119,12 +267,12 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
   useEffect(() => {
     if (!originTank || !destinationTank) return;
     const interval = setInterval(() => {
-      setOriginHistory(prev => {
+      setOriginHistory((prev) => {
         const next = [...prev, originTank.currentLevel];
         if (next.length > 30) next.shift();
         return next;
       });
-      setDestHistory(prev => {
+      setDestHistory((prev) => {
         const next = [...prev, destinationTank.currentLevel];
         if (next.length > 30) next.shift();
         return next;
@@ -145,7 +293,7 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-slate-50/20 dark:bg-slate-950/10 p-4 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden select-none">
-      
+
       {/* Visualizer Toolbar */}
       <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
         <div>
@@ -159,36 +307,32 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
           )}
         </div>
 
-        {/* View mode toggle */}
+        {/* View mode toggle — now 3 modes */}
         <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-800 text-[10px] font-bold">
-          <button
-            onClick={() => setViewMode('3d')}
-            className={cn(
-              "px-3 py-1 rounded-md transition-all cursor-pointer",
-              viewMode === '3d'
-                ? "bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-2xs"
-                : "text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-            )}
-          >
-            Fluxo 3D
-          </button>
-          <button
-            onClick={() => setViewMode('pfd')}
-            className={cn(
-              "px-3 py-1 rounded-md transition-all cursor-pointer",
-              viewMode === 'pfd'
-                ? "bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-2xs"
-                : "text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-            )}
-          >
-            Diagrama PFD
-          </button>
+          {([
+            { id: '3d',     label: 'Fluxo 3D' },
+            { id: 'pfd',    label: 'Diagrama PFD' },
+            { id: 'xyflow', label: 'Diagrama Interativo' },
+          ] as { id: '3d' | 'pfd' | 'xyflow'; label: string }[]).map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => setViewMode(mode.id)}
+              className={cn(
+                'px-3 py-1 rounded-md transition-all cursor-pointer',
+                viewMode === mode.id
+                  ? 'bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 shadow-2xs'
+                  : 'text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200',
+              )}
+            >
+              {mode.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Main Flow Canvas */}
       <div className="flex-1 min-h-[300px] flex items-center justify-center relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-2xs">
-        
+
         {/* Style definitions for animated dashes in SVG pipes */}
         <style dangerouslySetInnerHTML={{__html: `
           @keyframes pipe-dash {
@@ -208,10 +352,21 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
           }
         `}} />
 
-        {viewMode === '3d' ? (
+        {viewMode === 'xyflow' ? (
+          /* VIEW 3: INTERACTIVE XYFLOW DIAGRAM */
+          <div className="w-full h-full">
+            <ReactFlowProvider>
+              <InteractiveDiagramCanvas
+                originId={originId}
+                destinationId={destinationId}
+                movementId={movementId}
+              />
+            </ReactFlowProvider>
+          </div>
+        ) : viewMode === '3d' ? (
           /* VIEW 1: 3D INDUSTRIAL FLUID VIEW */
           <div className="w-full flex flex-col items-center gap-6 max-w-3xl">
-            
+
             {/* Tanks and pipes row */}
             <div className="w-full flex items-center justify-between gap-6">
               {/* Origin Tank */}
@@ -248,7 +403,6 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
                     strokeLinecap="round"
                     className="dark:stroke-slate-800"
                   />
-                  
                   {/* Active fluid inside pipe */}
                   {isFlowActive && (
                     <path
@@ -265,10 +419,10 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
                 {/* Pump/Flow node in center of pipeline */}
                 <div className="absolute top-1/2 -translate-y-1/2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-full p-2.5 shadow-md flex items-center justify-center z-20">
                   <div className={cn(
-                    "p-1.5 rounded-full border bg-slate-50 dark:bg-slate-800 text-slate-500",
-                    isFlowActive ? "border-emerald-400 text-emerald-600 dark:text-emerald-400" : "border-slate-200"
+                    'p-1.5 rounded-full border bg-slate-50 dark:bg-slate-800 text-slate-500',
+                    isFlowActive ? 'border-emerald-400 text-emerald-600 dark:text-emerald-400' : 'border-slate-200',
                   )}>
-                    <Activity className={cn("w-4 h-4", isFlowActive && "animate-pump-spin")} style={{ animationDuration: '3s' }} />
+                    <Activity className={cn('w-4 h-4', isFlowActive && 'animate-pump-spin')} style={{ animationDuration: '3s' }} />
                   </div>
                   {/* Dynamic flow readout */}
                   {isFlowActive && movement && (
@@ -324,14 +478,14 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
         ) : (
           /* VIEW 2: PROCESS FLOW DIAGRAM (PFD) */
           <div className="w-full flex flex-col items-center max-w-4xl font-mono text-[10px] select-text">
-            
+
             {/* PFD Graphics Grid */}
             <div className="w-full flex items-center justify-between gap-2 py-8 relative">
-              
+
               {/* Box 1: Origin */}
               <div className={cn(
-                "w-24 border rounded-lg p-2 bg-slate-50 dark:bg-slate-900 text-center shadow-2xs transition-colors",
-                isFlowActive ? "border-emerald-400/80 bg-emerald-50/10" : "border-slate-200 dark:border-slate-800"
+                'w-24 border rounded-lg p-2 bg-slate-50 dark:bg-slate-900 text-center shadow-2xs transition-colors',
+                isFlowActive ? 'border-emerald-400/80 bg-emerald-50/10' : 'border-slate-200 dark:border-slate-800',
               )}>
                 <div className="font-bold text-slate-800 dark:text-slate-200">{originTank.tag}</div>
                 <div className="text-slate-450 mt-0.5">{originTank.type}</div>
@@ -351,8 +505,8 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
 
               {/* Box 2: Origin Valve */}
               <div className={cn(
-                "w-14 border rounded-lg p-1 bg-slate-50 dark:bg-slate-900 text-center transition-colors",
-                isFlowActive ? "border-emerald-400 bg-emerald-50/10 text-emerald-600 dark:text-emerald-400" : "border-slate-200 dark:border-slate-800"
+                'w-14 border rounded-lg p-1 bg-slate-50 dark:bg-slate-900 text-center transition-colors',
+                isFlowActive ? 'border-emerald-400 bg-emerald-50/10 text-emerald-600 dark:text-emerald-400' : 'border-slate-200 dark:border-slate-800',
               )}>
                 <div className="font-bold">V-SRC</div>
                 <div className="text-[8px] text-slate-450 mt-0.5">
@@ -370,8 +524,8 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
 
               {/* Box 3: Centrifugal Pump */}
               <div className={cn(
-                "w-16 border rounded-lg p-1.5 bg-slate-50 dark:bg-slate-900 text-center shadow-2xs transition-colors",
-                isFlowActive ? "border-emerald-400 bg-emerald-50/10 text-emerald-600 dark:text-emerald-400" : "border-slate-200 dark:border-slate-800"
+                'w-16 border rounded-lg p-1.5 bg-slate-50 dark:bg-slate-900 text-center shadow-2xs transition-colors',
+                isFlowActive ? 'border-emerald-400 bg-emerald-50/10 text-emerald-600 dark:text-emerald-400' : 'border-slate-200 dark:border-slate-800',
               )}>
                 <div className="font-bold">PUMP-01</div>
                 <div className="text-[8px] text-slate-450 mt-0.5">
@@ -389,8 +543,8 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
 
               {/* Box 4: Destination Valve */}
               <div className={cn(
-                "w-14 border rounded-lg p-1 bg-slate-50 dark:bg-slate-900 text-center transition-colors",
-                isFlowActive ? "border-emerald-400 bg-emerald-50/10 text-emerald-600 dark:text-emerald-400" : "border-slate-200 dark:border-slate-800"
+                'w-14 border rounded-lg p-1 bg-slate-50 dark:bg-slate-900 text-center transition-colors',
+                isFlowActive ? 'border-emerald-400 bg-emerald-50/10 text-emerald-600 dark:text-emerald-400' : 'border-slate-200 dark:border-slate-800',
               )}>
                 <div className="font-bold">V-DST</div>
                 <div className="text-[8px] text-slate-450 mt-0.5">
@@ -408,8 +562,8 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
 
               {/* Box 5: Destination */}
               <div className={cn(
-                "w-24 border rounded-lg p-2 bg-slate-50 dark:bg-slate-900 text-center shadow-2xs transition-colors",
-                isFlowActive ? "border-emerald-400/80 bg-emerald-50/10" : "border-slate-200 dark:border-slate-800"
+                'w-24 border rounded-lg p-2 bg-slate-50 dark:bg-slate-900 text-center shadow-2xs transition-colors',
+                isFlowActive ? 'border-emerald-400/80 bg-emerald-50/10' : 'border-slate-200 dark:border-slate-800',
               )}>
                 <div className="font-bold text-slate-800 dark:text-slate-200">{destinationTank.tag}</div>
                 <div className="text-slate-450 mt-0.5">{destinationTank.type}</div>

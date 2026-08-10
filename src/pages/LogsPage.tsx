@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLogStore } from '../store/useLogStore';
 import { HeaderNavigation } from '../components/navigation/HeaderNavigation';
+import { Modal } from '../components/ui/Modal';
 import {
   Search,
   Filter,
@@ -12,7 +13,6 @@ import {
   ChevronRight,
   History,
   FileText,
-  X,
   Activity,
   ShieldAlert,
   AlertTriangle,
@@ -747,149 +747,147 @@ Valor Posterior: ${log.newValue || '-'}
             </div>
           </div>
         </div>
+      </main>
 
-        {/* Drawer / Details Panel (Slide over layout on the right) */}
+      {/* Modal de Detalhes da Evidência */}
+      <Modal
+        isOpen={!!selectedLog}
+        onClose={() => setSelectedLog(null)}
+        title="Detalhes da Evidência"
+        subtitle="Registro completo de alterações e auditoria de segurança"
+        maxWidth="max-w-xl"
+      >
         {selectedLog && (
-          <div className="w-full md:w-[480px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col shrink-0 overflow-y-auto max-h-full shadow-lg relative">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4 shrink-0">
+          <div className="space-y-4 text-xs">
+            {/* Event title and ID with Copy Button */}
+            <div>
+              <span className="text-[10px] text-slate-450 dark:text-slate-400 font-bold uppercase block mb-1">Identificador de Evento</span>
               <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-sky-500" />
-                <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-                  Detalhes da Evidência
-                </h3>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => handleCopyDetails(selectedLog)}
-                  className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-750 transition-colors cursor-pointer"
-                  title="Copiar detalhes para a área de transferência"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
-                <button
-                  onClick={() => setSelectedLog(null)}
-                  className="p-1 rounded hover:bg-slate-150 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-750 transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="space-y-4 text-xs flex-1">
-              
-              {/* Event title and ID */}
-              <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Identificador de Evento</span>
-                <span className="font-mono text-slate-500 select-all block bg-slate-50 dark:bg-slate-950 px-2 py-1 rounded border border-slate-200/50 dark:border-slate-800/50 font-bold">
+                <span className="font-mono text-slate-500 select-all block bg-slate-50 dark:bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-200/50 dark:border-slate-800/50 font-semibold flex-1 truncate text-left">
                   {selectedLog.id}
                 </span>
+                <button
+                  onClick={() => handleCopyDetails(selectedLog)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-650 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 font-semibold cursor-pointer transition-colors shadow-2xs shrink-0"
+                  title="Copiar detalhes para a área de transferência"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Copiado</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copiar</span>
+                    </>
+                  )}
+                </button>
               </div>
-
-              {/* Status and Severity Badges */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Severidade</span>
-                  <span className={cn(
-                    "px-2.5 py-1 rounded text-center block text-[11px] font-bold tracking-wider font-mono",
-                    selectedLog.severity === 'Informação' && 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
-                    selectedLog.severity === 'Sucesso' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-                    selectedLog.severity === 'Aviso' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-                    selectedLog.severity === 'Erro' && 'bg-red-500/10 text-red-600 dark:text-red-400',
-                    selectedLog.severity === 'Crítico' && 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30'
-                  )}>
-                    {selectedLog.severity}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Resultado</span>
-                  <span className={cn(
-                    "px-2.5 py-1 rounded text-center block text-[11px] font-bold tracking-wider font-mono",
-                    selectedLog.result === 'Sucesso' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-                    selectedLog.result === 'Falha' && 'bg-red-500/10 text-red-650 dark:text-red-400',
-                    selectedLog.result === 'Bloqueado' && 'bg-amber-500/10 text-amber-650 dark:text-amber-400'
-                  )}>
-                    {selectedLog.result}
-                  </span>
-                </div>
-              </div>
-
-              {/* Meta Grid */}
-              <div className="grid grid-cols-2 gap-y-3.5 gap-x-2 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-850 p-3 rounded-xl">
-                <div>
-                  <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Data e Hora Exata</span>
-                  <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">{selectedLog.timestamp}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Usuário Responsável</span>
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedLog.user}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Módulo</span>
-                  <span className="font-semibold text-slate-850 dark:text-slate-300">{selectedLog.module}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Entidade Afetada</span>
-                  <span className="font-semibold text-slate-850 dark:text-slate-300">{selectedLog.entity}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Operação (BPMN)</span>
-                  <span className="font-semibold text-slate-850 dark:text-slate-300 font-mono text-[11px]">{selectedLog.operation}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Origem da Ação</span>
-                  <span className="font-semibold text-slate-850 dark:text-slate-300 capitalize">{selectedLog.origin}</span>
-                </div>
-              </div>
-
-              {/* Action & Description */}
-              <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Ação Executada</span>
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-100 bg-slate-100/50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-200/50 dark:border-slate-800">
-                  {selectedLog.action}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Descrição Completa</span>
-                <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed font-sans bg-slate-100/20 dark:bg-slate-900/30 p-2.5 rounded-lg border border-slate-100 dark:border-slate-850">
-                  {selectedLog.description}
-                </p>
-              </div>
-
-              {/* Target ID affected */}
-              {selectedLog.targetId && (
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Registro Afetado</span>
-                  <div className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400 bg-sky-500/5 px-2.5 py-1.5 rounded-lg border border-sky-500/10 font-semibold font-mono text-[11px]">
-                    <Database className="w-3.5 h-3.5" />
-                    <span>{selectedLog.targetId}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Diff Values previous vs after */}
-              {(selectedLog.previousValue || selectedLog.newValue) && (
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5">Alteração de Estado (Anterior vs Posterior)</span>
-                  {renderValueDiff(selectedLog)}
-                </div>
-              )}
-
-              {/* Operational Block/Metadata */}
-              {selectedLog.metadata && Object.keys(selectedLog.metadata).length > 0 && (
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Metadados Adicionais</span>
-                  <pre className="text-[10px] text-slate-600 dark:text-slate-450 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200/30 dark:border-slate-800/30 overflow-auto font-mono">
-                    {JSON.stringify(selectedLog.metadata, null, 2)}
-                  </pre>
-                </div>
-              )}
             </div>
+
+            {/* Status and Severity Badges */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Severidade</span>
+                <span className={cn(
+                  "px-2.5 py-1 rounded text-center block text-[11px] font-bold tracking-wider font-mono",
+                  selectedLog.severity === 'Informação' && 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+                  selectedLog.severity === 'Sucesso' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450',
+                  selectedLog.severity === 'Aviso' && 'bg-amber-500/10 text-amber-600 dark:text-amber-450',
+                  selectedLog.severity === 'Erro' && 'bg-red-500/10 text-red-600 dark:text-red-400',
+                  selectedLog.severity === 'Crítico' && 'bg-purple-500/15 text-purple-650 dark:text-purple-400 border border-purple-500/30'
+                )}>
+                  {selectedLog.severity}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Resultado</span>
+                <span className={cn(
+                  "px-2.5 py-1 rounded text-center block text-[11px] font-bold tracking-wider font-mono",
+                  selectedLog.result === 'Sucesso' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450',
+                  selectedLog.result === 'Falha' && 'bg-red-500/10 text-red-650 dark:text-red-400',
+                  selectedLog.result === 'Bloqueado' && 'bg-amber-500/10 text-amber-650 dark:text-amber-400'
+                )}>
+                  {selectedLog.result}
+                </span>
+              </div>
+            </div>
+
+            {/* Meta Grid */}
+            <div className="grid grid-cols-2 gap-y-3.5 gap-x-2 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100 dark:border-slate-850 p-3 rounded-xl">
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Data e Hora Exata</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono text-left block">{selectedLog.timestamp}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Usuário Responsável</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 text-left block">{selectedLog.user}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Módulo</span>
+                <span className="font-semibold text-slate-850 dark:text-slate-300 text-left block">{selectedLog.module}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Entidade Afetada</span>
+                <span className="font-semibold text-slate-850 dark:text-slate-300 text-left block">{selectedLog.entity}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Operação (BPMN)</span>
+                <span className="font-semibold text-slate-850 dark:text-slate-300 font-mono text-[11px] text-left block">{selectedLog.operation}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-semibold block mb-0.5">Origem da Ação</span>
+                <span className="font-semibold text-slate-850 dark:text-slate-300 capitalize text-left block">{selectedLog.origin}</span>
+              </div>
+            </div>
+
+            {/* Action & Description */}
+            <div>
+              <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Ação Executada</span>
+              <div className="text-xs font-semibold text-slate-800 dark:text-slate-100 bg-slate-100/50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-200/50 dark:border-slate-800 text-left">
+                {selectedLog.action}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Descrição Completa</span>
+              <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed font-sans bg-slate-100/20 dark:bg-slate-900/30 p-2.5 rounded-lg border border-slate-100 dark:border-slate-850 text-left">
+                {selectedLog.description}
+              </p>
+            </div>
+
+            {/* Target ID affected */}
+            {selectedLog.targetId && (
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Registro Afetado</span>
+                <div className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400 bg-sky-500/5 px-2.5 py-1.5 rounded-lg border border-sky-500/10 font-semibold font-mono text-[11px]">
+                  <Database className="w-3.5 h-3.5" />
+                  <span>{selectedLog.targetId}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Diff Values previous vs after */}
+            {(selectedLog.previousValue || selectedLog.newValue) && (
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1.5">Alteração de Estado (Anterior vs Posterior)</span>
+                {renderValueDiff(selectedLog)}
+              </div>
+            )}
+
+            {/* Operational Block/Metadata */}
+            {selectedLog.metadata && Object.keys(selectedLog.metadata).length > 0 && (
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Metadados Adicionais</span>
+                <pre className="text-[10px] text-slate-600 dark:text-slate-455 bg-slate-50 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200/30 dark:border-slate-800/30 overflow-auto font-mono text-left">
+                  {JSON.stringify(selectedLog.metadata, null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
         )}
-      </main>
+      </Modal>
     </div>
   );
 };

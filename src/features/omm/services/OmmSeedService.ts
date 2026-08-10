@@ -45,8 +45,10 @@ const now = () => new Date().toISOString();
 // Helper: resolve equipment type from object name
 // ---------------------------------------------------------------------------
 function resolveEquipmentType(name: string): EquipmentType {
-  if (name.startsWith('V-3') || name.startsWith('V-4')) return 'Sphere';
-  if (name.startsWith('V-')) return 'Vessel';
+  // V-3xx are spherical tanks (e.g. V-301, V-302 — Esferas de Eteno)
+  if (name.startsWith('V-3')) return 'Sphere';
+  // V-4xx are pressurized vessels (e.g. V-401, V-402 — Vasos de Propeno)
+  if (name.startsWith('V-4') || name.startsWith('V-')) return 'Vessel';
   return 'Tank';
 }
 
