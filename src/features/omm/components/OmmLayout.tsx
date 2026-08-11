@@ -90,10 +90,10 @@ export const OmmLayout: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {/* Toolbar aligned to the right, only in movements view */}
+        {activeView === 'movements' && <OmmToolbar />}
       </div>
- 
-      {/* Toolbar (only on movements view) */}
-      {activeView === 'movements' && <OmmToolbar />}
  
       {/* Main content */}
       <div className="flex-1 overflow-hidden flex flex-col">

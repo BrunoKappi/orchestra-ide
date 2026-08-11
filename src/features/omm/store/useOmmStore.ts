@@ -38,6 +38,7 @@ import { seedOmmData, syncActiveMovementsToGlobal } from '../services/OmmSeedSer
 import { ommSimulationEngine } from '../services/OmmSimulationEngine';
 import { simulationEngine } from '../../../services/simulationEngine';
 import { propertyRepo as globalPropertyRepo } from '../../../repository/PropertyRepository';
+import { objectRepo } from '../../../repository/ObjectRepository';
 import { STORAGE_KEYS } from '../../../repository/storageKey';
 import { useLogStore } from '../../../store/useLogStore';
 
@@ -229,21 +230,47 @@ export const useOmmStore = create<OmmStore>()(
         propsByObj[p.targetId][p.name] = p.defaultValue;
       });
 
-      const syncedEquipments = equipmentRepo.getAll().map((eq) => {
-        const props = propsByObj[eq.id];
-        if (!props) return eq;
-        const cap   = parseFloat(props['Capacity']    || String(eq.capacity));
-        const lvl   = parseFloat(props['Level']       || String(eq.currentLevel));
-        const vol   = parseFloat(props['Volume']      || String(eq.currentVolume));
-        const temp  = parseFloat(props['Temperature'] || String(eq.temperature));
-        const press = parseFloat(props['Pressure']    || String(eq.pressure));
-        const dens  = parseFloat(props['Density']     || String(eq.density));
+      const objects = objectRepo.getAll();
+      const allOmmEquipments = equipmentRepo.getAll();
+      const syncedEquipments = objects.map((obj) => {
+        const existing = allOmmEquipments.find((eq) => eq.id === obj.id);
+        const props = propsByObj[obj.id] || {};
+        const cap   = parseFloat(props['Capacity']    || String(existing?.capacity ?? '15000'));
+        const lvl   = parseFloat(props['Level']       || String(existing?.currentLevel ?? '50'));
+        const vol   = parseFloat(props['Volume']      || String(existing?.currentVolume ?? (cap * lvl) / 100));
+        const temp  = parseFloat(props['Temperature'] || String(existing?.temperature ?? '25'));
+        const press = parseFloat(props['Pressure']    || String(existing?.pressure ?? '1.0'));
+        const dens  = parseFloat(props['Density']     || String(existing?.density ?? '720'));
         const flow  = parseFloat(props['Flow']        || '0');
         const flowIn  = flow > 0 ? flow : 0;
         const flowOut = flow < 0 ? Math.abs(flow) : 0;
         const mass = (vol * dens) / 1000;
+
+        const areaId = props['Area'] ? (props['Area'].includes('300') ? 'area-300' : props['Area'].includes('400') ? 'area-400' : 'area-500')
+                     : obj.name.startsWith('TK-3') ? 'area-300'
+                     : obj.name.startsWith('TK-4') ? 'area-400'
+                     : 'area-500';
+
+        const productName = props['Product'] || '';
+        const productId = productName.includes('Nafta') ? 'prod-naphtha'
+                        : productName.includes('Benz')  ? 'prod-benzene'
+                        : productName.includes('Eteno') ? 'prod-ethene'
+                        : productName.includes('Propen') ? 'prod-propene'
+                        : productName.includes('Xileno') ? 'prod-paraxylene'
+                        : null;
+
+        const type = existing?.type || (
+          obj.name.startsWith('V-3') ? 'Sphere' :
+          (obj.name.startsWith('V-4') || obj.name.startsWith('V-')) ? 'Vessel' : 'Tank'
+        );
+
         return {
-          ...eq,
+          id: obj.id,
+          tag: props['Tag'] || obj.name,
+          name: obj.name,
+          type,
+          areaId,
+          productId,
           capacity: cap,
           currentLevel: lvl,
           currentVolume: vol,
@@ -251,10 +278,16 @@ export const useOmmStore = create<OmmStore>()(
           temperature: temp,
           pressure: press,
           density: dens,
-          flowIn,
-          flowOut,
+          isActive: existing?.isActive ?? true,
           isSending: flowOut > 0,
           isReceiving: flowIn > 0,
+          flowIn,
+          flowOut,
+          x: existing?.x ?? 100,
+          y: existing?.y ?? 100,
+          width: existing?.width ?? 90,
+          height: existing?.height ?? 115,
+          color: existing?.color ?? '#3b82f6',
         };
       });
 

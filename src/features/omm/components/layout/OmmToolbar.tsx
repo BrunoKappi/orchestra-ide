@@ -30,7 +30,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
   shortcut,
 }) => {
   const base =
-    "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all select-none cursor-pointer border disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap";
+    "flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold transition-all select-none cursor-pointer border disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap";
   const variants = {
     default:
       "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700",
@@ -56,7 +56,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({
 };
 
 const Separator = () => (
-  <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 shrink-0" />
+  <div className="w-px h-4 bg-slate-200 dark:bg-slate-700 shrink-0" />
 );
 
 export const OmmToolbar: React.FC = () => {
@@ -85,21 +85,21 @@ export const OmmToolbar: React.FC = () => {
     selectedMovement?.status === "Active";
 
   return (
-    <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shrink-0 overflow-x-auto">
+    <div className="flex items-center gap-1.5 bg-transparent shrink-0 overflow-x-auto">
       {/* Search */}
       <div className="relative shrink-0">
-        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
         <input
           type="text"
           value={globalSearch}
           onChange={(e) => setGlobalSearch(e.target.value)}
           placeholder="Buscar..."
-          className="pl-8 pr-3 py-1.5 w-40 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-all"
+          className="pl-7 pr-2.5 py-1 w-40 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-[10px] outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/30 transition-all"
         />
       </div>
 
       <ToolbarButton
-        icon={<RotateCw className="w-3.5 h-3.5" />}
+        icon={<RotateCw className="w-3 h-3" />}
         label="Atualizar"
         onClick={() => refresh()}
         shortcut="Atualizar movimentos"
@@ -109,13 +109,13 @@ export const OmmToolbar: React.FC = () => {
 
       {/* Create */}
       <ToolbarButton
-        icon={<Plus className="w-3.5 h-3.5" />}
+        icon={<Plus className="w-3 h-3" />}
         label="Nova Ordem"
         onClick={() => openOrderDialog()}
         variant="primary"
       />
       <ToolbarButton
-        icon={<Layers className="w-3.5 h-3.5" />}
+        icon={<Layers className="w-3 h-3" />}
         label="Novo Movimento"
         onClick={() => openMovementModal()}
       />
@@ -124,27 +124,27 @@ export const OmmToolbar: React.FC = () => {
 
       {/* Status actions */}
       <ToolbarButton
-        icon={<Play className="w-3.5 h-3.5" />}
+        icon={<Play className="w-3 h-3" />}
         label="Ativar"
         onClick={() => handleStatusChange("Active")}
         disabled={!canActivate}
         variant="success"
       />
       <ToolbarButton
-        icon={<CheckCircle2 className="w-3.5 h-3.5" />}
+        icon={<CheckCircle2 className="w-3 h-3" />}
         label="Completar"
         onClick={() => handleStatusChange("Completed")}
         disabled={!canComplete}
         variant="primary"
       />
       <ToolbarButton
-        icon={<Lock className="w-3.5 h-3.5" />}
+        icon={<Lock className="w-3 h-3" />}
         label="Fechar"
         onClick={() => handleStatusChange("Closed")}
         disabled={!canClose}
       />
       <ToolbarButton
-        icon={<XCircle className="w-3.5 h-3.5" />}
+        icon={<XCircle className="w-3 h-3" />}
         label="Cancelar"
         onClick={() => handleStatusChange("Canceled")}
         disabled={!canCancel}

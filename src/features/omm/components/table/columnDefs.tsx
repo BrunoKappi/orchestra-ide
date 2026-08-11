@@ -209,7 +209,31 @@ const NumberCell: React.FC<{ id: string; number: string }> = ({ id, number }) =>
   );
 };
 
-const TankCell: React.FC<{ tankId: string; tag: string }> = ({ tankId, tag }) => {
+export function getRemainingTime(r: MovementRow): string {
+  if (r.status === 'Completed' || r.status === 'Closed') {
+    return 'Concluído';
+  }
+  if (r.status === 'Canceled') {
+    return '—';
+  }
+  
+  const remainingVolume = Math.max(0, r.plannedVolume - r.currentVolume);
+  const flow = r.currentFlow || r.simFlowRate || r.plannedFlow || 100;
+  
+  const remainingHours = remainingVolume / flow;
+  const totalMinutes = Math.round(remainingHours * 60);
+  
+  if (totalMinutes <= 0) {
+    return 'Concluído';
+  }
+  
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  
+  return h > 0 ? `${h}h ${m}min` : `${m} min`;
+}
+
+export const TankCell: React.FC<{ tankId: string; tag: string }> = ({ tankId, tag }) => {
   const openTelemetryModal = useOmmStore((s) => s.openTelemetryModal);
   return (
     <button
@@ -259,6 +283,10 @@ export const movementColumnDefs: ColDef[] = [
     <TankCell tankId={row.destinationId} tag={row.destinationTag} />
   ), 80),
 
+  col('alignmentCode', 'Alinhamento', (r) => r.alignmentCode, (v) => (
+    <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">{v ?? '—'}</span>
+  ), 95),
+
   col('productName', 'Produto', (r) => r, (_, row) => (
     <span className="flex items-center gap-1.5 text-[11px]">
       <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: row.productColor }} />
@@ -294,6 +322,10 @@ export const movementColumnDefs: ColDef[] = [
     <ProgressInline pct={v} />
   ), 90),
 
+  col('remainingTime', 'Tempo Restante', (r) => r, (_, row) => (
+    <span className="font-mono text-[11px] text-slate-600 dark:text-slate-400">{getRemainingTime(row)}</span>
+  ), 95),
+
   col('currentFlow', 'Vazão', (r) => r.currentFlow, (v) => (
     <span className={`font-mono text-[11px] font-semibold ${v > 0 ? 'text-sky-600 dark:text-sky-400' : 'text-slate-500'}`}>
       {v > 0 ? `${v.toFixed(0)} m³/h` : '—'}
@@ -302,7 +334,7 @@ export const movementColumnDefs: ColDef[] = [
 ];
 
 export const DEFAULT_VISIBLE_COLUMNS = new Set([
-  'select', 'number', 'orderNumber', 'movementTypeName', 'originTag', 'destinationTag',
+  'select', 'number', 'orderNumber', 'movementTypeName', 'originTag', 'destinationTag', 'alignmentCode',
   'productName', 'areaName', 'status', 'priority',
-  'plannedVolume', 'currentVolume', 'percentComplete', 'currentFlow',
+  'plannedVolume', 'currentVolume', 'percentComplete', 'remainingTime', 'currentFlow',
 ]);

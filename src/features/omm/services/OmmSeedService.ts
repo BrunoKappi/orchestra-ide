@@ -190,15 +190,19 @@ export function seedOmmData(): void {
   // 4. Movement Types
   // -------------------------------------------------------------------------
   const movementTypes: OmmMovementTypeConfig[] = [
-    { id: 'mtype-t2t',  code: 'TankToTank',    name: 'Tanque → Tanque',    category: 'Internal',  color: '#3b82f6', description: 'Transferência entre tanques atmosféricos', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-t2s',  code: 'TankToSphere',  name: 'Tanque → Esfera',    category: 'Internal',  color: '#06b6d4', description: 'Transferência de tanque para esfera pressurizada', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-s2t',  code: 'SphereToTank',  name: 'Esfera → Tanque',    category: 'Internal',  color: '#0891b2', description: 'Transferência de esfera para tanque atmosférico', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-t2a',  code: 'TankToArea',    name: 'Tanque → Área',      category: 'Transfer',  color: '#8b5cf6', description: 'Transferência de tanque para área de processo', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-a2t',  code: 'AreaToTank',    name: 'Área → Tanque',      category: 'Transfer',  color: '#7c3aed', description: 'Transferência de área de processo para tanque', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-a2a',  code: 'AreaToArea',    name: 'Área → Área',        category: 'Transfer',  color: '#6d28d9', description: 'Transferência entre áreas de processo', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-load', code: 'Loading',       name: 'Carregamento',       category: 'External',  color: '#f59e0b', description: 'Carregamento em caminhão, vagão ou navio', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-unld', code: 'Unloading',     name: 'Descarregamento',    category: 'External',  color: '#d97706', description: 'Recebimento de produto externo', active: true, createdAt: now(), updatedAt: now() },
-    { id: 'mtype-recirc', code: 'Recirculation', name: 'Recirculação',     category: 'Internal',  color: '#64748b', description: 'Recirculação interna do equipamento', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-t2t',  code: 'TankToTank',          name: 'Tanque → Tanque',          category: 'Internal',      color: '#3b82f6', description: 'Transferência entre tanques atmosféricos', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-p2t',  code: 'PipelineToTank',      name: 'Duto → Tanque',            category: 'Import',        color: '#06b6d4', description: 'Transferência de duto de importação para tanque', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-t2p',  code: 'TankToPipeline',      name: 'Tanque → Duto',            category: 'Export',        color: '#0891b2', description: 'Transferência de tanque para duto de exportação', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-m2t',  code: 'ManifoldToTank',      name: 'Manifold → Tanque',        category: 'Internal',      color: '#10b981', description: 'Transferência do manifold de distribuição para tanque', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-t2m',  code: 'TankToManifold',      name: 'Tanque → Manifold',        category: 'Internal',      color: '#059669', description: 'Transferência de tanque para o manifold de distribuição', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-t2u',  code: 'TankToUnit',          name: 'Tanque → Unidade',         category: 'Export',        color: '#8b5cf6', description: 'Alimentação de unidade de processo a partir de tanque', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-u2t',  code: 'UnitToTank',          name: 'Unidade → Tanque',         category: 'Import',        color: '#7c3aed', description: 'Recebimento de produto da unidade de processo para tanque', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-u2u',  code: 'UnitToUnit',          name: 'Unidade → Unidade',        category: 'Internal',      color: '#6d28d9', description: 'Transferência direta entre unidades de processo', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-u2m',  code: 'UnitToManifold',       name: 'Unidade → Manifold',       category: 'Internal',      color: '#ec4899', description: 'Transferência de unidade de processo para manifold', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-m2u',  code: 'ManifoldToUnit',      name: 'Manifold → Unidade',       category: 'Internal',      color: '#db2777', description: 'Transferência de manifold para unidade de processo', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-m2m',  code: 'ManifoldToManifold',  name: 'Manifold → Manifold',      category: 'Internal',      color: '#f43f5e', description: 'Transferência entre manifolds de distribuição', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-t2h',  code: 'TankToHolding',       name: 'Tanque → Espera',          category: 'Internal',      color: '#f59e0b', description: 'Transferência de tanque para linha/tanque de espera', active: true, createdAt: now(), updatedAt: now() },
+    { id: 'mtype-h2t',  code: 'HoldingToTank',       name: 'Espera → Tanque',          category: 'Internal',      color: '#d97706', description: 'Transferência de linha/tanque de espera para tanque', active: true, createdAt: now(), updatedAt: now() },
   ];
   movementTypeRepo.saveAll(movementTypes);
 
@@ -511,7 +515,7 @@ export function seedOmmData(): void {
       orderId: 'ord-2',
       number: 'MOV-0003',
       description: 'Transferência de Eteno V-301 → V-302 (concluída)',
-      typeId: 'mtype-t2s',
+      typeId: 'mtype-t2t',
       productId: 'prod-ethene',
       areaId: 'area-500',
       originId: 'tank-v-301',
@@ -579,7 +583,7 @@ export function seedOmmData(): void {
       orderId: 'ord-2',
       number: 'MOV-0005',
       description: 'Transferência de Eteno V-302 → V-301 (fechada)',
-      typeId: 'mtype-t2s',
+      typeId: 'mtype-t2t',
       productId: 'prod-ethene',
       areaId: 'area-500',
       originId: 'tank-v-302',

@@ -192,8 +192,12 @@ export const MovementModal: React.FC = () => {
   const mark = useCallback(() => setDirty(true), []);
 
   const handleSave = () => {
-    if (!productId || !originId || !destinationId) {
-      alert('Produto, Origem e Destino são obrigatórios.');
+    if (!alignmentId) {
+      alert('Alinhamento é obrigatório.');
+      return;
+    }
+    if (!productId) {
+      alert('Produto é obrigatório.');
       return;
     }
     const payload: Partial<OmmMovement> = {
@@ -206,7 +210,7 @@ export const MovementModal: React.FC = () => {
       operatorId,
       originId,
       destinationId,
-      alignmentId: alignmentId || null,
+      alignmentId,
       plannedVolume,
       plannedFlow,
       engUnitId,
@@ -253,11 +257,6 @@ export const MovementModal: React.FC = () => {
     { value: '', label: '— Sem Operador —' },
     ...securityUsers.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` })),
   ], [securityUsers]);
-
-  const equipOptions = useMemo(() => [
-    { value: '', label: 'Selecione equipamento...' },
-    ...equipments.map((e) => ({ value: e.id, label: `${e.tag} — ${e.name}`, subLabel: e.type, color: e.color })),
-  ], [equipments]);
 
   const alignmentOptions = useMemo(() => [
     { value: '', label: '— Nenhum —' },
@@ -359,116 +358,143 @@ export const MovementModal: React.FC = () => {
   );
 
   // ---- Movement Tab ----
-  const renderMovement = () => (
-    <div className="grid grid-cols-2 gap-4 p-5">
-      <FormField label="Origem" required hint={equipments.find((e) => e.id === originId)?.tag}>
-        <SearchableSelect
-          value={originId}
-          onChange={(val: string) => { setOriginId(val); mark(); }}
-          options={equipOptions}
-          disabled={cannotChangeRoute}
-        />
-      </FormField>
+  const renderMovement = () => {
+    const fromEq = equipments.find((e) => e.id === originId);
+    const toEq   = equipments.find((e) => e.id === destinationId);
 
-      <FormField label="Destino" required hint={equipments.find((e) => e.id === destinationId)?.tag}>
-        <SearchableSelect
-          value={destinationId}
-          onChange={(val: string) => { setDestinationId(val); mark(); }}
-          options={equipOptions}
-          disabled={cannotChangeRoute}
-        />
-      </FormField>
-
-      {originId && (
-        <div
-          onClick={() => setTelemetryTankId(originId)}
-          className="bg-slate-50 dark:bg-slate-800/60 hover:bg-sky-500/5 dark:hover:bg-slate-800 hover:border-sky-500/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer group"
-          title="Clique para ver telemetria"
-        >
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">Origem — {equipments.find((e) => e.id === originId)?.tag}</div>
-            <span className="text-[9px] text-sky-600 dark:text-sky-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">Detalhes</span>
-          </div>
-          <div className="space-y-1">
-            {[
-              ['Tipo', equipments.find((e) => e.id === originId)?.type],
-              ['Nível', `${(equipments.find((e) => e.id === originId)?.currentLevel ?? 0).toFixed(1)}%`],
-              ['Volume', `${(equipments.find((e) => e.id === originId)?.currentVolume ?? 0).toFixed(1)} m³`],
-              ['Capacidade', `${(equipments.find((e) => e.id === originId)?.capacity ?? 0).toFixed(0)} m³`],
-            ].map(([label, value]) => (
-              <div key={label} className="flex justify-between text-xs">
-                <span className="text-slate-500 dark:text-slate-400">{label}</span>
-                <span className="text-slate-800 dark:text-slate-200 font-mono">{value}</span>
-              </div>
-            ))}
-          </div>
+    return (
+      <div className="grid grid-cols-2 gap-4 p-5">
+        <div className="col-span-2">
+          <FormField label="Alinhamento (Rota)" required>
+            <SearchableSelect
+              value={alignmentId}
+              onChange={(val: string) => {
+                setAlignmentId(val);
+                const selectedAlign = alignments.find((a) => a.id === val);
+                if (selectedAlign) {
+                  setOriginId(selectedAlign.fromEquipmentId);
+                  setDestinationId(selectedAlign.toEquipmentId);
+                } else {
+                  setOriginId('');
+                  setDestinationId('');
+                }
+                mark();
+              }}
+              options={alignmentOptions}
+              disabled={cannotChangeRoute}
+            />
+          </FormField>
         </div>
-      )}
 
-      {destinationId && (
-        <div
-          onClick={() => setTelemetryTankId(destinationId)}
-          className="bg-slate-50 dark:bg-slate-800/60 hover:bg-sky-500/5 dark:hover:bg-slate-800 hover:border-sky-500/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer group"
-          title="Clique para ver telemetria"
-        >
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">Destino — {equipments.find((e) => e.id === destinationId)?.tag}</div>
-            <span className="text-[9px] text-sky-600 dark:text-sky-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">Detalhes</span>
-          </div>
-          <div className="space-y-1">
-            {[
-              ['Tipo', equipments.find((e) => e.id === destinationId)?.type],
-              ['Nível', `${(equipments.find((e) => e.id === destinationId)?.currentLevel ?? 0).toFixed(1)}%`],
-              ['Volume', `${(equipments.find((e) => e.id === destinationId)?.currentVolume ?? 0).toFixed(1)} m³`],
-              ['Cap. Disponível', `${Math.max(0, (equipments.find((e) => e.id === destinationId)?.capacity ?? 0) - (equipments.find((e) => e.id === destinationId)?.currentVolume ?? 0)).toFixed(0)} m³`],
-            ].map(([label, value]) => (
-              <div key={label} className="flex justify-between text-xs">
-                <span className="text-slate-500 dark:text-slate-400">{label}</span>
-                <span className="text-slate-800 dark:text-slate-200 font-mono">{value}</span>
-              </div>
-            ))}
-          </div>
+        {/* Read-only Origin display */}
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Origem (Preenchida pelo Alinhamento)
+          </label>
+          <input
+            type="text"
+            readOnly
+            className="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-500 dark:text-slate-400 focus:outline-none cursor-not-allowed"
+            value={fromEq ? `${fromEq.tag} — ${fromEq.name}` : 'Nenhum alinhamento selecionado'}
+          />
         </div>
-      )}
 
-      <FormField label="Alinhamento">
-        <SearchableSelect
-          value={alignmentId}
-          onChange={(val: string) => { setAlignmentId(val); mark(); }}
-          options={alignmentOptions}
-        />
-      </FormField>
+        {/* Read-only Destination display */}
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Destino (Preenchida pelo Alinhamento)
+          </label>
+          <input
+            type="text"
+            readOnly
+            className="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-500 dark:text-slate-400 focus:outline-none cursor-not-allowed"
+            value={toEq ? `${toEq.tag} — ${toEq.name}` : 'Nenhum alinhamento selecionado'}
+          />
+        </div>
 
-      <FormField label="Quantidade Planejada" required hint={`Unidade: ${currentUnit?.symbol ?? 'm³'}`}>
-        <div className="grid grid-cols-[1fr_100px] gap-2">
+        {originId && (
+          <div
+            onClick={() => setTelemetryTankId(originId)}
+            className="bg-slate-50 dark:bg-slate-800/60 hover:bg-sky-500/5 dark:hover:bg-slate-800 hover:border-sky-500/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer group"
+            title="Clique para ver telemetria"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">Origem — {fromEq?.tag}</div>
+              <span className="text-[9px] text-sky-600 dark:text-sky-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">Detalhes</span>
+            </div>
+            <div className="space-y-1">
+              {[
+                ['Tipo', fromEq?.type],
+                ['Nível', `${(fromEq?.currentLevel ?? 0).toFixed(1)}%`],
+                ['Volume', `${(fromEq?.currentVolume ?? 0).toFixed(1)} m³`],
+                ['Capacidade', `${(fromEq?.capacity ?? 0).toFixed(0)} m³`],
+              ].map(([label, value]) => (
+                <div key={label} className="flex justify-between text-xs">
+                  <span className="text-slate-500 dark:text-slate-400">{label}</span>
+                  <span className="text-slate-800 dark:text-slate-200 font-mono">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {destinationId && (
+          <div
+            onClick={() => setTelemetryTankId(destinationId)}
+            className="bg-slate-50 dark:bg-slate-800/60 hover:bg-sky-500/5 dark:hover:bg-slate-800 hover:border-sky-500/30 rounded-lg p-3 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer group"
+            title="Clique para ver telemetria"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">Destino — {toEq?.tag}</div>
+              <span className="text-[9px] text-sky-600 dark:text-sky-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">Detalhes</span>
+            </div>
+            <div className="space-y-1">
+              {[
+                ['Tipo', toEq?.type],
+                ['Nível', `${(toEq?.currentLevel ?? 0).toFixed(1)}%`],
+                ['Volume', `${(toEq?.currentVolume ?? 0).toFixed(1)} m³`],
+                ['Cap. Disponível', `${Math.max(0, (toEq?.capacity ?? 0) - (toEq?.currentVolume ?? 0)).toFixed(0)} m³`],
+              ].map(([label, value]) => (
+                <div key={label} className="flex justify-between text-xs">
+                  <span className="text-slate-500 dark:text-slate-400">{label}</span>
+                  <span className="text-slate-800 dark:text-slate-200 font-mono">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <FormField label="Quantidade Planejada" required hint={`Unidade: ${currentUnit?.symbol ?? 'm³'}`}>
+          <div className="grid grid-cols-[1fr_100px] gap-2">
+            <input
+              type="number"
+              min={0}
+              step={100}
+              className={inputCls}
+              value={plannedVolume}
+              onChange={(e) => { setPlannedVolume(parseFloat(e.target.value) || 0); mark(); }}
+            />
+            <SearchableSelect
+              value={engUnitId}
+              onChange={(val: string) => { setEngUnitId(val); mark(); }}
+              options={unitOptions}
+            />
+          </div>
+        </FormField>
+
+        <FormField label="Vazão Planejada" hint="m³/h">
           <input
             type="number"
             min={0}
-            step={100}
+            step={10}
             className={inputCls}
-            value={plannedVolume}
-            onChange={(e) => { setPlannedVolume(parseFloat(e.target.value) || 0); mark(); }}
+            value={plannedFlow}
+            onChange={(e) => { setPlannedFlow(parseFloat(e.target.value) || 0); mark(); }}
           />
-          <SearchableSelect
-            value={engUnitId}
-            onChange={(val: string) => { setEngUnitId(val); mark(); }}
-            options={unitOptions}
-          />
-        </div>
-      </FormField>
-
-      <FormField label="Vazão Planejada" hint="m³/h">
-        <input
-          type="number"
-          min={0}
-          step={10}
-          className={inputCls}
-          value={plannedFlow}
-          onChange={(e) => { setPlannedFlow(parseFloat(e.target.value) || 0); mark(); }}
-        />
-      </FormField>
-    </div>
-  );
+        </FormField>
+      </div>
+    );
+  };
 
   // ---- Flow View Tab ----
   const renderFlow = () => (
