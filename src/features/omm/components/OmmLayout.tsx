@@ -13,6 +13,7 @@ import { OrderDialog } from './ui/OrderDialog';
 import { MovementModal } from './ui/MovementModal';
 import { TankTelemetryModal } from './ui/TankTelemetryModal';
 import { OverviewDashboard } from './views/OverviewDashboard';
+import { SimulationCalculator } from './views/SimulationCalculator';
 
 // ---------------------------------------------------------------------------
 // View tab bar
@@ -24,6 +25,7 @@ const VIEW_TABS: { id: string; label: string }[] = [
   { id: 'timeline',  label: 'Timeline' },
   { id: 'inventory', label: 'Inventário' },
   { id: 'cutoff',    label: 'Cut-off' },
+  { id: 'calculator', label: 'Calculadora' },
   { id: 'admin',     label: 'Admin' },
 ];
 
@@ -49,6 +51,7 @@ export const OmmLayout: React.FC = () => {
       case 'timeline':  return <MovementTimeline />;
       case 'inventory': return <InventoryDashboard />;
       case 'cutoff':    return <CutoffHistory />;
+      case 'calculator': return <SimulationCalculator />;
       case 'admin':     return <AdminPanel />;
       default:          return (
         <div className="flex flex-1 overflow-hidden">

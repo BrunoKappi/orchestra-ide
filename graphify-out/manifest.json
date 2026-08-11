@@ -395,8 +395,8 @@
     "semantic_hash": "f7d57b587abceb595d5f22bd3bf55797"
   },
   "src/features/omm/components/OmmLayout.tsx": {
-    "mtime": 1786469516.1462598,
-    "ast_hash": "0dd82e6f9063e600e635880daa3c0757",
+    "mtime": 1786470090.9936187,
+    "ast_hash": "5c1414a6f1ffc69bace07886ed2d03f1",
     "semantic_hash": ""
   },
   "src/features/omm/components/admin/AdminPanel.tsx": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "src/features/omm/types/index.ts": {
-    "mtime": 1786404199.3876252,
-    "ast_hash": "f5b77214773c34d872445844d86af9d3",
+    "mtime": 1786470003.989192,
+    "ast_hash": "1aa039180b5ac7345b68db5282f897c7",
     "semantic_hash": ""
   },
   "src/pages/OmmPage.tsx": {
@@ -907,6 +907,16 @@
   "src/utils/trendHistorySimulator.ts": {
     "mtime": 1786455648.6563513,
     "ast_hash": "3b07d10e3af79f4840a67d4b3383a3b4",
+    "semantic_hash": ""
+  },
+  "src/features/omm/components/views/SimulationCalculator.tsx": {
+    "mtime": 1786470167.2720225,
+    "ast_hash": "1a16fcb4c62e982cf20ba8ea9c1ea34d",
+    "semantic_hash": ""
+  },
+  "src/features/omm/utils/strappingUtils.ts": {
+    "mtime": 1786470015.3385518,
+    "ast_hash": "cab90757fec179f015c41211ccecb8b6",
     "semantic_hash": ""
   }
 }

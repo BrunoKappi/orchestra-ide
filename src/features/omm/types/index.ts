@@ -377,7 +377,7 @@ export interface OmmStoreState {
   // UI state
   selectedMovementId: string | null;
   selectedOrderId: string | null;
-  activeView: 'overview' | 'movements' | 'plant' | 'timeline' | 'inventory' | 'cutoff' | 'admin';
+  activeView: 'overview' | 'movements' | 'plant' | 'timeline' | 'inventory' | 'cutoff' | 'admin' | 'calculator';
   tableFilters: Record<string, string>;
   globalSearch: string;
   tableGroupBy: string | null;
