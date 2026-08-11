@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useOmmStore } from '../store/useOmmStore';
-import { OmmKpiHeader } from './layout/OmmKpiHeader';
+
 import { OmmToolbar } from './layout/OmmToolbar';
 import { MovementTable } from './table/MovementTable';
 import { PlantOverview } from './views/PlantOverview';
@@ -91,9 +91,6 @@ export const OmmLayout: React.FC = () => {
           </div>
         </div>
       </div>
- 
-      {/* KPI header (only on movements view) */}
-      {activeView === 'movements' && <OmmKpiHeader />}
  
       {/* Toolbar (only on movements view) */}
       {activeView === 'movements' && <OmmToolbar />}

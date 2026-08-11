@@ -8,7 +8,7 @@ import { deploymentRepo } from '../repository/DeploymentRepository';
 import { associatedWidgetRepo } from '../repository/AssociatedWidgetRepository';
 import { mockConfigRepo } from '../repository/MockConfigRepository';
 import { alarmRepo } from '../repository/AlarmRepository';
-import type { ProductEntity, AreaEntity, EquipmentGraphicConfig, PropertyEntity, PropertyAlarmConfig } from '../types/domain';
+import type { ProductEntity, AreaEntity, EquipmentGraphicConfig, PropertyEntity, PropertyAlarmConfig, TankStrappingConfig, StrappingPoint } from '../types/domain';
 import { AlarmEngine } from './AlarmEngine';
 import { inheritanceService } from './InheritanceService';
 
@@ -16,6 +16,85 @@ import { inheritanceService } from './InheritanceService';
 // Helper: create a PropertyEntity skeleton
 // ---------------------------------------------------------------------------
 type PropDef = Omit<PropertyEntity, 'id' | 'createdAt' | 'updatedAt'>;
+
+// ---------------------------------------------------------------------------
+// Helpers: generate strapping (capacity table) points by geometry
+// ---------------------------------------------------------------------------
+
+/** Vertical cylindrical tank: volume is perfectly linear with level percentage */
+function strappingVertical(nominalCapacity: number, referenceHeight: number, steps = 19): TankStrappingConfig {
+  const points: StrappingPoint[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const levelPct = parseFloat(((i / steps) * 100).toFixed(1));
+    const volume = parseFloat(((levelPct / 100) * nominalCapacity).toFixed(1));
+    points.push({ level: levelPct, volume });
+  }
+  return {
+    levelUnit: '%',
+    volumeUnit: 'm³',
+    referenceHeight,
+    nominalCapacity,
+    points,
+    notes: 'Tabela gerada automaticamente — tanque cilíndrico vertical (relação linear)',
+  };
+}
+
+/**
+ * Horizontal cylindrical tank: cross-section area of circular segment — non-linear.
+ * Volume at height h in a cylinder of diameter D and length L:
+ *   V(h) = L * [ (D²/4) * arccos((R-h)/R) - (R-h) * sqrt(2*R*h - h²) ]
+ * Here we parametrise on level % of diameter D.
+ */
+function strappingHorizontal(nominalCapacity: number, diameter: number, steps = 20): TankStrappingConfig {
+  const R = diameter / 2;
+  // Estimate cylinder length from nominal capacity and diameter
+  const L = nominalCapacity / (Math.PI * R * R);
+  const points: StrappingPoint[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const levelPct = parseFloat(((i / steps) * 100).toFixed(1));
+    const h = (levelPct / 100) * diameter;
+    const area = R * R * Math.acos((R - h) / R) - (R - h) * Math.sqrt(2 * R * h - h * h);
+    const rawVol = L * area;
+    const volume = parseFloat(Math.max(0, Math.min(rawVol, nominalCapacity)).toFixed(1));
+    points.push({ level: levelPct, volume });
+  }
+  return {
+    levelUnit: '%',
+    volumeUnit: 'm³',
+    referenceHeight: diameter,
+    nominalCapacity,
+    points,
+    notes: 'Tabela gerada automaticamente — tanque cilíndrico horizontal (relação setor circular)',
+  };
+}
+
+/**
+ * Spherical / pressurized vessel: volume of spherical cap.
+ *   V(h) = π * h² * (3R - h) / 3
+ * where R = D/2, h = fill height from 0 to D.
+ * Parametrised on level % of diameter D.
+ */
+function strappingSpherical(nominalCapacity: number, diameter: number, steps = 20): TankStrappingConfig {
+  const R = diameter / 2;
+  const vFull = (4 / 3) * Math.PI * R * R * R;
+  const scaleFactor = nominalCapacity / vFull;
+  const points: StrappingPoint[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const levelPct = parseFloat(((i / steps) * 100).toFixed(1));
+    const h = (levelPct / 100) * diameter;
+    const rawVol = (Math.PI * h * h * (3 * R - h)) / 3;
+    const volume = parseFloat(Math.max(0, Math.min(rawVol * scaleFactor, nominalCapacity)).toFixed(1));
+    points.push({ level: levelPct, volume });
+  }
+  return {
+    levelUnit: '%',
+    volumeUnit: 'm³',
+    referenceHeight: diameter,
+    nominalCapacity,
+    points,
+    notes: 'Tabela gerada automaticamente — tanque esférico/pressurizado (calota esférica)',
+  };
+}
 
 function makeProp(
   targetId: string,
@@ -567,6 +646,25 @@ export class SeedService {
         : seed.geometry === 'pressurized' ? tplPressurized.graphicConfig
         : tplAtm.graphicConfig;
 
+      // Compute strapping config from geometry
+      let strappingConfig: TankStrappingConfig;
+      if (seed.geometry === 'horizontal_cylindrical') {
+        // diameter estimated from capacity and a reasonable aspect ratio (L ≈ 3×D)
+        const diameter = Math.cbrt(seed.capacity / (3 * Math.PI / 4));
+        strappingConfig = strappingHorizontal(seed.capacity, Math.round(diameter * 10) / 10);
+      } else if (seed.geometry === 'spherical') {
+        const diameter = 2 * Math.cbrt((3 * seed.capacity) / (4 * Math.PI));
+        strappingConfig = strappingSpherical(seed.capacity, Math.round(diameter * 10) / 10);
+      } else if (seed.geometry === 'pressurized') {
+        // Pressurized vessel — use spherical approximation with a smaller effective diameter
+        const diameter = 2 * Math.cbrt((3 * seed.capacity) / (4 * Math.PI)) * 0.8;
+        strappingConfig = strappingSpherical(seed.capacity, Math.round(diameter * 10) / 10);
+      } else {
+        // Default: vertical cylindrical — linear relationship
+        const refHeight = seed.capacity >= 10000 ? 18 : seed.capacity >= 5000 ? 12 : 8;
+        strappingConfig = strappingVertical(seed.capacity, refHeight);
+      }
+
       // Save ObjectEntity
       objectRepo.save({
         id: seed.id,
@@ -578,6 +676,7 @@ export class SeedService {
           ...tplGraphic,
           geometryType: seed.geometry,
         },
+        strappingConfig,
         createdAt: now,
         updatedAt: now,
       });

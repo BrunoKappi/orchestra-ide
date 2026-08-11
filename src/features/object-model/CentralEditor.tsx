@@ -6,10 +6,12 @@ import {
   ListFilter,
   Layers,
   Trash2,
+  BarChart3,
 } from "lucide-react";
 import { useObjectModelStore } from "../../store/useObjectModelStore";
 import { PropertiesTable } from "./PropertiesTable";
 import { EquipmentGraphicConfigEditor } from "./EquipmentGraphicConfigEditor";
+import { StrappingConfigEditor } from "./StrappingConfigEditor";
 import { PropertyModal } from "./PropertyModal";
 import { ExportImportModal } from "./ExportImportModal";
 import { MockConfigModal } from "./MockConfigModal";
@@ -248,14 +250,28 @@ export const CentralEditor: React.FC = () => {
           <Layers className="w-4 h-4 text-amber-500" />
           <span>Gráfico do Equipamento</span>
         </button>
+
+        <button
+          onClick={() => setActiveEditorTab("strapping")}
+          className={cn(
+            "flex items-center gap-2 py-3 px-4 border-b-2 font-semibold transition-colors duration-150 cursor-pointer",
+            activeEditorTab === "strapping"
+              ? "border-sky-600 text-sky-600 dark:text-sky-400 bg-white dark:bg-slate-900"
+              : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
+          )}>
+          <BarChart3 className="w-4 h-4 text-emerald-500" />
+          <span>Arqueação</span>
+        </button>
       </div>
 
       {/* Tab Content Display */}
       <div className="flex-1 overflow-hidden flex flex-col bg-slate-50/30 dark:bg-slate-950">
         {activeEditorTab === "properties" ? (
           <PropertiesTable />
-        ) : (
+        ) : activeEditorTab === "graphics" ? (
           <EquipmentGraphicConfigEditor />
+        ) : (
+          <StrappingConfigEditor />
         )}
       </div>
 

@@ -107,20 +107,6 @@ export const HeaderNavigation = () => {
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
     {
-      to: "/widgets",
-      label: "Widgets",
-      icon: Shapes,
-      colorClass: "text-emerald-500",
-      activeTextClass: "text-emerald-600 dark:text-emerald-400",
-    },
-    {
-      to: "/flows",
-      label: "Fluxogramas",
-      icon: Workflow,
-      colorClass: "text-sky-500",
-      activeTextClass: "text-sky-600 dark:text-sky-400",
-    },
-    {
       to: "/simulator",
       label: "Simulador",
       icon: Activity,
@@ -128,11 +114,11 @@ export const HeaderNavigation = () => {
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
     {
-      to: "/screens",
-      label: "Telas",
-      icon: Monitor,
-      colorClass: "text-violet-500",
-      activeTextClass: "text-violet-600 dark:text-violet-400",
+      to: "/grid-dashboard",
+      label: "Grid Designer",
+      icon: LayoutGrid,
+      colorClass: "text-amber-500",
+      activeTextClass: "text-amber-600 dark:text-amber-400",
     },
     {
       to: "/runtime",
@@ -165,6 +151,34 @@ export const HeaderNavigation = () => {
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
     {
+      to: "/logs",
+      label: "Logs e Auditoria",
+      icon: History,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/widgets",
+      label: "Widgets",
+      icon: Shapes,
+      colorClass: "text-emerald-500",
+      activeTextClass: "text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      to: "/flows",
+      label: "Fluxogramas",
+      icon: Workflow,
+      colorClass: "text-sky-500",
+      activeTextClass: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      to: "/screens",
+      label: "Telas",
+      icon: Monitor,
+      colorClass: "text-violet-500",
+      activeTextClass: "text-violet-600 dark:text-violet-400",
+    },
+    {
       to: "/opc-browser",
       label: "OPC Browser",
       icon: Network,
@@ -182,20 +196,6 @@ export const HeaderNavigation = () => {
       to: "/security",
       label: "Usuários e Segurança",
       icon: Shield,
-      colorClass: "text-sky-500",
-      activeTextClass: "text-sky-600 dark:text-sky-400",
-    },
-    {
-      to: "/grid-dashboard",
-      label: "Grid Designer",
-      icon: LayoutGrid,
-      colorClass: "text-amber-500",
-      activeTextClass: "text-amber-600 dark:text-amber-400",
-    },
-    {
-      to: "/logs",
-      label: "Logs e Auditoria",
-      icon: History,
       colorClass: "text-sky-500",
       activeTextClass: "text-sky-600 dark:text-sky-400",
     },
@@ -318,12 +318,12 @@ export const HeaderNavigation = () => {
           className="flex items-center gap-2 select-none shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
         >
           <img
-            src="/SerranoIcon.png"
-            alt="Serrano Logo"
+            src="/BraskemIcon.png"
+            alt="Braskem Logo"
             className="w-7 h-7 object-contain"
           />
           <span className="text-base font-bold text-gray-600 dark:text-slate-100 tracking-wide">
-            Serrano Automação
+            Gestão de Inventários
           </span>
         </div>
       </div>
@@ -371,7 +371,7 @@ export const HeaderNavigation = () => {
                     className={cn(
                       "flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors",
                       isActive
-                        ? "bg-sky-950/40 text-sky-400 dark:bg-sky-950/40 dark:text-sky-400"
+                        ? "bg-sky-50 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700",
                     )}>
                     <div className="flex items-center gap-2">
@@ -454,7 +454,7 @@ export const HeaderNavigation = () => {
         {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-350 transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
           title="Toggle Light/Dark Theme">
           {theme === "dark" ? (
             <Sun className="w-4 h-4 text-amber-400" />

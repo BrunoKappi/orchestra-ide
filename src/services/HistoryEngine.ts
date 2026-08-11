@@ -104,7 +104,8 @@ export const historyEngine = {
     const collectionMode = config?.collectionMode ?? 'interval';
     if (collectionMode === 'interval') {
       const last = lastRecordedAt.get(k) ?? 0;
-      if (now - last < intervalMs) return false;
+      // Allow 50ms tolerance for setInterval variance
+      if (now - last < intervalMs - 50) return false;
 
       // If deadband check is required in interval mode
       if (prevValue !== undefined && deadband > 0) {

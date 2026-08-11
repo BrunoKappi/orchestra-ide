@@ -189,7 +189,7 @@ export const OverviewDashboard: React.FC = () => {
                   return (
                     <div 
                       key={mov.id} 
-                      className="group border border-slate-150 dark:border-slate-800/80 rounded-xl p-4 hover:border-sky-500/30 transition-colors flex flex-col gap-3.5 bg-slate-50/20 dark:bg-slate-950/20"
+                      className="group border border-slate-200/70 dark:border-slate-700/40 rounded-xl p-4 hover:border-sky-400/40 dark:hover:border-sky-500/30 transition-colors flex flex-col gap-3.5 bg-slate-50/30 dark:bg-slate-800/10"
                     >
                       {/* Top info */}
                       <div className="flex items-start justify-between gap-4">
@@ -198,8 +198,8 @@ export const OverviewDashboard: React.FC = () => {
                             <span className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-405 transition-colors">
                               {mov.number || mov.id.toUpperCase()}
                             </span>
-                            <span className="px-2 py-0.2 rounded-md text-[9px] font-mono font-bold bg-sky-500/10 text-sky-600 dark:text-sky-455 border border-sky-500/15">
-                              {mov.productId.replace('prod-', '').toUpperCase()}
+                            <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/15">
+                              {mov.productName || mov.productId.replace('prod-', '').toUpperCase()}
                             </span>
                           </div>
                           <p className="text-[10px] text-slate-500 mt-0.5 font-medium leading-normal">
@@ -224,15 +224,15 @@ export const OverviewDashboard: React.FC = () => {
                         <div className="flex items-center justify-between text-[9px] text-slate-500 font-semibold font-mono">
                           <span>{mov.currentVolume.toFixed(0)} / {mov.plannedVolume.toFixed(0)} m³ ({progress.toFixed(1)}%)</span>
                           <span className="flex items-center gap-1 font-sans">
-                            <Clock className="w-3.5 h-3.5 text-sky-500" /> ETC: <span className="font-mono">{mov.etoc || 'calculando...'}</span>
+                            <Clock className="w-3.5 h-3.5 text-sky-500" /> Prev. Conclusão: <span className="font-mono">{mov.etoc ? new Date(mov.etoc).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'calculando...'}</span>
                           </span>
                         </div>
                       </div>
 
                       {/* Alignments tags */}
-                      <div className="flex items-center justify-between text-[10px] pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                        <span className="text-slate-500 font-medium">Via: <span className="font-semibold text-slate-600 dark:text-slate-350">{mov.alignmentCode || 'Alinhamento Manual'}</span></span>
-                        <span className="text-slate-500 font-medium">Operador: <span className="font-semibold text-slate-600 dark:text-slate-350">{mov.operatorName}</span></span>
+                      <div className="flex items-center justify-between text-[10px] pt-2 border-t border-slate-100 dark:border-slate-700/40">
+                          <span className="text-slate-500 font-medium">Via: <span className="font-semibold text-slate-600 dark:text-slate-300">{mov.alignmentCode || 'Alinhamento Manual'}</span></span>
+                          <span className="text-slate-500 font-medium">{mov.originTag || mov.originId} → {mov.destinationTag || mov.destinationId}</span>
                       </div>
                     </div>
                   );

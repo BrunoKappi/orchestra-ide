@@ -79,7 +79,10 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
-      setSize({ width: entry.contentRect.width, height: entry.contentRect.height });
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setSize({ width, height });
+      }
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -245,7 +248,19 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
     return () => el.removeEventListener('wheel', handleWheel);
   }, [fromMs, toMs, timeRange, innerW, onViewRangeChange]);
 
-  if (data.length === 0 || data.every((d) => d.samples.length === 0)) {
+  // Check if there are any samples overall for the selected variables,
+  // to avoid showing the empty state if the user just scrolled out of the current viewport.
+  const hasAnySamplesOverall = useMemo(() => {
+    return data.some((d) => {
+      const allSamples = historyEngine.query({
+        objectId: d.variable.objectId,
+        propertyId: d.variable.propertyId,
+      });
+      return allSamples.length > 0;
+    });
+  }, [data]);
+
+  if (data.length === 0 || !hasAnySamplesOverall) {
     const hasVars = data.length > 0;
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-3">
@@ -267,7 +282,7 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full"
+      className="relative flex-1 w-full"
       onMouseLeave={() => { setTooltip(null); handleMouseUp(); }}
     >
       {/* Zoom & Reset Overlay Buttons */}
@@ -299,8 +314,9 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
 
       <svg
         ref={svgRef}
-        width={size.width}
-        height={size.height}
+        viewBox={`0 0 ${size.width} ${size.height}`}
+        width="100%"
+        height="100%"
         className={cn("absolute inset-0 select-none", isPanning ? "cursor-grabbing" : "cursor-grab")}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -406,6 +422,20 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
 export const HistorianPage: React.FC = () => {
   const { objects, mergedProperties, simulationTickCount, simulatedValues } = useObjectModelStore();
 
+  const getPropValue = useCallback((objectId: string, propertyId: string, propertyName: string) => {
+    if (objectId === 'OPC_VIRTUAL') {
+      const liveKey = `OPC_VIRTUAL:${propertyId}`;
+      return simulatedValues[liveKey] ?? '0';
+    }
+    const liveKey = `${objectId}:${propertyName}`;
+    if (simulatedValues[liveKey] !== undefined) {
+      return simulatedValues[liveKey];
+    }
+    const props = inheritanceService.getMergedProperties(objectId, 'instance') as any[];
+    const prop = props?.find((p) => p.id === propertyId || p.name === propertyName);
+    return prop?.defaultValue ?? '0';
+  }, [simulatedValues]);
+
   // Sidebar state
   const [expandedObjects, setExpandedObjects] = useState<Set<string>>(new Set());
   const [sidebarSearch, setSidebarSearch] = useState('');
@@ -431,28 +461,85 @@ export const HistorianPage: React.FC = () => {
   // Copy feedback
   const [copiedRow, setCopiedRow] = useState<string | null>(null);
 
-  // Refresh counter to re-query on tick
-  const [, setRefreshTick] = useState(0);
+  // Refresh counter to re-query on tick or timer
+  const [refreshTick, setRefreshTick] = useState(0);
   useEffect(() => { setRefreshTick((n) => n + 1); }, [simulationTickCount]);
 
-  // Hook startMonitoring / stopMonitoring on-demand
+  // Active second-by-second data collection for selected variables in Historian Page
   useEffect(() => {
-    selectedVars.forEach((v) => {
-      historyEngine.startMonitoring(v.objectId, v.propertyId);
-    });
-    return () => {
+    const interval = setInterval(() => {
       selectedVars.forEach((v) => {
-        historyEngine.stopMonitoring(v.objectId, v.propertyId);
+        const currentValue = getPropValue(v.objectId, v.propertyId, v.propertyName);
+        
+        historyEngine.record(
+          v.objectId,
+          v.propertyId,
+          currentValue,
+          {
+            enabled: true,
+            collectionMode: 'interval',
+            intervalMs: 0, // Bypass rate limit to ensure every tick is recorded
+            retentionMs: 86400000,
+            maxSamples: 5000,
+            deadband: 0,
+            compression: false,
+            engineeringUnit: v.unit,
+            notes: 'historian-live-collect',
+          },
+          'simulation'
+        );
+      });
+      
+      setRefreshTick((n) => n + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [selectedVars, getPropValue]);
+
+  // Hook startMonitoring / stopMonitoring on-demand without losing history on array change
+  const monitoredRefs = useRef<Set<string>>(new Set());
+  
+  useEffect(() => {
+    const nextSet = new Set(selectedVars.map(v => `${v.objectId}:${v.propertyId}`));
+    
+    // Stop monitoring variables that were removed
+    monitoredRefs.current.forEach((k) => {
+      if (!nextSet.has(k)) {
+        const [objId, propId] = k.split(':');
+        historyEngine.stopMonitoring(objId, propId);
+      }
+    });
+    
+    // Start monitoring variables that were added
+    nextSet.forEach((k) => {
+      if (!monitoredRefs.current.has(k)) {
+        const [objId, propId] = k.split(':');
+        historyEngine.startMonitoring(objId, propId);
+      }
+    });
+    
+    monitoredRefs.current = nextSet;
+    
+    // Do NOT stop monitoring everything on unmount of this specific effect, 
+    // only on actual component unmount.
+  }, [selectedVars]);
+
+  useEffect(() => {
+    // True unmount cleanup
+    return () => {
+      monitoredRefs.current.forEach((k) => {
+        const [objId, propId] = k.split(':');
+        historyEngine.stopMonitoring(objId, propId);
       });
     };
-  }, [selectedVars]);
+  }, []);
 
   // Determine time range
   const calculatedRange = useMemo(() => {
     const cf = customFrom ? new Date(customFrom) : undefined;
     const ct = customTo ? new Date(customTo) : undefined;
     return getPeriodRange(period, cf, ct);
-  }, [period, customFrom, customTo, simulationTickCount]); // eslint-disable-line
+  }, [period, customFrom, customTo, refreshTick]); // eslint-disable-line
 
   const from = viewFrom ?? calculatedRange.from;
   const to = viewTo ?? calculatedRange.to;
@@ -462,7 +549,7 @@ export const HistorianPage: React.FC = () => {
       const props = inheritanceService.getMergedProperties(obj.id, 'instance') as typeof mergedProperties;
       const histProps = props.filter((p) => {
         const name = p.name.toLowerCase();
-        if (p.dataType !== 'Float' && p.dataType !== 'Integer' && p.dataType !== 'Boolean' && p.dataType !== 'String') return false;
+        if (p.dataType !== 'Float' && p.dataType !== 'Integer') return false;
         if (
           name.includes('limit') ||
           name.includes('high') ||
@@ -479,7 +566,7 @@ export const HistorianPage: React.FC = () => {
       });
       return { obj, histProps };
     }).filter(({ histProps }) => histProps.length > 0);
-  }, [objects, simulationTickCount]); // eslint-disable-line
+  }, [objects, refreshTick]); // eslint-disable-line
 
   // Filter sidebar
   const filteredHistorianObjects = useMemo(() => {
@@ -499,13 +586,19 @@ export const HistorianPage: React.FC = () => {
   function toggleVar(objectId: string, objectName: string, propertyId: string, propertyName: string, unit: string) {
     setSelectedVars((prev) => {
       const exists = prev.find((v) => v.objectId === objectId && v.propertyId === propertyId);
-      if (exists) return prev.filter((v) => !(v.objectId === objectId && v.propertyId === propertyId));
+      if (exists) {
+        // Clear history immediately when deselected to free up memory
+        historyEngine.clearKey(objectId, propertyId);
+        return prev.filter((v) => !(v.objectId === objectId && v.propertyId === propertyId));
+      }
+      
       const ci = colorCounterRef.current++ % CURVE_COLORS.length;
 
+      // Clear any pre-collected simulation background samples so we start from scratch
+      historyEngine.clearKey(objectId, propertyId);
+
       // Seed an immediate first sample so the chart shows something right away.
-      // Use enabled:true config to bypass the isMonitored check (startMonitoring is handled by useEffect).
-      const liveKey = `${objectId}:${propertyName}`;
-      const currentValue = simulatedValues[liveKey] ?? '0';
+      const currentValue = getPropValue(objectId, propertyId, propertyName);
       historyEngine.record(objectId, propertyId, currentValue, {
         enabled: true,
         collectionMode: 'interval',
@@ -528,7 +621,7 @@ export const HistorianPage: React.FC = () => {
       variable: v,
       samples: historyEngine.query({ objectId: v.objectId, propertyId: v.propertyId, from, to }),
     }));
-  }, [selectedVars, from, to, simulationTickCount]); // eslint-disable-line
+  }, [selectedVars, from, to, refreshTick]); // eslint-disable-line
 
   // All samples flat (for table view)
   const allSamples = useMemo(() => {
@@ -720,6 +813,24 @@ export const HistorianPage: React.FC = () => {
                   const exists = prev.find((v) => v.objectId === 'OPC_VIRTUAL' && v.propertyId === tag.path);
                   if (exists) return prev;
                   const ci = colorCounterRef.current++ % CURVE_COLORS.length;
+
+                  // Clear background history for this tag so it starts from scratch
+                  historyEngine.clearKey('OPC_VIRTUAL', tag.path);
+
+                  // Seed an immediate first sample for dropped OPC tag
+                  const currentValue = getPropValue('OPC_VIRTUAL', tag.path, tag.name);
+                  historyEngine.record('OPC_VIRTUAL', tag.path, currentValue, {
+                    enabled: true,
+                    collectionMode: 'interval',
+                    intervalMs: 0,
+                    retentionMs: 86400000,
+                    maxSamples: 5000,
+                    deadband: 0,
+                    compression: false,
+                    engineeringUnit: tag.engineeringUnit || '',
+                    notes: 'historian-seed',
+                  }, 'simulation');
+
                   return [...prev, {
                     objectId: 'OPC_VIRTUAL',
                     objectName: 'OPC Network',
@@ -884,8 +995,8 @@ export const HistorianPage: React.FC = () => {
 
               {view === 'chart' ? (
                 /* Chart area */
-                <div className="flex-1 overflow-hidden p-4">
-                  <div className="w-full h-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+                <div className="flex-1 flex flex-col overflow-hidden p-4">
+                  <div className="flex-1 w-full flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
                     <TrendChart
                       data={chartData}
                       from={from}

@@ -21,6 +21,7 @@ import type {
   ProductEntity,
   AreaEntity,
   EquipmentGraphicConfig,
+  TankStrappingConfig,
 } from '../types/domain';
 import { templateRepo } from '../repository/TemplateRepository';
 import { objectRepo } from '../repository/ObjectRepository';
@@ -53,13 +54,14 @@ import { clearAllOmmData } from '../features/omm/repository';
 interface ObjectModelStoreState {
   // Navigation & Theme
   activeSidebarTab: 'derivation' | 'deployment';
-  activeEditorTab: 'properties' | 'graphics';
+  activeEditorTab: 'properties' | 'graphics' | 'strapping';
   theme: 'light' | 'dark';
   searchQuery: string;
   products: ProductEntity[];
   areas: AreaEntity[];
   movements: any[];
   saveEquipmentGraphicConfig: (id: string, type: EntityType, config: EquipmentGraphicConfig) => void;
+  saveStrappingConfig: (id: string, type: EntityType, config: TankStrappingConfig) => void;
 
   // Active selection
   selectedEntity: { id: string; type: EntityType } | null;
@@ -112,7 +114,7 @@ interface ObjectModelStoreState {
   // Actions
   init: () => void;
   setActiveSidebarTab: (tab: 'derivation' | 'deployment') => void;
-  setActiveEditorTab: (tab: 'properties' | 'graphics') => void;
+  setActiveEditorTab: (tab: 'properties' | 'graphics' | 'strapping') => void;
   setTheme: (theme: 'light' | 'dark') => void;
   toggleTheme: () => void;
   setSearchQuery: (query: string) => void;
@@ -309,6 +311,36 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         const obj = objectRepo.getById(id);
         if (obj) {
           obj.graphicConfig = config;
+          objectRepo.save(obj);
+        }
+      }
+      get().refreshData();
+    },
+
+    saveStrappingConfig: (id: string, type: EntityType, config: TankStrappingConfig) => {
+      const name = type === 'template' ? templateRepo.getById(id)?.name : objectRepo.getById(id)?.name;
+      useLogStore.getState().addLog({
+        user: 'Bruno Kappi',
+        module: 'Orquestra',
+        entity: type === 'template' ? 'Template' : 'Objeto',
+        operation: 'CONFIGURE',
+        action: 'Configuração de Arqueação Alterada',
+        description: `Tabela de arqueação do equipamento "${name || id}" modificada (${config.points.length} pontos).`,
+        severity: 'Informação',
+        result: 'Sucesso',
+        origin: 'manual',
+        targetId: id,
+      });
+      if (type === 'template') {
+        const tpl = templateRepo.getById(id);
+        if (tpl) {
+          tpl.strappingConfig = config;
+          templateRepo.save(tpl);
+        }
+      } else {
+        const obj = objectRepo.getById(id);
+        if (obj) {
+          obj.strappingConfig = config;
           objectRepo.save(obj);
         }
       }
@@ -577,6 +609,28 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
             if (selectedEntity?.id === obj.id) {
               nextHistory[prop.name] = hist;
             }
+          }
+
+          // Record to Historian if monitored or explicitly enabled
+          const isMonitored = historyEngine.isMonitored(obj.id, prop.id);
+          if (isMonitored || prop.historyConfig?.enabled) {
+            historyEngine.record(
+              obj.id,
+              prop.id,
+              prop.defaultValue,
+              prop.historyConfig || {
+                enabled: true,
+                collectionMode: 'interval',
+                intervalMs: 1000,
+                retentionMs: 3600000 * 24,
+                maxSamples: 1000,
+                deadband: 0,
+                compression: false,
+                engineeringUnit: '',
+                notes: 'Auto-recorded',
+              },
+              'simulation'
+            );
           }
         });
       });

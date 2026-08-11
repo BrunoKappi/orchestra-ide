@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useObjectModelStore } from '../../store/useObjectModelStore';
 import { inheritanceService } from '../../services/InheritanceService';
 import { historyEngine } from '../../services/HistoryEngine';
 import { TankGeometrySvg } from '../TankGeometrySvg';
 import { MiniTrendChart } from './MiniTrendChart';
 import { Thermometer, Gauge, Droplets, Activity, Percent, Database, HelpCircle } from 'lucide-react';
+import { generateTrendHistory, type TrendDirection } from '../../utils/trendHistorySimulator';
+import { useOmmStore } from '../../features/omm/store/useOmmStore';
 
 
 interface TankTelemetryDashboardProps {
@@ -89,27 +91,64 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
     };
   }, [objectId, objectDetail, processVariablesConfig]);
 
-  // Populate initial history from historyEngine or generate initial baseline (flat)
+  // Determine trend direction from active OMM movements
+  const ommMovements = useOmmStore((s) => s.movements);
+  const ommTrendDirection = useMemo((): TrendDirection => {
+    const active = ommMovements.find(
+      (m) => m.status === 'Active' && !m.simPaused &&
+        (m.originId === objectId || m.destinationId === objectId)
+    );
+    if (!active) return 'stable';
+    if (active.originId === objectId) return 'down';
+    return 'up';
+  }, [ommMovements, objectId]);
+
+  // Refs to access current values inside init effect without reactive dep churn
+  const processVarsRef = useRef(processVariablesConfig);
+  processVarsRef.current = processVariablesConfig;
+  const simulatedValuesRef = useRef(simulatedValues);
+  simulatedValuesRef.current = simulatedValues;
+
+  // Track which combination was last initialized to prevent resets on reference-only changes
+  const lastInitKey = useRef('');
+
+  // Populate initial history from historyEngine or generate synthetic trend baseline
+  // Only re-runs when objectId or trend direction string actually changes
   useEffect(() => {
     if (!objectDetail) return;
-    const initial: Record<string, number[]> = {};
+    const initKey = `${objectId}:${ommTrendDirection}`;
+    if (lastInitKey.current === initKey) return; // already initialized for this combo
+    lastInitKey.current = initKey;
 
-    processVariablesConfig.forEach((prop) => {
+    const initial: Record<string, number[]> = {};
+    const vars = processVarsRef.current;
+    const simVals = simulatedValuesRef.current;
+
+    vars.forEach((prop) => {
       const propId = prop.id;
       const samples = historyEngine.query({ objectId, propertyId: propId });
       let vals = samples.map((s) => parseFloat(s.value)).filter((v) => !isNaN(v));
 
       if (vals.length === 0) {
-        // Start with the current property value as a flat baseline — no random noise
-        const curVal = parseFloat(getLiveValue(prop.name, prop.defaultValue));
+        const curRaw = simVals[`${objectId}:${prop.name}`] ?? prop.defaultValue;
+        const curVal = parseFloat(curRaw);
         const startVal = isNaN(curVal) ? 0 : curVal;
-        vals = Array.from({ length: 30 }, () => startVal);
+
+        // Use synthetic trend history so charts show curves instead of flat lines
+        vals = generateTrendHistory({
+          variableName: prop.name,
+          currentValue: startVal,
+          trend: ommTrendDirection,
+          numSamples: 50,
+          minBound: prop.name === 'Level' ? 0 : undefined,
+          maxBound: prop.name === 'Level' ? 100 : undefined,
+        });
       }
 
-      if (vals.length > 30) {
-        vals = vals.slice(vals.length - 30);
-      } else if (vals.length < 30) {
-        const pad = Array.from({ length: 30 - vals.length }, () => vals[0] ?? 0);
+      if (vals.length > 50) {
+        vals = vals.slice(vals.length - 50);
+      } else if (vals.length < 50) {
+        const pad = Array.from({ length: 50 - vals.length }, () => vals[0] ?? 0);
         vals = [...pad, ...vals];
       }
 
@@ -117,7 +156,8 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
     });
 
     setHistoryData(initial);
-  }, [objectId, objectDetail, processVariablesConfig]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [objectId, objectDetail, ommTrendDirection]);
 
   // Update history buffer on every tick / simulatedValues change
   useEffect(() => {
@@ -132,10 +172,19 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
         const curVal = parseFloat(curStr);
         const val = isNaN(curVal) ? 0 : curVal;
 
-        const list = prev[prop.name] ? [...prev[prop.name]] : Array.from({ length: 30 }, () => val);
-        list.push(val);
-        if (list.length > 30) list.shift();
-        next[prop.name] = list;
+        // Regenerate the full synthetic curve anchored to the current value
+        // This ensures the charts always show realistic curves instead of flattening out
+        const vals = generateTrendHistory({
+          variableName: prop.name,
+          currentValue: val,
+          trend: ommTrendDirection,
+          numSamples: 50,
+          minBound: prop.name === 'Level' ? 0 : undefined,
+          maxBound: prop.name === 'Level' ? 100 : (prop.name === 'Volume' ? parseFloat(getLiveValue('Capacity', '10000')) : (prop.name === 'Mass' ? parseFloat(getLiveValue('Capacity', '10000')) * 1.2 : undefined)),
+          timeOffset: Date.now(),
+        });
+
+        next[prop.name] = vals;
         changed = true;
       });
 

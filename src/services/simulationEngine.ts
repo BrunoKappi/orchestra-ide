@@ -1,7 +1,6 @@
 import { propertyRepo } from '../repository/PropertyRepository';
 import { objectRepo } from '../repository/ObjectRepository';
 import { STORAGE_KEYS } from '../repository/storageKey';
-import { historyEngine } from './HistoryEngine';
 import { AlarmEngine } from './AlarmEngine';
 import { inheritanceService } from './InheritanceService';
 
@@ -54,8 +53,7 @@ interface OmmMovementSyncEntry {
 // Storage keys
 const OMM_MOVEMENTS_KEY = 'omm_v2_movements';
 
-// History sampling: record every N ticks to avoid filling localStorage
-const HISTORY_SAMPLE_INTERVAL = 1;
+
 
 export class SimulationEngine {
   private timer: number | null = null;
@@ -265,9 +263,7 @@ export class SimulationEngine {
     });
 
     // Record history samples every N ticks
-    if (this.tickCount % HISTORY_SAMPLE_INTERVAL === 0) {
-      this.recordHistory(propsByObject);
-    }
+    // (Handled in useObjectModelStore to include inherited properties properly)
 
     // Check Alarm Thresholds
     this.evaluateAlarms(propsByObject);
@@ -284,31 +280,7 @@ export class SimulationEngine {
     }
   }
 
-  private recordHistory(propsByObject: Record<string, Record<string, any>>): void {
-    const trackedProps = ['Level', 'Volume', 'Temperature', 'Pressure', 'Flow', 'Mass'];
-    const defaultHistConfig = {
-      enabled: true,
-      collectionMode: 'interval' as const,
-      intervalMs: 1000,
-      retentionMs: 3600000 * 24,
-      maxSamples: 1000,
-      deadband: 0,
-      compression: false,
-      engineeringUnit: '',
-      notes: 'Auto-recorded by SimulationEngine',
-    };
 
-    Object.keys(propsByObject).forEach((objId) => {
-      const objProps = propsByObject[objId];
-      Object.keys(objProps).forEach((propName) => {
-        const prop = objProps[propName];
-        const isMonitored = historyEngine.isMonitored(objId, prop.id);
-        if (isMonitored || trackedProps.includes(propName)) {
-          historyEngine.record(objId, prop.id, prop.defaultValue, prop.historyConfig || defaultHistConfig, 'simulation');
-        }
-      });
-    });
-  }
 
   private evaluateAlarms(propsByObject: Record<string, Record<string, any>>): void {
     const objects = objectRepo.getAll();

@@ -32,6 +32,7 @@ export interface TemplateEntity {
   parentTemplateId: string | null;
   description: string;
   graphicConfig?: EquipmentGraphicConfig;
+  strappingConfig?: TankStrappingConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -43,6 +44,7 @@ export interface ObjectEntity {
   description: string;
   isDeployed?: boolean;
   graphicConfig?: EquipmentGraphicConfig;
+  strappingConfig?: TankStrappingConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,6 +54,41 @@ export type TankGeometryType =
   | 'horizontal_cylindrical'
   | 'spherical'
   | 'pressurized';
+
+// ----------------------------------------------------------------------------
+// Tank Strapping / Capacity Table Types (API MPMS Chapter 2.2A — simplified)
+// ----------------------------------------------------------------------------
+
+/** A single point in the capacity table: measured level → corresponding volume */
+export interface StrappingPoint {
+  /** Measured level value (unit defined by TankStrappingConfig.levelUnit) */
+  level: number;
+  /** Volume at the given level (unit defined by TankStrappingConfig.volumeUnit) */
+  volume: number;
+}
+
+export type StrappingLevelUnit = 'mm' | 'cm' | 'm' | '%';
+export type StrappingVolumeUnit = 'm³' | 'bbl' | 'L';
+
+/**
+ * Simplified tank strapping / capacity table configuration.
+ * Associates a tank with its level-to-volume relationship for inventory management.
+ * Stored directly on TemplateEntity or ObjectEntity (same pattern as graphicConfig).
+ */
+export interface TankStrappingConfig {
+  /** Engineering unit used for the level column */
+  levelUnit: StrappingLevelUnit;
+  /** Engineering unit used for the volume column */
+  volumeUnit: StrappingVolumeUnit;
+  /** Total reference height of the tank shell (meters) */
+  referenceHeight: number;
+  /** Nominal working capacity (in volumeUnit) */
+  nominalCapacity: number;
+  /** Ordered list of capacity table points — at least 2 required */
+  points: StrappingPoint[];
+  /** Optional technical notes about the calibration */
+  notes?: string;
+}
 
 /**
  * Binding between a visual field in the equipment card and a property name

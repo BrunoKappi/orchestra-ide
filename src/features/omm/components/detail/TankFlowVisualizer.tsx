@@ -19,6 +19,7 @@ import { cn } from '../../../../utils/cn';
 import { OmmTankNode, type OmmTankNodeData } from '../flow/OmmTankNode';
 import { OmmFlowEdge, type OmmFlowEdgeData } from '../flow/OmmFlowEdge';
 import type { OmmStatus } from '../../types';
+import { generateTrendHistory } from '../../../../utils/trendHistorySimulator';
 
 // ---------------------------------------------------------------------------
 // XYFlow type registries (module-scoped, stable references)
@@ -250,36 +251,47 @@ export const TankFlowVisualizer: React.FC<TankFlowVisualizerProps> = ({
   const [originHistory, setOriginHistory] = useState<number[]>([]);
   const [destHistory,   setDestHistory]   = useState<number[]>([]);
 
-  useEffect(() => {
-    if (!originTank || !destinationTank) return;
-    const initialOrigin = Array.from({ length: 25 }, (_, i) => {
-      const step = isFlowActive ? (25 - 1 - i) * 0.2 : 0;
-      return Math.min(100, Math.max(0, originTank.currentLevel + step));
-    });
-    const initialDest = Array.from({ length: 25 }, (_, i) => {
-      const step = isFlowActive ? (25 - 1 - i) * 0.2 : 0;
-      return Math.min(100, Math.max(0, destinationTank.currentLevel - step));
-    });
-    setOriginHistory(initialOrigin);
-    setDestHistory(initialDest);
-  }, [originTank?.id, destinationTank?.id]);
+  const originRef = React.useRef(originTank);
+  originRef.current = originTank;
+  const destRef = React.useRef(destinationTank);
+  destRef.current = destinationTank;
+  const isFlowActiveRef = React.useRef(isFlowActive);
+  isFlowActiveRef.current = isFlowActive;
 
   useEffect(() => {
-    if (!originTank || !destinationTank) return;
+    // We only need the interval to animate the synthetic trend over time
     const interval = setInterval(() => {
-      setOriginHistory((prev) => {
-        const next = [...prev, originTank.currentLevel];
-        if (next.length > 30) next.shift();
-        return next;
-      });
-      setDestHistory((prev) => {
-        const next = [...prev, destinationTank.currentLevel];
-        if (next.length > 30) next.shift();
-        return next;
-      });
+      const oTank = originRef.current;
+      const dTank = destRef.current;
+      const flowActive = isFlowActiveRef.current;
+      if (!oTank || !dTank) return;
+
+      const now = Date.now();
+      const originTrend = flowActive ? 'down' : 'stable';
+      const destTrend = flowActive ? 'up' : 'stable';
+
+      setOriginHistory(generateTrendHistory({
+        variableName: 'Level',
+        currentValue: oTank.currentLevel,
+        trend: originTrend,
+        numSamples: 50,
+        minBound: 0,
+        maxBound: 100,
+        timeOffset: now,
+      }));
+
+      setDestHistory(generateTrendHistory({
+        variableName: 'Level',
+        currentValue: dTank.currentLevel,
+        trend: destTrend,
+        numSamples: 50,
+        minBound: 0,
+        maxBound: 100,
+        timeOffset: now,
+      }));
     }, 1500);
     return () => clearInterval(interval);
-  }, [originTank?.currentLevel, destinationTank?.currentLevel]);
+  }, []);
 
   if (!originTank || !destinationTank) {
     return (

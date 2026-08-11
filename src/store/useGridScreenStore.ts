@@ -56,7 +56,7 @@ export const buildCardFromObject = (
 
   if (!obj) {
     return {
-      id: `card-${objectId}`,
+      id: `card-${objectId}-${uuidv4().slice(0, 8)}`,
       objectId,
       tag: objectId,
       category: 'EQUIPAMENTO',
@@ -99,7 +99,7 @@ export const buildCardFromObject = (
   };
 
   return {
-    id: `card-${objectId}`,
+    id: `card-${objectId}-${uuidv4().slice(0, 8)}`,
     objectId,
     tag,
     category,

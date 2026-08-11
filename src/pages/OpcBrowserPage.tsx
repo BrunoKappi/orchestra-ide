@@ -39,8 +39,7 @@ export const OpcBrowserPage: React.FC = () => {
     createNode,
     updateNode,
     deleteNode,
-    toggleSimulation,
-    tickSimulation
+    toggleSimulation
   } = useOpcStore();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -78,13 +77,8 @@ export const OpcBrowserPage: React.FC = () => {
     init();
   }, [init]);
 
-  useEffect(() => {
-    if (!isSimulating) return;
-    const interval = setInterval(() => {
-      tickSimulation();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isSimulating, tickSimulation]);
+  // Simulation tick is handled globally by App.tsx
+
 
   // Handle selected tag history for sparkline
   const selectedNode = useMemo(() => {

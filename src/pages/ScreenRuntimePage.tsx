@@ -269,8 +269,6 @@ export const ScreenRuntimePage: React.FC = () => {
   const {
     simulatedValues,
     isSimulating,
-    simulationSpeedMs,
-    tickSimulation,
     toggleSimulation,
     init: initObjects,
   } = useObjectModelStore();
@@ -288,12 +286,8 @@ export const ScreenRuntimePage: React.FC = () => {
     setScreen(found ?? null);
   }, [id]);
 
-  // Simulation ticker
-  useEffect(() => {
-    if (!isSimulating) return;
-    const interval = setInterval(() => tickSimulation(), simulationSpeedMs);
-    return () => clearInterval(interval);
-  }, [isSimulating, simulationSpeedMs, tickSimulation]);
+  // Simulation tick is handled globally by App.tsx
+
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {

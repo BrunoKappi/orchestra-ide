@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Lock, LogIn, Sun, Moon } from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore';
-import { useObjectModelStore } from '../store/useObjectModelStore';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { User, Lock, LogIn, Sun, Moon } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
+import { useObjectModelStore } from "../store/useObjectModelStore";
 
 export const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const login = useAuthStore((s) => s.login);
   const { theme, toggleTheme } = useObjectModelStore();
@@ -16,14 +16,14 @@ export const LoginPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!username.trim()) {
-      setError('Por favor, informe o usuário.');
+      setError("Por favor, informe o usuário.");
       return;
     }
     if (!password.trim()) {
-      setError('Por favor, informe a senha.');
+      setError("Por favor, informe a senha.");
       return;
     }
 
@@ -32,7 +32,7 @@ export const LoginPage: React.FC = () => {
     setTimeout(() => {
       login(username);
       setIsLoading(false);
-      navigate('/');
+      navigate("/");
     }, 800);
   };
   return (
@@ -45,9 +45,8 @@ export const LoginPage: React.FC = () => {
       <button
         onClick={toggleTheme}
         className="absolute top-6 right-6 p-2 rounded-xl bg-white/70 hover:bg-white/90 border border-slate-200 dark:bg-slate-700/60 dark:hover:bg-slate-600/60 dark:border-slate-500 text-slate-700 dark:text-white cursor-pointer transition-all hover:scale-105"
-        title="Alternar Tema"
-      >
-        {theme === 'dark' ? (
+        title="Alternar Tema">
+        {theme === "dark" ? (
           <Sun className="w-5 h-5 text-amber-400" />
         ) : (
           <Moon className="w-5 h-5 text-indigo-600" />
@@ -69,7 +68,7 @@ export const LoginPage: React.FC = () => {
             Serrano Automação
           </h1>
           <p className="text-[11px] text-slate-500 dark:text-slate-300 font-semibold tracking-wider uppercase mt-0.5">
-            Plataforma Integrada SCADA
+            POC de Gestão de Inventários e Movimentos
           </p>
         </div>
 
@@ -81,10 +80,14 @@ export const LoginPage: React.FC = () => {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="w-full space-y-5 text-xs text-slate-700 dark:text-white">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full space-y-5 text-xs text-slate-700 dark:text-white">
           {/* Username Input */}
           <div className="space-y-1.5">
-            <label className="block text-slate-600 dark:text-slate-200 font-semibold pl-1">Usuário / Login</label>
+            <label className="block text-slate-600 dark:text-slate-200 font-semibold pl-1">
+              Usuário / Login
+            </label>
             <div className="relative">
               <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400" />
               <input
@@ -100,7 +103,9 @@ export const LoginPage: React.FC = () => {
 
           {/* Password Input */}
           <div className="space-y-1.5">
-            <label className="block text-slate-600 dark:text-slate-200 font-semibold pl-1">Senha de Acesso</label>
+            <label className="block text-slate-600 dark:text-slate-200 font-semibold pl-1">
+              Senha de Acesso
+            </label>
             <div className="relative">
               <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400" />
               <input
@@ -118,8 +123,7 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-sky-650 hover:from-indigo-700 hover:to-sky-700 disabled:from-indigo-800 disabled:to-sky-800 text-white font-bold text-xs rounded-2xl shadow-lg shadow-indigo-500/10 hover:shadow-indigo-550/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
-          >
+            className="w-full py-3.5 px-4 bg-sky-600 hover:bg-sky-700 disabled:bg-sky-800 text-white font-bold text-xs rounded-2xl shadow-lg shadow-sky-500/20 hover:shadow-sky-600/30 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2">
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -135,11 +139,8 @@ export const LoginPage: React.FC = () => {
         </form>
 
         {/* Footer info */}
-        <div className="mt-8 text-center text-[10px] text-slate-400 dark:text-slate-400 font-semibold font-sans">
-          Serrano Automação Industrial MVP v2.0
-        </div>
+        <div className="mt-8 text-center text-[10px] text-slate-400 dark:text-slate-400 font-semibold font-sans"></div>
       </div>
     </div>
   );
 };
-

@@ -33,7 +33,8 @@ export const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
       setCols(initialConfig.cols || 8);
       setActivePreset(`${initialConfig.rows}x${initialConfig.cols}`);
     }
-  }, [isOpen, initialConfig]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const presets = [
     { label: '6x6', r: 6, c: 6 },
@@ -51,8 +52,8 @@ export const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
   const handleConfirm = () => {
     onConfirm({
       screenName: screenName.trim() || "Nova Tela",
-      rows: Math.max(2, Math.min(24, rows)),
-      cols: Math.max(2, Math.min(24, cols)),
+      rows: Math.max(2, Math.min(48, rows)),
+      cols: Math.max(2, Math.min(48, cols)),
     });
     onClose();
   };
@@ -107,15 +108,16 @@ export const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
-                Linhas (2 a 24)
+                Linhas (2 a 48)
               </label>
               <input
                 type="number"
                 min={2}
-                max={24}
+                max={48}
                 value={rows}
                 onChange={(e) => {
-                  setRows(parseInt(e.target.value) || 2);
+                  const val = Number(e.target.value);
+                  setRows(isNaN(val) || val < 1 ? 2 : val);
                   setActivePreset("custom");
                 }}
                 className="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100"
@@ -124,15 +126,16 @@ export const GridSettingsModal: React.FC<GridSettingsModalProps> = ({
 
             <div>
               <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
-                Colunas (2 a 24)
+                Colunas (2 a 48)
               </label>
               <input
                 type="number"
                 min={2}
-                max={24}
+                max={48}
                 value={cols}
                 onChange={(e) => {
-                  setCols(parseInt(e.target.value) || 2);
+                  const val = Number(e.target.value);
+                  setCols(isNaN(val) || val < 1 ? 2 : val);
                   setActivePreset("custom");
                 }}
                 className="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100"

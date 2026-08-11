@@ -49,10 +49,8 @@ export const RuntimePage: React.FC = () => {
     deploymentFolders,
     deploymentNodes,
     isSimulating,
-    simulationSpeedMs,
     simulatedValues,
     toggleSimulation,
-    tickSimulation,
     init: initObjectModel,
     updateSimulatedValue,
   } = useObjectModelStore();
@@ -159,14 +157,8 @@ export const RuntimePage: React.FC = () => {
     initObjectModel();
   }, [initObjectModel]);
 
-  // Keep simulation tick running if isSimulating is active
-  useEffect(() => {
-    if (!isSimulating) return;
-    const interval = setInterval(() => {
-      tickSimulation();
-    }, simulationSpeedMs);
-    return () => clearInterval(interval);
-  }, [isSimulating, simulationSpeedMs, tickSimulation]);
+  // Simulation tick is handled globally by App.tsx
+
 
   // Flash highlight animation for changed values
   useEffect(() => {
@@ -623,8 +615,8 @@ export const RuntimePage: React.FC = () => {
                         className={cn(
                           "p-3 rounded-xl border transition-all cursor-pointer select-none relative group",
                           isActiveView
-                            ? "bg-sky-50 dark:bg-sky-950/40 border-sky-300 dark:border-sky-700 shadow-2xs"
-                            : "bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 hover:border-sky-300"
+                            ? "bg-sky-50 dark:bg-sky-950 border-sky-300 dark:border-sky-800 shadow-2xs"
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-500"
                         )}
                       >
                         <div className="flex items-center justify-between">
@@ -646,8 +638,8 @@ export const RuntimePage: React.FC = () => {
                             </div>
                           ) : (
                             <div className="flex items-center gap-2 min-w-0">
-                              <Bookmark className={cn("w-4 h-4 shrink-0", isActiveView ? "text-sky-500 fill-sky-500" : "text-amber-500")} />
-                              <span className="text-xs font-bold text-slate-800 dark:text-slate-150 truncate">
+                               <Bookmark className={cn("w-4 h-4 shrink-0", isActiveView ? "text-sky-500 fill-sky-500" : "text-amber-500")} />
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
                                 {v.name}
                               </span>
                             </div>

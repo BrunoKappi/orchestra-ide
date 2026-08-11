@@ -42,16 +42,8 @@ export const SimulatorEditor: React.FC = () => {
   const [changedProps, setChangedProps] = useState<Record<string, boolean>>({});
   const [prevValues, setPrevValues] = useState<Record<string, string>>({});
 
-  // 1-second interval timer for simulator ticker
-  useEffect(() => {
-    if (!isSimulating) return;
+  // Simulation tick is handled globally by App.tsx
 
-    const interval = setInterval(() => {
-      tickSimulation();
-    }, simulationSpeedMs);
-
-    return () => clearInterval(interval);
-  }, [isSimulating, simulationSpeedMs, tickSimulation]);
 
   // Flash highlight animation for changed values
   useEffect(() => {

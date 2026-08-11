@@ -266,22 +266,14 @@ export const ObjectSelectorModal: React.FC<ObjectSelectorModalProps> = ({
                       <button
                         key={obj.id}
                         onClick={() => {
-                          if (!isSelected) {
-                            onSelect(obj.id);
-                            onClose();
-                          }
+                          onSelect(obj.id);
+                          onClose();
                         }}
-                        disabled={isSelected}
-                        className={cn(
-                          'relative text-left p-3 rounded-xl border transition-all duration-150',
-                          isSelected
-                            ? 'border-slate-200 dark:border-slate-800 opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-800/50'
-                            : 'border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-500 hover:bg-sky-50/30 dark:hover:bg-sky-950/10 cursor-pointer bg-white dark:bg-slate-900',
-                        )}
+                        className="relative text-left p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-sky-400 dark:hover:border-sky-500 hover:bg-sky-50/30 dark:hover:bg-sky-950/10 cursor-pointer bg-white dark:bg-slate-900 transition-all duration-150"
                       >
                         {isSelected && (
-                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-sky-500 flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
+                          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/20 text-[9px] font-bold">
+                            Já Adicionado
                           </div>
                         )}
 

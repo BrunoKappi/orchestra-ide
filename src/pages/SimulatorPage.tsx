@@ -80,14 +80,8 @@ export const SimulatorPage: React.FC = () => {
     initOmmStore();
   }, [initObjectModelStore, initOmmStore]);
 
-  // Interval timer for simulator ticker
-  useEffect(() => {
-    if (!isSimulating) return;
-    const interval = setInterval(() => {
-      tickSimulation();
-    }, simulationSpeedMs);
-    return () => clearInterval(interval);
-  }, [isSimulating, simulationSpeedMs, tickSimulation]);
+  // Simulation tick is handled globally by App.tsx
+
 
   // Highlight flash animation for changed values
   useEffect(() => {

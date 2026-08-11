@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { OrchestraPage } from './pages/OrchestraPage';
 import { WidgetsPage } from './pages/WidgetsPage';
@@ -19,6 +19,7 @@ import { LogsPage } from './pages/LogsPage';
 import { DatabaseAnalyticsPage } from './pages/DatabaseAnalyticsPage';
 
 import { useObjectModelStore } from './store/useObjectModelStore';
+import { useOpcStore } from './store/useOpcStore';
 import { useAuthStore } from './store/useAuthStore';
 import { LoginPage } from './pages/LoginPage';
 import { HomePage } from './pages/HomePage';
@@ -42,7 +43,21 @@ function AuthGuard({ children }: AuthGuardProps) {
 
 export function App() {
   const location = useLocation();
-  const { theme } = useObjectModelStore();
+  const { theme, isSimulating, simulationSpeedMs, tickSimulation } = useObjectModelStore();
+  const tickOpc = useOpcStore((s) => s.tickSimulation);
+
+  // ─── Global simulation ticker ───────────────────────────────────────────────
+  // Centralised here so the simulation always runs regardless of which page is
+  // currently open. Individual pages must NOT have their own tickSimulation loops.
+  const tick = useCallback(() => {
+    tickSimulation();
+    tickOpc();
+  }, [tickSimulation, tickOpc]);
+  useEffect(() => {
+    if (!isSimulating) return;
+    const id = setInterval(tick, simulationSpeedMs);
+    return () => clearInterval(id);
+  }, [isSimulating, simulationSpeedMs, tick]);
 
   useEffect(() => {
     if (theme === 'dark') {

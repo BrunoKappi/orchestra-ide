@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "@xyflow/react/dist/style.css";
 
+@theme {
+  --color-slate-850: #151f32;
+  --color-slate-855: #131c2e;
+  --color-slate-955: #090d16;
+  --color-sky-650: #0369a1;
+}
+
 /* Custom XYFlow Animation */
 @keyframes flowAnimation {
   from {

@@ -28,7 +28,7 @@ export const GridDashboardPage = () => {
     clearActiveScreenCards,
   } = useGridScreenStore();
 
-  const { objects, isSimulating, simulationSpeedMs, tickSimulation } = useObjectModelStore();
+  const { objects } = useObjectModelStore();
 
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
@@ -57,14 +57,8 @@ export const GridDashboardPage = () => {
     init();
   }, [init]);
 
-  // Global simulator loop
-  useEffect(() => {
-    if (!isSimulating) return;
-    const interval = setInterval(() => {
-      tickSimulation();
-    }, simulationSpeedMs);
-    return () => clearInterval(interval);
-  }, [isSimulating, simulationSpeedMs, tickSimulation]);
+  // Simulation tick is handled globally by App.tsx
+
 
   const cards = activeScreen?.cards || [];
   const config: GridConfig = {
@@ -104,8 +98,7 @@ export const GridDashboardPage = () => {
     if (!pendingAdd) return;
     const { sRow, sCol, rSpan, cSpan } = pendingAdd;
     const newCard = buildCardFromObject(objectId, sRow, sCol, rSpan, cSpan);
-    const filtered = cards.filter((c) => c.objectId !== objectId);
-    updateActiveScreenCards([...filtered, newCard]);
+    updateActiveScreenCards([...cards, newCard]);
     setSelectedCardId(newCard.id);
     setPendingAdd(null);
     showToast(`✓ Equipamento ${newCard.tag} adicionado ao Grid`);

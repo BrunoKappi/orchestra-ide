@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { useObjectModelStore } from '../../../store/useObjectModelStore';
 import { inheritanceService } from '../../../services/InheritanceService';
@@ -6,6 +6,8 @@ import { historyEngine } from '../../../services/HistoryEngine';
 import { useResizeObserver } from '../../../hooks/useResizeObserver';
 import { cn } from '../../../utils/cn';
 import type { TankCardData } from '../types';
+import { generateTrendHistory, type TrendDirection } from '../../../utils/trendHistorySimulator';
+import { useOmmStore } from '../../omm/store/useOmmStore';
 
 const yGridTicks = [0.25, 0.5, 0.75];
 const xGridTicks = [0.2, 0.5, 0.8];
@@ -97,7 +99,37 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
     };
   }, [card.trendProperties]);
 
-  // Initialize history buffer from historyEngine or baseline on card props change
+  // Determine trend direction from active OMM movements for each objectId
+  const ommMovements = useOmmStore((s) => s.movements);
+
+  // Compute a stable string key — only changes when actual directions change, not on every tick
+  const trendKey = useMemo(() => {
+    const trendProps = card.trendProperties || [];
+    return trendProps.map((prop) => {
+      const active = ommMovements.find(
+        (m) => m.status === 'Active' && !m.simPaused &&
+          (m.originId === prop.objectId || m.destinationId === prop.objectId)
+      );
+      if (!active) return `${prop.objectId}:stable`;
+      if (active.originId === prop.objectId) return `${prop.objectId}:down`;
+      return `${prop.objectId}:up`;
+    }).join(',');
+  }, [card.trendProperties, ommMovements]);
+
+  // Helper used inside init effect — captured via ref to avoid dep churn
+  const trendKeyRef = useRef(trendKey);
+  trendKeyRef.current = trendKey;
+
+  const resolveTrendDir = useCallback((objectId: string): TrendDirection => {
+    const key = trendKeyRef.current;
+    const segment = key.split(',').find((s) => s.startsWith(`${objectId}:`));
+    if (!segment) return 'stable';
+    const dir = segment.split(':')[1] as TrendDirection;
+    return dir ?? 'stable';
+  }, []);
+
+  // Initialize history buffer from historyEngine or synthetic baseline
+  // Deps use trendKey (string) so this only re-runs when direction actually changes, not every tick
   useEffect(() => {
     const trendProps = card.trendProperties || [];
     const now = Date.now();
@@ -119,28 +151,39 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
       const startVal = isNaN(curVal) ? 0 : curVal;
 
       if (pts.length === 0) {
-        // Build 30 baseline temporal points spaced 1.5s apart ending at now
-        pts = Array.from({ length: 30 }, (_, idx) => ({
-          timestamp: now - (29 - idx) * 1500,
-          value: startVal,
+        // Generate synthetic trend history — 50 samples spaced 1.5s apart
+        const trendDir = resolveTrendDir(prop.objectId);
+        const syntheticValues = generateTrendHistory({
+          variableName: prop.propertyName,
+          currentValue: startVal,
+          trend: trendDir,
+          numSamples: 50,
+          minBound: prop.propertyName.toLowerCase().includes('level') ? 0 : undefined,
+          maxBound: prop.propertyName.toLowerCase().includes('level') ? 100 : undefined,
+        });
+        pts = syntheticValues.map((val, idx) => ({
+          timestamp: now - (49 - idx) * 1500,
+          value: val,
         }));
-      } else if (pts.length < 30) {
+      } else if (pts.length < 50) {
         const firstPt = pts[0];
-        const padCount = 30 - pts.length;
+        const padCount = 50 - pts.length;
         const pad = Array.from({ length: padCount }, (_, idx) => ({
           timestamp: firstPt.timestamp - (padCount - idx) * 1500,
           value: firstPt.value,
         }));
         pts = [...pad, ...pts];
-      } else if (pts.length > 30) {
-        pts = pts.slice(pts.length - 30);
+      } else if (pts.length > 50) {
+        pts = pts.slice(pts.length - 50);
       }
 
       initialBuffer[key] = pts;
     });
 
     setHistoryBuffer(initialBuffer);
-  }, [card.id, card.trendProperties]);
+    // trendKey is a stable string primitive — only changes when movement directions change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card.id, trendKey]);
 
   // Update history buffer on every global simulator tick (simulatedValues update)
   useEffect(() => {
@@ -158,12 +201,24 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
         const val = curRaw != null ? parseFloat(curRaw) : 0;
         const numVal = isNaN(val) ? 0 : val;
 
-        const currentList = prev[key] ? [...prev[key]] : [];
-        currentList.push({ timestamp: now, value: numVal });
-        if (currentList.length > 30) {
-          currentList.shift();
-        }
-        next[key] = currentList;
+        // Regenerate full synthetic curve to avoid flatlining over time
+        const trendDir = resolveTrendDir(prop.objectId);
+        const syntheticValues = generateTrendHistory({
+          variableName: prop.propertyName,
+          currentValue: numVal,
+          trend: trendDir,
+          numSamples: 50,
+          minBound: prop.propertyName.toLowerCase().includes('level') ? 0 : undefined,
+          maxBound: prop.propertyName.toLowerCase().includes('level') ? 100 : undefined,
+          timeOffset: now,
+        });
+
+        const pts = syntheticValues.map((v, idx) => ({
+          timestamp: now - (49 - idx) * 1500,
+          value: v,
+        }));
+
+        next[key] = pts;
         hasUpdates = true;
       });
 
