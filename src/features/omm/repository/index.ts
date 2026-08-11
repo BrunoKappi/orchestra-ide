@@ -20,7 +20,7 @@ const NS = 'omm_v2';
 
 const defaultSimState: OmmSimulatorState = {
   isRunning: false,
-  speedMultiplier: 10,
+  speedMultiplier: 1,
   simulatedTime: new Date().toISOString(),
   tickCount: 0,
   lastTickAt: new Date().toISOString(),

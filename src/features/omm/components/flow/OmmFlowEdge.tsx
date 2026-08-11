@@ -15,6 +15,10 @@ export interface OmmFlowEdgeData {
   productName: string;
   productColor: string;
   simPaused?: boolean;
+  movementNumber?: string;
+  currentVolume?: number;
+  plannedVolume?: number;
+  percentComplete?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -126,16 +130,23 @@ export const OmmFlowEdge: React.FC<EdgeProps> = memo(({
         >
           {edgeData && (
             <div
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg shadow-md border text-center
+              className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl shadow-lg border text-center font-sans
                 ${status === 'Active' && !isPaused
-                  ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-200 dark:border-emerald-800'
+                  ? 'bg-emerald-50/90 dark:bg-emerald-950/90 border-emerald-250 dark:border-emerald-800'
                   : isPaused
-                    ? 'bg-amber-50 dark:bg-amber-950/80 border-amber-200 dark:border-amber-800'
+                    ? 'bg-amber-50/90 dark:bg-amber-950/90 border-amber-250 dark:border-amber-800'
                     : 'bg-white/90 dark:bg-slate-900/90 border-slate-200 dark:border-slate-700'
                 }`}
             >
+              {/* Movement Number */}
+              {edgeData.movementNumber && (
+                <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 tracking-wider">
+                  {edgeData.movementNumber}
+                </span>
+              )}
+
               {status === 'Active' && !isPaused && edgeData.currentFlow > 0 && (
-                <span className="text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                <span className="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
                   {edgeData.currentFlow.toFixed(1)} m³/h
                 </span>
               )}
@@ -144,14 +155,22 @@ export const OmmFlowEdge: React.FC<EdgeProps> = memo(({
                   ⏸ PAUSADO
                 </span>
               )}
+
+              {/* Volume Progress */}
+              {edgeData.currentVolume !== undefined && edgeData.plannedVolume !== undefined && (
+                <span className="text-[8px] font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap mt-0.5">
+                  {Math.round(edgeData.currentVolume)}/{Math.round(edgeData.plannedVolume)} m³ ({edgeData.percentComplete?.toFixed(0)}%)
+                </span>
+              )}
+
               <span
-                className="text-[8px] font-bold uppercase tracking-wider"
+                className="text-[7.5px] font-bold uppercase tracking-widest mt-0.5"
                 style={{ color: isPaused ? '#d97706' : stroke }}
               >
                 {STATUS_LABEL[status]}
               </span>
               {edgeData.productName && status === 'Active' && (
-                <span className="text-[8px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                <span className="text-[8px] font-semibold text-slate-550 dark:text-slate-400 whitespace-nowrap mt-0.5">
                   {edgeData.productName}
                 </span>
               )}

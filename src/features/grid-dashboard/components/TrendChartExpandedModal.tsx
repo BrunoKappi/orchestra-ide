@@ -62,6 +62,29 @@ export const TrendChartExpandedModal: React.FC<TrendChartExpandedModalProps> = (
   // Real-time temporal history buffer
   const [historyBuffer, setHistoryBuffer] = useState<Record<string, Array<{ timestamp: number; value: number }>>>({});
 
+  // Start/stop history engine monitoring on-demand
+  useEffect(() => {
+    if (!isOpen || !card || !card.trendProperties) return;
+    
+    const trendProps = card.trendProperties;
+    const resolved: Array<{ objectId: string; propertyId: string }> = [];
+
+    trendProps.forEach((prop) => {
+      const props = inheritanceService.getMergedProperties(prop.objectId, 'instance');
+      const propDef = props.find((p) => p.name === prop.propertyName);
+      if (propDef?.id) {
+        historyEngine.startMonitoring(prop.objectId, propDef.id);
+        resolved.push({ objectId: prop.objectId, propertyId: propDef.id });
+      }
+    });
+
+    return () => {
+      resolved.forEach((r) => {
+        historyEngine.stopMonitoring(r.objectId, r.propertyId);
+      });
+    };
+  }, [isOpen, card?.id, card?.trendProperties]);
+
   useEffect(() => {
     if (!card || !card.trendProperties) return;
     const now = Date.now();

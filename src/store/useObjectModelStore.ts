@@ -257,24 +257,6 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       }
       seedService.seedInitialDataIfNeeded();
       
-      // Ensure history is enabled for key process variables in existing storage
-      const props = propertyRepo.getAll();
-      let updatedProps = false;
-      props.forEach((p) => {
-        if (!p.historyConfig?.enabled && (p.name === 'Level' || p.name === 'Volume' || p.name === 'Temperature' || p.name === 'Pressure' || p.name === 'Flow')) {
-          p.historyConfig = {
-            enabled: true,
-            periodMs: 1000,
-            storageType: 'Memory',
-            engineeringUnit: p.name === 'Level' ? '%' : p.name === 'Temperature' ? '°C' : p.name === 'Pressure' ? 'bar' : p.name === 'Flow' ? 'm³/h' : 'm³',
-          };
-          updatedProps = true;
-        }
-      });
-      if (updatedProps) {
-        propertyRepo.saveAll(props);
-      }
-
       historyEngine.init();
       simulationEngine.start(10);
       simulationEngine.subscribe(() => {

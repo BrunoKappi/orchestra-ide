@@ -500,7 +500,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
         {/* Global Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Card 1: Storage Limit */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase">Tamanho Total DB</span>
               <HardDrive className="w-4 h-4 text-indigo-500" />
@@ -526,7 +526,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
           </div>
 
           {/* Card 2: Monitored Keys */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase">Tabelas Ativas</span>
               <Database className="w-4 h-4 text-sky-500" />
@@ -542,7 +542,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
           </div>
 
           {/* Card 3: Total Records Count */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase">Registros Totais</span>
               <Activity className="w-4 h-4 text-emerald-500" />
@@ -564,14 +564,14 @@ export const DatabaseAnalyticsPage: React.FC = () => {
           </div>
 
           {/* Card 4: CPU & Performance Overview */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase">Saúde do Sistema</span>
               <Gauge className="w-4 h-4 text-violet-500" />
             </div>
             <div className="mt-2.5">
               <h3 className="text-xl font-bold flex items-baseline gap-1 font-mono">
-                {fps} <span className="text-[10px] font-sans font-normal text-slate-455">FPS</span>
+                {fps.toFixed(1)} <span className="text-[10px] font-sans font-normal text-slate-455">FPS</span>
               </h3>
               <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Taxa de quadros de animações UI</p>
             </div>
@@ -590,7 +590,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
             
             {/* Left Block: Table List & Search & Backups */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs">
                 
                 {/* Search & Actions Panel */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -726,7 +726,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
               </div>
 
               {/* Real-time DB Sizing Trend Chart */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs">
                 <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-1.5">
                   <Activity className="w-4 h-4 text-emerald-500 animate-pulse" />
                   Tendência de Ocupação de Disco em Tempo Real (KB)
@@ -838,7 +838,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
             <div className="space-y-6">
               
               {/* Comparative Donut Chart */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col items-center">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs flex flex-col items-center">
                 <h3 className="text-xs font-bold text-slate-805 dark:text-slate-200 self-start mb-5">
                   Comparativo de Armazenamento por Tabela
                 </h3>
@@ -911,7 +911,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
               </div>
 
               {/* Storage Info Details Box */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs space-y-4">
                 <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                   <Info className="w-4 h-4 text-sky-500" />
                   Sobre a Arquitetura DB
@@ -948,7 +948,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               
               {/* Performance Gauges Grid */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs">
                 <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-6">
                   Métricas Operacionais da Aplicação
                 </h3>
@@ -980,7 +980,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{cpu}%</span>
+                        <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{cpu.toFixed(1)}%</span>
                         <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">CPU Gateway</span>
                       </div>
                     </div>
@@ -1013,7 +1013,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{ram} <span className="text-[9px] font-sans font-normal">MB</span></span>
+                        <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{ram.toFixed(1)} <span className="text-[9px] font-sans font-normal">MB</span></span>
                         <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Heap RAM</span>
                       </div>
                     </div>
@@ -1046,7 +1046,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{fps}</span>
+                        <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{fps.toFixed(1)}</span>
                         <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Interface FPS</span>
                       </div>
                     </div>
@@ -1056,7 +1056,7 @@ export const DatabaseAnalyticsPage: React.FC = () => {
               </div>
 
               {/* Performance Line Trend Chart */}
-              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800/40 shadow-2xs">
                 <h3 className="text-xs font-bold text-slate-805 dark:text-slate-200 mb-4">
                   Histórico de Performance Recente (Últimos 20 segundos)
                 </h3>

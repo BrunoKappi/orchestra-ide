@@ -31,8 +31,8 @@ const edgeTypes = { ommFlow: OmmFlowEdge };
 // Layout constants
 // ---------------------------------------------------------------------------
 const NODE_W = 200;  // compact node width
-const GAP_H  = 140;  // horizontal gap between paired nodes (room for edge + label)
-const GAP_V  = 290;  // vertical gap between rows
+const GAP_H  = 240;  // horizontal gap between paired nodes (room for edge + label)
+const GAP_V  = 380;  // vertical gap between rows
 
 // ---------------------------------------------------------------------------
 // Smart layout: position nodes based on movement pairs.
@@ -232,6 +232,10 @@ const PlantFlowCanvas: React.FC = () => {
           productName:  product?.name ?? '',
           productColor: product?.color ?? '#3b82f6',
           simPaused:    mov.simPaused,
+          movementNumber: mov.number,
+          currentVolume: mov.currentVolume,
+          plannedVolume: mov.plannedVolume,
+          percentComplete: mov.percentComplete,
         },
       };
     });

@@ -233,11 +233,10 @@ export const GridDashboardPage = () => {
             toggleViewMode();
             setSelectedCardId(null);
           }}
-          className="fixed top-4 right-4 z-50 py-2 px-3.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 border border-amber-600 shadow-md ring-2 ring-amber-500/20 hover:scale-105 transition-all cursor-pointer"
-          title="Voltar para o Modo de Edição"
+          className="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-900 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-white shadow-lg backdrop-blur-xs border border-white/10 dark:border-slate-700 ring-2 ring-black/5 hover:scale-105 transition-all cursor-pointer flex items-center justify-center"
+          title="Modo Edição"
         >
           <Edit3 className="w-4 h-4" />
-          <span>Voltar para Edição</span>
         </button>
       )}
 

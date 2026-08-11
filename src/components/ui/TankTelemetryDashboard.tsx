@@ -72,7 +72,24 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
   // State to hold local scrolling history of process variables
   const [historyData, setHistoryData] = useState<Record<string, number[]>>({});
 
-  // Populate initial history from historyEngine or generate initial baseline
+  // Start/stop history engine monitoring on-demand
+  useEffect(() => {
+    if (!objectDetail) return;
+    const resolved: Array<{ objectId: string; propertyId: string }> = [];
+
+    processVariablesConfig.forEach((prop) => {
+      historyEngine.startMonitoring(objectId, prop.id);
+      resolved.push({ objectId, propertyId: prop.id });
+    });
+
+    return () => {
+      resolved.forEach((r) => {
+        historyEngine.stopMonitoring(r.objectId, r.propertyId);
+      });
+    };
+  }, [objectId, objectDetail, processVariablesConfig]);
+
+  // Populate initial history from historyEngine or generate initial baseline (flat)
   useEffect(() => {
     if (!objectDetail) return;
     const initial: Record<string, number[]> = {};
@@ -83,12 +100,10 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
       let vals = samples.map((s) => parseFloat(s.value)).filter((v) => !isNaN(v));
 
       if (vals.length === 0) {
+        // Start with the current property value as a flat baseline — no random noise
         const curVal = parseFloat(getLiveValue(prop.name, prop.defaultValue));
         const startVal = isNaN(curVal) ? 0 : curVal;
-        vals = Array.from({ length: 30 }, () => {
-          const noise = (Math.random() - 0.5) * (startVal * 0.01 || 0.5);
-          return Math.max(0, startVal + noise);
-        });
+        vals = Array.from({ length: 30 }, () => startVal);
       }
 
       if (vals.length > 30) {
@@ -262,7 +277,12 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
                   </div>
                 </div>
                 <div className="h-12 w-full">
-                  <MiniTrendChart values={v.values} color={v.color} />
+                  <MiniTrendChart 
+                    values={v.values} 
+                    color={v.color} 
+                    min={v.name === 'Level' ? 0 : v.name === 'Volume' ? 0 : v.name === 'Mass' ? 0 : v.name === 'Flow' ? -1200 : undefined}
+                    max={v.name === 'Level' ? 100 : v.name === 'Volume' ? capacity : v.name === 'Mass' ? (capacity * 1.2) : v.name === 'Flow' ? 1200 : undefined}
+                  />
                 </div>
               </div>
             ))}

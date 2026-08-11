@@ -5,6 +5,8 @@ interface MiniTrendChartProps {
   color?: string;
   height?: number;
   showPoints?: boolean;
+  min?: number;
+  max?: number;
 }
 
 export const MiniTrendChart: React.FC<MiniTrendChartProps> = ({
@@ -12,10 +14,46 @@ export const MiniTrendChart: React.FC<MiniTrendChartProps> = ({
   color = '#38bdf8',
   height = 64,
   showPoints = true,
+  min,
+  max,
 }) => {
   const safeValues = values.length > 0 ? values : [0];
-  const minVal = Math.min(...safeValues);
-  const maxVal = Math.max(...safeValues);
+  
+  // Custom scaling limits to prevent noise stretching
+  let minVal = min !== undefined ? min : Math.min(...safeValues);
+  let maxVal = max !== undefined ? max : Math.max(...safeValues);
+  
+  if (min === undefined || max === undefined) {
+    const actualMin = Math.min(...safeValues);
+    const actualMax = Math.max(...safeValues);
+    const actualRange = actualMax - actualMin;
+    
+    if (min === undefined && max === undefined) {
+      if (actualRange < 0.5) {
+        const mid = (actualMin + actualMax) / 2;
+        minVal = mid - 1.0;
+        maxVal = mid + 1.0;
+      } else {
+        minVal = actualMin;
+        maxVal = actualMax;
+      }
+    } else if (min !== undefined && max === undefined) {
+      if (actualMax - minVal < 0.5) {
+        maxVal = minVal + 2.0;
+      }
+    } else if (min === undefined && max !== undefined) {
+      if (maxVal - actualMin < 0.5) {
+        minVal = maxVal - 2.0;
+      }
+    }
+  }
+
+  // Ensure strict inequality
+  if (minVal === maxVal) {
+    minVal -= 1;
+    maxVal += 1;
+  }
+
   const range = maxVal - minVal;
 
   const width = 500;

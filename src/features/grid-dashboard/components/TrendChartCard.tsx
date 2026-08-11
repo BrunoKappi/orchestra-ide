@@ -76,6 +76,27 @@ export const TrendChartCard: React.FC<TrendChartCardProps> = ({
   // Real-time temporal history buffer (max 30 samples window)
   const [historyBuffer, setHistoryBuffer] = useState<Record<string, Array<{ timestamp: number; value: number }>>>({});
 
+  // Start/stop history engine monitoring on-demand
+  useEffect(() => {
+    const trendProps = card.trendProperties || [];
+    const resolved: Array<{ objectId: string; propertyId: string }> = [];
+
+    trendProps.forEach((prop) => {
+      const props = inheritanceService.getMergedProperties(prop.objectId, 'instance');
+      const propDef = props.find((p) => p.name === prop.propertyName);
+      if (propDef?.id) {
+        historyEngine.startMonitoring(prop.objectId, propDef.id);
+        resolved.push({ objectId: prop.objectId, propertyId: propDef.id });
+      }
+    });
+
+    return () => {
+      resolved.forEach((r) => {
+        historyEngine.stopMonitoring(r.objectId, r.propertyId);
+      });
+    };
+  }, [card.trendProperties]);
+
   // Initialize history buffer from historyEngine or baseline on card props change
   useEffect(() => {
     const trendProps = card.trendProperties || [];

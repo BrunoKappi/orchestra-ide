@@ -246,12 +246,17 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
   }, [fromMs, toMs, timeRange, innerW, onViewRangeChange]);
 
   if (data.length === 0 || data.every((d) => d.samples.length === 0)) {
+    const hasVars = data.length > 0;
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-3">
-        <Activity className="w-10 h-10 opacity-30" />
-        <p className="text-sm font-medium">Nenhum dado histórico disponível</p>
+        <Activity className={cn("w-10 h-10 opacity-30", hasVars && "animate-pulse opacity-50")} />
+        <p className="text-sm font-medium">
+          {hasVars ? 'Aguardando primeiras amostras...' : 'Nenhuma variável selecionada'}
+        </p>
         <p className="text-xs text-slate-400 max-w-sm text-center">
-          Habilite o histórico em uma propriedade e aguarde amostras serem coletadas durante a simulação.
+          {hasVars
+            ? 'Os dados começarão a aparecer assim que a simulação registrar amostras. Aguarde alguns segundos.'
+            : 'Selecione variáveis na lista à esquerda para visualizar tendências históricas.'}
         </p>
       </div>
     );
@@ -399,7 +404,7 @@ function TrendChart({ data, from, to, calculatedFrom, calculatedTo, onViewRangeC
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export const HistorianPage: React.FC = () => {
-  const { objects, mergedProperties, simulationTickCount } = useObjectModelStore();
+  const { objects, mergedProperties, simulationTickCount, simulatedValues } = useObjectModelStore();
 
   // Sidebar state
   const [expandedObjects, setExpandedObjects] = useState<Set<string>>(new Set());
@@ -430,6 +435,18 @@ export const HistorianPage: React.FC = () => {
   const [, setRefreshTick] = useState(0);
   useEffect(() => { setRefreshTick((n) => n + 1); }, [simulationTickCount]);
 
+  // Hook startMonitoring / stopMonitoring on-demand
+  useEffect(() => {
+    selectedVars.forEach((v) => {
+      historyEngine.startMonitoring(v.objectId, v.propertyId);
+    });
+    return () => {
+      selectedVars.forEach((v) => {
+        historyEngine.stopMonitoring(v.objectId, v.propertyId);
+      });
+    };
+  }, [selectedVars]);
+
   // Determine time range
   const calculatedRange = useMemo(() => {
     const cf = customFrom ? new Date(customFrom) : undefined;
@@ -443,7 +460,23 @@ export const HistorianPage: React.FC = () => {
   const historianObjects = useMemo(() => {
     return objects.map((obj) => {
       const props = inheritanceService.getMergedProperties(obj.id, 'instance') as typeof mergedProperties;
-      const histProps = props.filter((p) => p.historyConfig?.enabled);
+      const histProps = props.filter((p) => {
+        const name = p.name.toLowerCase();
+        if (p.dataType !== 'Float' && p.dataType !== 'Integer' && p.dataType !== 'Boolean' && p.dataType !== 'String') return false;
+        if (
+          name.includes('limit') ||
+          name.includes('high') ||
+          name.includes('low') ||
+          name.includes('capacity') ||
+          name.includes('tag') ||
+          name.includes('vcf') ||
+          name.includes('description') ||
+          name.includes('template')
+        ) {
+          return false;
+        }
+        return true;
+      });
       return { obj, histProps };
     }).filter(({ histProps }) => histProps.length > 0);
   }, [objects, simulationTickCount]); // eslint-disable-line
@@ -462,12 +495,29 @@ export const HistorianPage: React.FC = () => {
       .filter(({ histProps }) => histProps.length > 0);
   }, [historianObjects, sidebarSearch]);
 
-  // Toggle variable selection
+  // Toggle variable selection — also seeds an immediate first data point
   function toggleVar(objectId: string, objectName: string, propertyId: string, propertyName: string, unit: string) {
     setSelectedVars((prev) => {
       const exists = prev.find((v) => v.objectId === objectId && v.propertyId === propertyId);
       if (exists) return prev.filter((v) => !(v.objectId === objectId && v.propertyId === propertyId));
       const ci = colorCounterRef.current++ % CURVE_COLORS.length;
+
+      // Seed an immediate first sample so the chart shows something right away.
+      // Use enabled:true config to bypass the isMonitored check (startMonitoring is handled by useEffect).
+      const liveKey = `${objectId}:${propertyName}`;
+      const currentValue = simulatedValues[liveKey] ?? '0';
+      historyEngine.record(objectId, propertyId, currentValue, {
+        enabled: true,
+        collectionMode: 'interval',
+        intervalMs: 0, // force record regardless of interval
+        retentionMs: 86400000,
+        maxSamples: 5000,
+        deadband: 0,
+        compression: false,
+        engineeringUnit: unit,
+        notes: 'historian-seed',
+      }, 'simulation');
+
       return [...prev, { objectId, objectName, propertyId, propertyName, unit, colorIndex: ci }];
     });
   }

@@ -167,7 +167,7 @@ const defaultState: OmmStoreState = {
   cutoffSnapshots: [],
   simulatorState: {
     isRunning: false,
-    speedMultiplier: 10,
+    speedMultiplier: 1,
     simulatedTime: new Date().toISOString(),
     tickCount: 0,
     lastTickAt: new Date().toISOString(),
@@ -176,7 +176,7 @@ const defaultState: OmmStoreState = {
   securityUsers: [],
   selectedMovementId: null,
   selectedOrderId: null,
-  activeView: 'movements',
+  activeView: 'overview',
   tableFilters: {},
   globalSearch: '',
   tableGroupBy: null,
@@ -263,7 +263,14 @@ export const useOmmStore = create<OmmStore>()(
       }
 
       const simState = simStateRepo.get();
-      simState.isRunning = simulationEngine.getIsRunning();
+      const isRunning = simulationEngine.getIsRunning();
+      simState.isRunning = isRunning;
+      if (isRunning) {
+        const cur = new Date(simState.simulatedTime || new Date().toISOString());
+        cur.setSeconds(cur.getSeconds() + 1 * (simState.speedMultiplier || 10));
+        simState.simulatedTime = cur.toISOString();
+        simStateRepo.set(simState);
+      }
 
       set((state) => {
         state.orders            = orderRepo.getAll();

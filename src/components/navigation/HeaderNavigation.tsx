@@ -22,6 +22,7 @@ import {
   LayoutGrid,
   History,
   Database,
+  LogOut,
 } from "lucide-react";
 
 import { useSecurityStore } from "../../store/useSecurityStore";
@@ -32,6 +33,9 @@ import { useWidgetStore } from "../../store/useWidgetStore";
 import { useScreenStore } from "../../store/useScreenStore";
 import { useFlowStore } from "../../store/useFlowStore";
 import { useOpcStore } from "../../store/useOpcStore";
+import { useOmmStore } from "../../features/omm/store/useOmmStore";
+import { useAuthStore } from "../../store/useAuthStore";
+import { historyEngine } from "../../services/HistoryEngine";
 import { Modal } from "../ui/Modal";
 import { cn } from "../../utils/cn";
 
@@ -55,16 +59,37 @@ export const HeaderNavigation = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const dataPopoverRef = useRef<HTMLDivElement>(null);
+  const userPopoverRef = useRef<HTMLDivElement>(null);
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDataPopoverOpen, setIsDataPopoverOpen] = useState(false);
+  const [isUserPopoverOpen, setIsUserPopoverOpen] = useState(false);
+
+  const { currentUser, logout } = useAuthStore();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(target)
       ) {
         setIsDropdownOpen(false);
+      }
+      if (
+        dataPopoverRef.current &&
+        !dataPopoverRef.current.contains(target)
+      ) {
+        setIsDataPopoverOpen(false);
+      }
+      if (
+        userPopoverRef.current &&
+        !userPopoverRef.current.contains(target)
+      ) {
+        setIsUserPopoverOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -75,7 +100,7 @@ export const HeaderNavigation = () => {
 
   const navItems = [
     {
-      to: "/",
+      to: "/orchestra",
       label: "Orquestra IDE",
       icon: Cpu,
       colorClass: "text-sky-500",
@@ -187,7 +212,7 @@ export const HeaderNavigation = () => {
   const activeItem =
     navItems.find((item) => {
       if (item.to === "/") {
-        return currentPath === "/";
+        return currentPath === "/" || currentPath === "/home";
       }
       return currentPath.startsWith(item.to);
     }) || navItems[0];
@@ -237,13 +262,32 @@ export const HeaderNavigation = () => {
     useFlowStore.getState().clearAllData();
     useSecurityStore.getState().clearAllData();
     useLogStore.getState().clearLogs();
-    // Clear OMM-specific namespace
+    
+    // Clear other specific keys in localStorage
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && (key.startsWith('omm_v2') || key === 'grid_dashboard_layout')) keysToRemove.push(key);
+      if (key && (
+        key.startsWith('omm_v2') || 
+        key.startsWith('historian_v1_') ||
+        key.startsWith('archestra_') ||
+        key === 'grid_dashboard_layout' ||
+        key === 'grid_dashboard_screens' ||
+        key === 'opc_virtual_tags'
+      )) {
+        keysToRemove.push(key);
+      }
     }
     keysToRemove.forEach((k) => localStorage.removeItem(k));
+    
+    // Clear stores in memory
+    useOmmStore.getState().clearAll();
+    historyEngine.clearAll();
+    
+    // Force OMM refresh and OPC re-init
+    useOmmStore.getState().refresh();
+    useOpcStore.getState().init();
+    
     setIsResetConfirmOpen(false);
   };
 
@@ -269,7 +313,10 @@ export const HeaderNavigation = () => {
     <header className="h-12 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-4 shrink-0 shadow-2xs z-30 select-none">
       {/* Route Tabs */}
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2 select-none shrink-0">
+        <div 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 select-none shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+        >
           <img
             src="/SerranoIcon.png"
             alt="Serrano Logo"
@@ -279,11 +326,15 @@ export const HeaderNavigation = () => {
             Serrano Automação
           </span>
         </div>
-        {/* Navigation Route Switches */}
+      </div>
+
+      {/* Global Actions */}
+      <div className="flex items-center gap-2.5 text-xs">
+        {/* Navigation Route Switches (Repositioned to the right side) */}
         <div ref={dropdownRef} className="relative z-50">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[180px] bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/70 dark:hover:bg-slate-700/80 rounded-lg border border-slate-200/80 dark:border-slate-700/50 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all select-none cursor-pointer">
+            className="flex items-center justify-between gap-2 px-3 py-1.5 min-w-[170px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/70 dark:hover:bg-slate-700 rounded-lg border border-slate-200/80 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all select-none cursor-pointer">
             <div className="flex items-center gap-2">
               <activeItem.icon
                 className={cn(
@@ -299,15 +350,17 @@ export const HeaderNavigation = () => {
                 </span>
               )}
             </div>
-            <ChevronDown className="w-3.5 h-3.5 opacity-60" />
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute left-0 mt-1.5 min-w-[200px] max-h-[350px] overflow-y-auto bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-lg py-1 z-50 animate-in fade-in-50 slide-in-from-top-1 duration-100">
+            <div className={cn(
+              "absolute right-0 mt-1.5 min-w-[200px] max-h-[350px] overflow-y-auto rounded-lg border shadow-lg py-1 z-50 animate-in fade-in-50 slide-in-from-top-1 duration-100",
+              "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
+            )}>
               {navItems.map((item) => {
                 const isActive =
                   item.to === "/"
-                    ? currentPath === "/"
+                    ? currentPath === "/" || currentPath === "/home"
                     : currentPath.startsWith(item.to);
                 return (
                   <NavLink
@@ -316,10 +369,10 @@ export const HeaderNavigation = () => {
                     end={item.to === "/"}
                     onClick={() => setIsDropdownOpen(false)}
                     className={cn(
-                      "flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60",
+                      "flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors",
                       isActive
-                        ? "bg-sky-50/50 dark:bg-sky-950/20 text-sky-600 dark:text-sky-400"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
+                        ? "bg-sky-950/40 text-sky-400 dark:bg-sky-950/40 dark:text-sky-400"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700",
                     )}>
                     <div className="flex items-center gap-2">
                       <item.icon
@@ -344,37 +397,64 @@ export const HeaderNavigation = () => {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Global Actions */}
-      <div className="flex items-center gap-2 text-xs">
-        <button
-          onClick={handleResetData}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium transition-colors"
-          title="Reset to Initial Seed Dataset">
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Reset Data</span>
-        </button>
+        {/* Data Management Dropdown */}
+        <div ref={dataPopoverRef} className="relative z-50">
+          <button
+            onClick={() => setIsDataPopoverOpen(!isDataPopoverOpen)}
+            className="flex items-center justify-center p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            title="Gestão de Dados Local Storage"
+          >
+            <Database className="w-4 h-4 text-indigo-500" />
+            <ChevronDown className="w-3 h-3 opacity-60 ml-1" />
+          </button>
 
-        <button
-          onClick={handleResetMockData}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium transition-colors bg-emerald-50/30 dark:bg-emerald-950/10 cursor-pointer"
-          title="Reset e Criar Massa de Dados Customizada (Tanques/Esferas)">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Reset/Mock</span>
-        </button>
+          {isDataPopoverOpen && (
+            <div className="absolute right-0 mt-1.5 w-56 rounded-lg border shadow-lg py-1.5 z-50 text-xs bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+              <div className="px-3 py-1 text-[10px] font-bold uppercase border-b mb-1 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-700">
+                Banco de Dados Local
+              </div>
+              
+              <button
+                onClick={() => {
+                  setIsDataPopoverOpen(false);
+                  handleResetData();
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left transition-colors font-semibold text-rose-600 dark:text-rose-450 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-rose-500" />
+                <span>Limpar Tudo (Reset Data)</span>
+              </button>
 
-        <button
-          onClick={() => navigate('/simulator')}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-sky-200 dark:border-sky-800 hover:bg-sky-50 dark:hover:bg-sky-950/30 text-sky-700 dark:text-sky-400 font-medium transition-colors bg-sky-50/30 dark:bg-sky-950/10 cursor-pointer"
-          title="Abrir Simulador Global (Painel de Controle e Simulação de Dados)">
-          <Activity className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
-          <span>Simulador Global</span>
-        </button>
+              <button
+                onClick={() => {
+                  setIsDataPopoverOpen(false);
+                  handleResetMockData();
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left transition-colors font-semibold text-emerald-600 dark:text-emerald-450 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Restaurar Mock (Reset/Mock)</span>
+              </button>
 
+              <button
+                onClick={() => {
+                  setIsDataPopoverOpen(false);
+                  navigate('/simulator');
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-left transition-colors font-semibold border-t mt-1.5 pt-1.5 text-sky-600 dark:text-sky-400 border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+              >
+                <Activity className="w-3.5 h-3.5 text-sky-500 animate-pulse" />
+                <span>Painel Simulador Global</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-350 transition-colors"
           title="Toggle Light/Dark Theme">
           {theme === "dark" ? (
             <Sun className="w-4 h-4 text-amber-400" />
@@ -383,12 +463,52 @@ export const HeaderNavigation = () => {
           )}
         </button>
 
+        {/* User Session Dropdown */}
+        {currentUser && (
+          <div ref={userPopoverRef} className="relative z-50">
+            <button
+              onClick={() => setIsUserPopoverOpen(!isUserPopoverOpen)}
+              className="flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/70 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all select-none cursor-pointer"
+            >
+              <img
+                src={currentUser.avatarUrl}
+                alt="Avatar"
+                className="w-5 h-5 rounded-md object-cover border border-black/5 dark:border-white/5 bg-slate-200 dark:bg-slate-900"
+              />
+              <span className="max-w-[70px] truncate">{currentUser.name}</span>
+              <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+            </button>
+
+            {isUserPopoverOpen && (
+              <div className="absolute right-0 mt-1.5 w-48 rounded-lg border shadow-lg py-2 z-50 text-xs bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+                <div className="px-3 py-1 flex flex-col gap-0.5 border-b mb-1.5 pb-1.5 border-slate-100 dark:border-slate-700">
+                  <span className="font-bold truncate text-slate-800 dark:text-slate-100">{currentUser.name}</span>
+                  <span className="text-[10px] text-slate-400 font-semibold">{currentUser.role}</span>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setIsUserPopoverOpen(false);
+                    logout();
+                    navigate('/login');
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-rose-600 dark:text-rose-400 text-left transition-colors font-semibold hover:bg-rose-50 dark:hover:bg-rose-950/25"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Logoff / Sair</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Collapse Button */}
         <button
           onClick={() => {
             setIsCollapsed(true);
             localStorage.setItem("archestra_navbar_collapsed", "true");
           }}
-          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-500 dark:text-slate-400 transition-colors"
           title="Colapsar Barra de Menu">
           <ChevronUp className="w-4 h-4" />
         </button>

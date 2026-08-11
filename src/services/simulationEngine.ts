@@ -60,12 +60,12 @@ const HISTORY_SAMPLE_INTERVAL = 1;
 export class SimulationEngine {
   private timer: number | null = null;
   private isRunning: boolean = false;
-  private speedMult: number = 10;
+  private speedMult: number = 1;
   private tickListeners: Array<() => void> = [];
   private tickCount: number = 0;
 
-  public start(speedMult: number = 10): void {
-    this.speedMult = speedMult;
+  public start(_speedMult: number = 1): void {
+    this.speedMult = 1;
     if (this.isRunning) return;
     this.isRunning = true;
     this.timer = window.setInterval(() => {
@@ -81,8 +81,8 @@ export class SimulationEngine {
     this.isRunning = false;
   }
 
-  public setSpeed(speedMult: number): void {
-    this.speedMult = speedMult;
+  public setSpeed(_speedMult: number): void {
+    this.speedMult = 1;
   }
 
   public getIsRunning(): boolean {
@@ -96,7 +96,7 @@ export class SimulationEngine {
     };
   }
 
-  private notifyListeners(): void {
+  public notifyListeners(): void {
     this.tickListeners.forEach((fn) => fn());
   }
 
@@ -180,9 +180,9 @@ export class SimulationEngine {
         const newSrcLvl = (newSrcVol / srcCap) * 100;
         const newSrcMass = (newSrcVol * srcDensity) / 1000;
 
-        this.updateProp(srcProps, 'Volume', newSrcVol.toFixed(1));
-        this.updateProp(srcProps, 'Level', newSrcLvl.toFixed(1));
-        this.updateProp(srcProps, 'Mass', newSrcMass.toFixed(1));
+        this.updateProp(srcProps, 'Volume', newSrcVol.toFixed(4));
+        this.updateProp(srcProps, 'Level', newSrcLvl.toFixed(4));
+        this.updateProp(srcProps, 'Mass', newSrcMass.toFixed(4));
         this.updateProp(srcProps, 'Flow', (-flowRate).toFixed(1));
         this.updateProp(srcProps, 'Status', 'Em Transferência');
 
@@ -191,9 +191,9 @@ export class SimulationEngine {
         const newDestLvl = (newDestVol / destCap) * 100;
         const newDestMass = (newDestVol * destDensity) / 1000;
 
-        this.updateProp(destProps, 'Volume', newDestVol.toFixed(1));
-        this.updateProp(destProps, 'Level', newDestLvl.toFixed(1));
-        this.updateProp(destProps, 'Mass', newDestMass.toFixed(1));
+        this.updateProp(destProps, 'Volume', newDestVol.toFixed(4));
+        this.updateProp(destProps, 'Level', newDestLvl.toFixed(4));
+        this.updateProp(destProps, 'Mass', newDestMass.toFixed(4));
         this.updateProp(destProps, 'Flow', flowRate.toFixed(1));
         this.updateProp(destProps, 'Status', 'Em Transferência');
 
@@ -246,21 +246,21 @@ export class SimulationEngine {
       const objProps = propsByObject[objId];
       if (objProps['Temperature']) {
         const currentTemp = parseFloat(objProps['Temperature'].defaultValue || '25.0');
-        const noise = (Math.random() - 0.5) * 0.15;
+        const noise = (Math.random() - 0.5) * 0.02; // was 0.15 — reduced to avoid chart spikes
         const newTemp = Math.max(-20, Math.min(80, currentTemp + noise));
-        this.updateProp(objProps, 'Temperature', newTemp.toFixed(1));
+        this.updateProp(objProps, 'Temperature', newTemp.toFixed(2));
       }
       if (objProps['Pressure']) {
         const currentPress = parseFloat(objProps['Pressure'].defaultValue || '1.2');
-        const noise = (Math.random() - 0.5) * 0.03;
+        const noise = (Math.random() - 0.5) * 0.004; // was 0.03 — reduced
         const newPress = Math.max(0.1, Math.min(35, currentPress + noise));
-        this.updateProp(objProps, 'Pressure', newPress.toFixed(2));
+        this.updateProp(objProps, 'Pressure', newPress.toFixed(3));
       }
       if (objProps['Density']) {
         const currentDens = parseFloat(objProps['Density'].defaultValue || '720.0');
-        const noise = (Math.random() - 0.5) * 0.8;
+        const noise = (Math.random() - 0.5) * 0.1; // was 0.8 — reduced
         const newDens = Math.max(400, Math.min(1200, currentDens + noise));
-        this.updateProp(objProps, 'Density', newDens.toFixed(1));
+        this.updateProp(objProps, 'Density', newDens.toFixed(2));
       }
     });
 
@@ -300,10 +300,11 @@ export class SimulationEngine {
 
     Object.keys(propsByObject).forEach((objId) => {
       const objProps = propsByObject[objId];
-      trackedProps.forEach((propName) => {
-        if (objProps[propName]) {
-          const prop = objProps[propName];
-          historyEngine.record(objId, prop.id, prop.defaultValue, defaultHistConfig, 'simulation');
+      Object.keys(objProps).forEach((propName) => {
+        const prop = objProps[propName];
+        const isMonitored = historyEngine.isMonitored(objId, prop.id);
+        if (isMonitored || trackedProps.includes(propName)) {
+          historyEngine.record(objId, prop.id, prop.defaultValue, prop.historyConfig || defaultHistConfig, 'simulation');
         }
       });
     });

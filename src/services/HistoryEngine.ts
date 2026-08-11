@@ -7,6 +7,8 @@ const MAX_SAMPLES_HARD_CAP = 50_000;
 const lastRecordedAt = new Map<string, number>();
 // Tracks the last recorded value per key to enforce deadband
 const lastRecordedValue = new Map<string, string>();
+// Tracks active monitoring components for on-demand variable history recording
+const monitoredKeys = new Map<string, number>();
 
 type Store = Map<string, HistorySample[]>;
 let store: Store = new Map();
@@ -17,49 +19,11 @@ function key(objectId: string, propertyId: string): string {
 }
 
 function loadFromStorage(): void {
-  try {
-    const index = localStorage.getItem(`${STORAGE_PREFIX}index`);
-    if (!index) return;
-    const keys: string[] = JSON.parse(index);
-    keys.forEach((k) => {
-      const raw = localStorage.getItem(`${STORAGE_PREFIX}${k}`);
-      if (raw) {
-        store.set(k, JSON.parse(raw));
-      }
-    });
-  } catch {
-    // Storage corrupt — start clean
-    store = new Map();
-  }
+  // Bypassed: keep history in-memory only
 }
 
-const pendingPersist = new Set<string>();
-let persistTimeout: any = null;
-
-function schedulePersist(k: string): void {
-  pendingPersist.add(k);
-  if (persistTimeout === null) {
-    persistTimeout = setTimeout(() => {
-      pendingPersist.forEach((keyToPersist) => {
-        try {
-          const samples = store.get(keyToPersist) ?? [];
-          localStorage.setItem(`${STORAGE_PREFIX}${keyToPersist}`, JSON.stringify(samples));
-
-          // Maintain index
-          const index = localStorage.getItem(`${STORAGE_PREFIX}index`);
-          const keys: string[] = index ? JSON.parse(index) : [];
-          if (!keys.includes(keyToPersist)) {
-            keys.push(keyToPersist);
-            localStorage.setItem(`${STORAGE_PREFIX}index`, JSON.stringify(keys));
-          }
-        } catch {
-          // Quota exceeded — skip silently
-        }
-      });
-      pendingPersist.clear();
-      persistTimeout = null;
-    }, 2000);
-  }
+function schedulePersist(_k?: string): void {
+  // Bypassed: keep history in-memory only
 }
 
 function purgeExpiredSamples(k: string, retentionMs: number, maxSamples: number): void {
@@ -85,6 +49,31 @@ export const historyEngine = {
     initialized = true;
   },
 
+  /** Start monitoring a specific tag for history collection */
+  startMonitoring(objectId: string, propertyId: string): void {
+    const k = key(objectId, propertyId);
+    const count = monitoredKeys.get(k) ?? 0;
+    monitoredKeys.set(k, count + 1);
+  },
+
+  /** Stop monitoring. If count drops to 0, clear samples from memory and storage */
+  stopMonitoring(objectId: string, propertyId: string): void {
+    const k = key(objectId, propertyId);
+    const count = monitoredKeys.get(k) ?? 0;
+    if (count <= 1) {
+      monitoredKeys.delete(k);
+      // Clear data to save memory and avoid LocalStorage footprint
+      this.clearKey(objectId, propertyId);
+    } else {
+      monitoredKeys.set(k, count - 1);
+    }
+  },
+
+  isMonitored(objectId: string, propertyId: string): boolean {
+    const k = key(objectId, propertyId);
+    return monitoredKeys.has(k);
+  },
+
   /**
    * Record a new sample, respecting config (deadband, interval, on_change).
    * Returns true if a sample was actually recorded.
@@ -93,23 +82,27 @@ export const historyEngine = {
     objectId: string,
     propertyId: string,
     value: string,
-    config: PropertyHistoryConfig,
+    config?: PropertyHistoryConfig,
     source: HistorySample['source'] = 'simulation',
     quality: SampleQuality = 'Good'
   ): boolean {
-    if (!config.enabled) return false;
-
     const k = key(objectId, propertyId);
+    const isMonitored = monitoredKeys.has(k);
+
+    // Record if enabled in config or if actively monitored on-demand by the historian
+    if (!config?.enabled && !isMonitored) return false;
+
     const now = Date.now();
     const prevValue = lastRecordedValue.get(k);
 
-    const intervalMs = config.intervalMs ?? config.periodMs ?? 1000;
-    const deadband = config.deadband ?? 0;
-    const retentionMs = config.retentionMs ?? 86400000;
-    const maxSamples = config.maxSamples ?? 5000;
+    const intervalMs = config?.intervalMs ?? config?.periodMs ?? 1000;
+    const deadband = config?.deadband ?? 0;
+    const retentionMs = config?.retentionMs ?? 86400000;
+    const maxSamples = config?.maxSamples ?? 5000;
 
     // --- Collection mode check ---
-    if (config.collectionMode === 'interval') {
+    const collectionMode = config?.collectionMode ?? 'interval';
+    if (collectionMode === 'interval') {
       const last = lastRecordedAt.get(k) ?? 0;
       if (now - last < intervalMs) return false;
 

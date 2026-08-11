@@ -255,7 +255,6 @@ export class SeedService {
 
     // -------------------------------------------------------------------------
     // 5a. Properties on the BASE TANK TEMPLATE
-    // These are inherited by all derived templates and instances.
     // -------------------------------------------------------------------------
     const baseTplProps: PropDef[] = [
       // Identificação
@@ -267,16 +266,16 @@ export class SeedService {
       // Estado Operacional
       makeProp(baseTankTplId, 'template', 'Status', 'String', 'Normal', 'Status operacional e de inventário do tanque', 'Status'),
 
-      // Capacidade e Inventário (Com Historian/Storyon ativado)
+      // Capacidade e Inventário
       makeProp(baseTankTplId, 'template', 'Capacity', 'Float', '15000.0', 'Capacidade volumétrica nominal total (m³)', 'Inventário'),
-      makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³' }),
-      makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '%' }),
+      makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário'),
+      makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário'),
       makeProp(baseTankTplId, 'template', 'Mass', 'Float', '0.0', 'Massa total armazenada (toneladas)', 'Inventário'),
-
-      // Processo (Com Historian/Storyon ativado)
-      makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³/h' }),
-      makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '°C' }),
-      makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo', { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'bar' }),
+ 
+      // Processo
+      makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo'),
+      makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo'),
+      makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo'),
       makeProp(baseTankTplId, 'template', 'Density', 'Float', '800.0', 'Densidade operacional do produto (kg/m³)', 'Processo'),
     ];
 
@@ -586,6 +585,8 @@ export class SeedService {
       // -----------------------------------------------------------------------
       // Instance-level OVERRIDES only — values that differ from template defaults.
       // -----------------------------------------------------------------------
+      const isHistoryEnabled = seed.id === 'tank-tk-301' || seed.id === 'tank-tk-302';
+
       const instanceProps: PropDef[] = [
         makeProp(seed.id, 'instance', 'Tag', 'String', seed.tag, 'TAG industrial do equipamento', 'Identificação'),
         makeProp(seed.id, 'instance', 'Description', 'String', seed.description, 'Descrição operacional', 'Identificação'),
@@ -593,11 +594,11 @@ export class SeedService {
         makeProp(seed.id, 'instance', 'Product', 'String', seed.productName, 'Produto petroquímico armazenado', 'Identificação'),
         makeProp(seed.id, 'instance', 'Status', 'String', seed.status, 'Status operacional e de inventário', 'Status'),
         makeProp(seed.id, 'instance', 'Capacity', 'Float', seed.capacity.toString(), 'Capacidade volumétrica nominal total (m³)', 'Inventário'),
-        makeProp(seed.id, 'instance', 'Level', 'Float', seed.level.toString(), 'Nível medido (%)', 'Inventário'),
-        makeProp(seed.id, 'instance', 'Volume', 'Float', vol.toFixed(1), 'Volume atual (m³)', 'Inventário'),
-        makeProp(seed.id, 'instance', 'Temperature', 'Float', seed.temp.toString(), 'Temperatura (°C)', 'Processo'),
-        makeProp(seed.id, 'instance', 'Pressure', 'Float', seed.press.toString(), 'Pressão (bar)', 'Processo'),
-        makeProp(seed.id, 'instance', 'Flow', 'Float', seed.flow.toString(), 'Vazão (m³/h)', 'Processo'),
+        makeProp(seed.id, 'instance', 'Level', 'Float', seed.level.toString(), 'Nível medido (%)', 'Inventário', isHistoryEnabled ? { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '%' } : undefined),
+        makeProp(seed.id, 'instance', 'Volume', 'Float', vol.toFixed(1), 'Volume atual (m³)', 'Inventário', isHistoryEnabled ? { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³' } : undefined),
+        makeProp(seed.id, 'instance', 'Temperature', 'Float', seed.temp.toString(), 'Temperatura (°C)', 'Processo', isHistoryEnabled ? { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: '°C' } : undefined),
+        makeProp(seed.id, 'instance', 'Pressure', 'Float', seed.press.toString(), 'Pressão (bar)', 'Processo', isHistoryEnabled ? { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'bar' } : undefined),
+        makeProp(seed.id, 'instance', 'Flow', 'Float', seed.flow.toString(), 'Vazão (m³/h)', 'Processo', isHistoryEnabled ? { enabled: true, periodMs: 1000, storageType: 'Memory', engineeringUnit: 'm³/h' } : undefined),
         makeProp(seed.id, 'instance', 'Density', 'Float', seed.density.toString(), 'Densidade (kg/m³)', 'Processo'),
         makeProp(seed.id, 'instance', 'Mass', 'Float', mass.toFixed(1), 'Massa total armazenada (t)', 'Inventário'),
       ];
@@ -783,6 +784,167 @@ export class SeedService {
               },
             ],
           };
+        } else if (seed.id === 'tank-tk-404' && p.name === 'Temperature') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-404-temp-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '28.0',
+                severity: 'medium',
+                priority: 50,
+                message: '[TK-404] Alerta: Temperatura do Para-Xileno acima do normal (>= 28 °C)',
+                color: '#eab308',
+                icon: 'AlertCircle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.5,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-302' && p.name === 'Temperature') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-302-temp-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '-5.0',
+                severity: 'medium',
+                priority: 60,
+                message: '[V-302] Alerta: Temperatura da esfera de Eteno elevada (>= -5 °C)',
+                color: '#eab308',
+                icon: 'AlertCircle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.5,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-302' && p.name === 'Pressure') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-302-press-hh',
+                type: 'HH',
+                enabled: true,
+                blocked: false,
+                compareValue: '20.0',
+                severity: 'critical',
+                priority: 95,
+                message: '[V-302] ALARME CRÍTICO: Pressão muito alta na esfera de Eteno (>= 20.0 bar)',
+                color: '#ef4444',
+                icon: 'ShieldAlert',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.5,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-402' && p.name === 'Level') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-402-level-ll',
+                type: 'LL',
+                enabled: true,
+                blocked: false,
+                compareValue: '5.0',
+                severity: 'critical',
+                priority: 90,
+                message: '[V-402] ALARME CRÍTICO: Nível muito baixo de Propeno (<= 5.0 %)',
+                color: '#ef4444',
+                icon: 'ShieldAlert',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 1.0,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-v-402' && p.name === 'Temperature') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-v-402-temp-l',
+                type: 'L',
+                enabled: true,
+                blocked: false,
+                compareValue: '10.0',
+                severity: 'low',
+                priority: 30,
+                message: '[V-402] Aviso: Temperatura baixa de Propeno (<= 10.0 °C)',
+                color: '#3b82f6',
+                icon: 'Bell',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.5,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-tk-403' && p.name === 'Level') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-403-level-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '80.0',
+                severity: 'high',
+                priority: 70,
+                message: '[TK-403] Alerta: Nível de Para-Xileno elevado (>= 80.0 %)',
+                color: '#f97316',
+                icon: 'AlertTriangle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 1.0,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
+        } else if (seed.id === 'tank-tk-301' && p.name === 'Pressure') {
+          alarmConfig = {
+            enabled: true,
+            rules: [
+              {
+                id: 'rule-tk-301-press-h',
+                type: 'H',
+                enabled: true,
+                blocked: false,
+                compareValue: '2.5',
+                severity: 'medium',
+                priority: 50,
+                message: '[TK-301] Alerta: Pressão elevada no tanque de Nafta (>= 2.5 bar)',
+                color: '#eab308',
+                icon: 'AlertCircle',
+                activationDelay: 0,
+                returnDelay: 0,
+                hysteresis: 0.1,
+                requireAck: true,
+                historical: true,
+              },
+            ],
+          };
         }
 
         propertyRepo.save({ id: uuidv4(), ...p, alarmConfig, createdAt: now, updatedAt: now });
@@ -851,6 +1013,249 @@ export class SeedService {
     ];
     localStorage.setItem(STORAGE_KEYS.MOVEMENTS, JSON.stringify(initialMovements));
 
+    // Seed 12 diverse active and historical alarms
+    const enrichedAlarms = [
+      {
+        id: 'alarm-seeded-1',
+        ruleId: 'rule-tk-301-level-h',
+        objectId: 'tank-tk-301',
+        objectName: 'TK-301',
+        propertyName: 'Level',
+        currentValue: '82.5',
+        configuredValue: '70.0',
+        severity: 'high' as const,
+        priority: 75,
+        message: '[TK-301] Alerta: Nível elevado de Nafta (>= 70%)',
+        color: '#f97316',
+        icon: 'AlertTriangle',
+        activatedAt: new Date(n - 3600000).toISOString(),
+        acknowledgedAt: null,
+        clearedAt: null,
+        ackedBy: null,
+        durationMs: null,
+        status: 'Active Unacknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-2',
+        ruleId: 'rule-v-301-press-h',
+        objectId: 'tank-v-301',
+        objectName: 'V-301',
+        propertyName: 'Pressure',
+        currentValue: '23.4',
+        configuredValue: '18.0',
+        severity: 'critical' as const,
+        priority: 90,
+        message: '[V-301] ALARME CRÍTICO: Pressão alta na Esfera de Eteno (>= 18.0 bar)',
+        color: '#ef4444',
+        icon: 'ShieldAlert',
+        activatedAt: new Date(n - 1800000).toISOString(),
+        acknowledgedAt: null,
+        clearedAt: null,
+        ackedBy: null,
+        durationMs: null,
+        status: 'Active Unacknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-3',
+        ruleId: 'rule-tk-404-temp-h',
+        objectId: 'tank-tk-404',
+        objectName: 'TK-404',
+        propertyName: 'Temperature',
+        currentValue: '31.2',
+        configuredValue: '28.0',
+        severity: 'medium' as const,
+        priority: 50,
+        message: '[TK-404] Alerta: Temperatura do Para-Xileno acima do normal (>= 28 °C)',
+        color: '#eab308',
+        icon: 'AlertCircle',
+        activatedAt: new Date(n - 7200000).toISOString(),
+        acknowledgedAt: new Date(n - 5400000).toISOString(),
+        clearedAt: null,
+        ackedBy: 'carlos.souza',
+        durationMs: null,
+        status: 'Active Acknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-4',
+        ruleId: 'rule-v-401-level-h',
+        objectId: 'tank-v-401',
+        objectName: 'V-401',
+        propertyName: 'Level',
+        currentValue: '72.0',
+        configuredValue: '70.0',
+        severity: 'high' as const,
+        priority: 70,
+        message: '[V-401] Alerta: Nível elevado no Vaso de Propeno (>= 70%)',
+        color: '#f97316',
+        icon: 'AlertTriangle',
+        activatedAt: new Date(n - 3600000 * 3).toISOString(),
+        acknowledgedAt: new Date(n - 3600000 * 2.5).toISOString(),
+        clearedAt: null,
+        ackedBy: 'ana.martins',
+        durationMs: null,
+        status: 'Active Acknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-5',
+        ruleId: 'rule-tk-302-level-l',
+        objectId: 'tank-tk-302',
+        objectName: 'TK-302',
+        propertyName: 'Level',
+        currentValue: '22.4',
+        configuredValue: '20.0',
+        severity: 'low' as const,
+        priority: 25,
+        message: '[TK-302] Aviso: Nível baixo de Nafta (<= 20%)',
+        color: '#3b82f6',
+        icon: 'Bell',
+        activatedAt: new Date(n - 3600000 * 4).toISOString(),
+        acknowledgedAt: null,
+        clearedAt: new Date(n - 3600000 * 2).toISOString(),
+        ackedBy: null,
+        durationMs: 7200000,
+        status: 'Cleared Unacknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-6',
+        ruleId: 'rule-v-302-temp-h',
+        objectId: 'tank-v-302',
+        objectName: 'V-302',
+        propertyName: 'Temperature',
+        currentValue: '-8.5',
+        configuredValue: '-5.0',
+        severity: 'medium' as const,
+        priority: 60,
+        message: '[V-302] Alerta: Temperatura da esfera de Eteno elevada (>= -5 °C)',
+        color: '#eab308',
+        icon: 'AlertCircle',
+        activatedAt: new Date(n - 3600000 * 5).toISOString(),
+        acknowledgedAt: null,
+        clearedAt: new Date(n - 3600000 * 3).toISOString(),
+        ackedBy: null,
+        durationMs: 7200000,
+        status: 'Cleared Unacknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-7',
+        ruleId: 'rule-tk-403-press-l',
+        objectId: 'tank-tk-403',
+        objectName: 'TK-403',
+        propertyName: 'Pressure',
+        currentValue: '1.05',
+        configuredValue: '1.0',
+        severity: 'low' as const,
+        priority: 30,
+        message: '[TK-403] Aviso: Pressão abaixo do nominal (<= 1.0 bar)',
+        color: '#3b82f6',
+        icon: 'Bell',
+        activatedAt: new Date(n - 3600000 * 6).toISOString(),
+        acknowledgedAt: new Date(n - 3600000 * 5.5).toISOString(),
+        clearedAt: new Date(n - 3600000 * 4).toISOString(),
+        ackedBy: 'bruno.kappi',
+        durationMs: 7200000,
+        status: 'Cleared Acknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-8',
+        ruleId: 'rule-v-402-level-ll',
+        objectId: 'tank-v-402',
+        objectName: 'V-402',
+        propertyName: 'Level',
+        currentValue: '28.5',
+        configuredValue: '5.0',
+        severity: 'critical' as const,
+        priority: 90,
+        message: '[V-402] ALARME CRÍTICO: Nível muito baixo de Propeno (<= 5.0 %)',
+        color: '#ef4444',
+        icon: 'ShieldAlert',
+        activatedAt: new Date(n - 3600000 * 8).toISOString(),
+        acknowledgedAt: new Date(n - 3600000 * 7.8).toISOString(),
+        clearedAt: new Date(n - 3600000 * 6).toISOString(),
+        ackedBy: 'bruno.kappi',
+        durationMs: 7200000,
+        status: 'Cleared Acknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-9',
+        ruleId: 'rule-v-402-temp-l',
+        objectId: 'tank-v-402',
+        objectName: 'V-402',
+        propertyName: 'Temperature',
+        currentValue: '9.2',
+        configuredValue: '10.0',
+        severity: 'low' as const,
+        priority: 30,
+        message: '[V-402] Aviso: Temperatura baixa de Propeno (<= 10.0 °C)',
+        color: '#3b82f6',
+        icon: 'Bell',
+        activatedAt: new Date(n - 45 * 60000).toISOString(),
+        acknowledgedAt: null,
+        clearedAt: null,
+        ackedBy: null,
+        durationMs: null,
+        status: 'Active Unacknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-10',
+        ruleId: 'rule-tk-403-level-h',
+        objectId: 'tank-tk-403',
+        objectName: 'TK-403',
+        propertyName: 'Level',
+        currentValue: '81.4',
+        configuredValue: '80.0',
+        severity: 'high' as const,
+        priority: 70,
+        message: '[TK-403] Alerta: Nível de Para-Xileno elevado (>= 80.0 %)',
+        color: '#f97316',
+        icon: 'AlertTriangle',
+        activatedAt: new Date(n - 15 * 60000).toISOString(),
+        acknowledgedAt: null,
+        clearedAt: null,
+        ackedBy: null,
+        durationMs: null,
+        status: 'Active Unacknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-11',
+        ruleId: 'rule-tk-301-press-h',
+        objectId: 'tank-tk-301',
+        objectName: 'TK-301',
+        propertyName: 'Pressure',
+        currentValue: '1.02',
+        configuredValue: '2.5',
+        severity: 'medium' as const,
+        priority: 50,
+        message: '[TK-301] Alerta: Pressão elevada no tanque de Nafta (>= 2.5 bar)',
+        color: '#eab308',
+        icon: 'AlertCircle',
+        activatedAt: new Date(n - 3600000 * 12).toISOString(),
+        acknowledgedAt: new Date(n - 3600000 * 11.5).toISOString(),
+        clearedAt: new Date(n - 3600000 * 10).toISOString(),
+        ackedBy: 'carlos.souza',
+        durationMs: 7200000,
+        status: 'Cleared Acknowledged' as const,
+      },
+      {
+        id: 'alarm-seeded-12',
+        ruleId: 'rule-v-302-press-hh',
+        objectId: 'tank-v-302',
+        objectName: 'V-302',
+        propertyName: 'Pressure',
+        currentValue: '22.8',
+        configuredValue: '20.0',
+        severity: 'critical' as const,
+        priority: 95,
+        message: '[V-302] ALARME CRÍTICO: Pressão muito alta na esfera de Eteno (>= 20.0 bar)',
+        color: '#ef4444',
+        icon: 'ShieldAlert',
+        activatedAt: new Date(n - 90 * 60000).toISOString(),
+        acknowledgedAt: new Date(n - 80 * 60000).toISOString(),
+        clearedAt: null,
+        ackedBy: 'ana.martins',
+        durationMs: null,
+        status: 'Active Acknowledged' as const,
+      }
+    ];
     // Evaluate initial alarms dynamically for all deployed objects
     const objects = objectRepo.getAll();
     const simValues: Record<string, string> = {};
@@ -864,6 +1269,9 @@ export class SeedService {
       objects,
       (objectId, type) => inheritanceService.getMergedProperties(objectId, type)
     );
+
+    // Save enriched historical and active alarms last to preserve them
+    alarmRepo.saveAll(enrichedAlarms);
 
     localStorage.setItem(STORAGE_KEYS.SEEDED, 'true');
   }

@@ -19,6 +19,9 @@ import { LogsPage } from './pages/LogsPage';
 import { DatabaseAnalyticsPage } from './pages/DatabaseAnalyticsPage';
 
 import { useObjectModelStore } from './store/useObjectModelStore';
+import { useAuthStore } from './store/useAuthStore';
+import { LoginPage } from './pages/LoginPage';
+import { HomePage } from './pages/HomePage';
 
 const setFavicon = (emoji: string) => {
   const link = (document.querySelector("link[rel~='icon']") as HTMLLinkElement) || document.createElement('link');
@@ -27,6 +30,15 @@ const setFavicon = (emoji: string) => {
   link.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${emoji}</text></svg>`;
   document.getElementsByTagName('head')[0].appendChild(link);
 };
+
+interface AuthGuardProps {
+  children: React.ReactNode;
+}
+
+function AuthGuard({ children }: AuthGuardProps) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+}
 
 export function App() {
   const location = useLocation();
@@ -45,7 +57,13 @@ export function App() {
     let title = 'Orquestra';
     let emoji = '⚙️';
 
-    if (path === '/' || path === '/orchestra') {
+    if (path === '/login') {
+      title = 'Login - Serrano';
+      emoji = '🔒';
+    } else if (path === '/' || path === '/home') {
+      title = 'Home - Serrano';
+      emoji = '🏠';
+    } else if (path === '/orchestra') {
       title = 'Orquestra IDE - Serrano';
       emoji = '⚙️';
     } else if (path === '/widgets') {
@@ -102,29 +120,32 @@ export function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<OrchestraPage />} />
-        <Route path="/orchestra" element={<OrchestraPage />} />
-        <Route path="/widgets" element={<WidgetsPage />} />
-        <Route path="/flows" element={<FlowsV2Page />} />
-        <Route path="/fluxos" element={<FlowsV2Page />} />
-        <Route path="/flows-v2" element={<FlowsV2Page />} />
-        <Route path="/fluxogramas" element={<FlowsV2Page />} />
-        <Route path="/simulator" element={<SimulatorPage />} />
-        <Route path="/simulador" element={<SimulatorPage />} />
-        <Route path="/screens" element={<ScreenDesignerPage />} />
-        <Route path="/screen/:id" element={<ScreenRuntimePage />} />
-        <Route path="/runtime" element={<RuntimePage />} />
-        <Route path="/alarms" element={<AlarmViewerPage />} />
-        <Route path="/historian" element={<HistorianPage />} />
-        <Route path="/omm" element={<OmmPage />} />
-        <Route path="/omm/*" element={<OmmPage />} />
-        <Route path="/opc-browser" element={<OpcBrowserPage />} />
-        <Route path="/security" element={<SecurityPage />} />
-        <Route path="/connectivity" element={<ConnectivityStudioPage />} />
-        <Route path="/grid-dashboard" element={<GridDashboardPage />} />
-        <Route path="/grid-designer" element={<GridDashboardPage />} />
-        <Route path="/logs" element={<LogsPage />} />
-        <Route path="/database-analytics" element={<DatabaseAnalyticsPage />} />
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route path="/" element={<AuthGuard><HomePage /></AuthGuard>} />
+        <Route path="/home" element={<AuthGuard><HomePage /></AuthGuard>} />
+        <Route path="/orchestra" element={<AuthGuard><OrchestraPage /></AuthGuard>} />
+        <Route path="/widgets" element={<AuthGuard><WidgetsPage /></AuthGuard>} />
+        <Route path="/flows" element={<AuthGuard><FlowsV2Page /></AuthGuard>} />
+        <Route path="/fluxos" element={<AuthGuard><FlowsV2Page /></AuthGuard>} />
+        <Route path="/flows-v2" element={<AuthGuard><FlowsV2Page /></AuthGuard>} />
+        <Route path="/fluxogramas" element={<AuthGuard><FlowsV2Page /></AuthGuard>} />
+        <Route path="/simulator" element={<AuthGuard><SimulatorPage /></AuthGuard>} />
+        <Route path="/simulador" element={<AuthGuard><SimulatorPage /></AuthGuard>} />
+        <Route path="/screens" element={<AuthGuard><ScreenDesignerPage /></AuthGuard>} />
+        <Route path="/screen/:id" element={<AuthGuard><ScreenRuntimePage /></AuthGuard>} />
+        <Route path="/runtime" element={<AuthGuard><RuntimePage /></AuthGuard>} />
+        <Route path="/alarms" element={<AuthGuard><AlarmViewerPage /></AuthGuard>} />
+        <Route path="/historian" element={<AuthGuard><HistorianPage /></AuthGuard>} />
+        <Route path="/omm" element={<AuthGuard><OmmPage /></AuthGuard>} />
+        <Route path="/omm/*" element={<AuthGuard><OmmPage /></AuthGuard>} />
+        <Route path="/opc-browser" element={<AuthGuard><OpcBrowserPage /></AuthGuard>} />
+        <Route path="/security" element={<AuthGuard><SecurityPage /></AuthGuard>} />
+        <Route path="/connectivity" element={<AuthGuard><ConnectivityStudioPage /></AuthGuard>} />
+        <Route path="/grid-dashboard" element={<AuthGuard><GridDashboardPage /></AuthGuard>} />
+        <Route path="/grid-designer" element={<AuthGuard><GridDashboardPage /></AuthGuard>} />
+        <Route path="/logs" element={<AuthGuard><LogsPage /></AuthGuard>} />
+        <Route path="/database-analytics" element={<AuthGuard><DatabaseAnalyticsPage /></AuthGuard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowV2EditorModal />
