@@ -17,6 +17,8 @@ import { ConnectivityStudioPage } from './pages/ConnectivityStudioPage';
 import { GridDashboardPage } from './pages/GridDashboardPage';
 import { LogsPage } from './pages/LogsPage';
 import { DatabaseAnalyticsPage } from './pages/DatabaseAnalyticsPage';
+import { ProcessAlertsPage } from './pages/ProcessAlertsPage';
+import { ProcessAlertToastContainer } from './components/ui/ProcessAlertToastContainer';
 
 import { useObjectModelStore } from './store/useObjectModelStore';
 import { useOpcStore } from './store/useOpcStore';
@@ -126,6 +128,9 @@ export function App() {
     } else if (path === '/database-analytics') {
       title = 'Database Analytics - Serrano';
       emoji = '🗄️';
+    } else if (path === '/process-alerts') {
+      title = 'Alertas de Processo - Serrano';
+      emoji = '⚠️';
     }
 
     document.title = title;
@@ -150,6 +155,7 @@ export function App() {
         <Route path="/screens" element={<AuthGuard><ScreenDesignerPage /></AuthGuard>} />
         <Route path="/screen/:id" element={<AuthGuard><ScreenRuntimePage /></AuthGuard>} />
         <Route path="/runtime" element={<AuthGuard><RuntimePage /></AuthGuard>} />
+        <Route path="/process-alerts" element={<AuthGuard><ProcessAlertsPage /></AuthGuard>} />
         <Route path="/alarms" element={<AuthGuard><AlarmViewerPage /></AuthGuard>} />
         <Route path="/historian" element={<AuthGuard><HistorianPage /></AuthGuard>} />
         <Route path="/omm" element={<AuthGuard><OmmPage /></AuthGuard>} />
@@ -164,6 +170,7 @@ export function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FlowV2EditorModal />
+      <ProcessAlertToastContainer />
     </>
   );
 }

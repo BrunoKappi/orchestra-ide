@@ -340,7 +340,7 @@
       "label": "setFavicon()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L27",
+      "source_location": "L29",
       "id": "src_app_setfavicon",
       "community": 6,
       "norm_label": "setfavicon()"
@@ -349,7 +349,7 @@
       "label": "AuthGuardProps",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L35",
+      "source_location": "L37",
       "id": "src_app_authguardprops",
       "community": 6,
       "norm_label": "authguardprops"
@@ -358,7 +358,7 @@
       "label": "AuthGuard()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L39",
+      "source_location": "L41",
       "id": "src_app_authguard",
       "community": 6,
       "norm_label": "authguard()"
@@ -367,9 +367,9 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "src/App.tsx",
-      "source_location": "L44",
+      "source_location": "L46",
       "id": "src_app_app",
-      "community": 6,
+      "community": 19,
       "norm_label": "app()"
     },
     {
@@ -378,7 +378,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L1",
       "id": "components_tankgeometrysvg",
-      "community": 25,
+      "community": 23,
       "norm_label": "tankgeometrysvg.tsx"
     },
     {
@@ -387,7 +387,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L4",
       "id": "components_tankgeometrysvg_tankgeometrysvgprops",
-      "community": 25,
+      "community": 23,
       "norm_label": "tankgeometrysvgprops"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L22",
       "id": "components_tankgeometrysvg_tankgeometrysvg",
-      "community": 25,
+      "community": 23,
       "norm_label": "tankgeometrysvg()"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L49",
       "id": "components_tankgeometrysvg_verticalcylindricalsvg",
-      "community": 25,
+      "community": 23,
       "norm_label": "verticalcylindricalsvg()"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L122",
       "id": "components_tankgeometrysvg_horizontalcylindricalsvg",
-      "community": 25,
+      "community": 23,
       "norm_label": "horizontalcylindricalsvg()"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L187",
       "id": "components_tankgeometrysvg_sphericalsvg",
-      "community": 25,
+      "community": 23,
       "norm_label": "sphericalsvg()"
     },
     {
@@ -432,7 +432,7 @@
       "source_file": "src/components/TankGeometrySvg.tsx",
       "source_location": "L246",
       "id": "components_tankgeometrysvg_pressurizedsvg",
-      "community": 25,
+      "community": 23,
       "norm_label": "pressurizedsvg()"
     },
     {
@@ -441,16 +441,16 @@
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
       "source_location": "L1",
       "id": "navigation_headernavigation",
-      "community": 6,
+      "community": 16,
       "norm_label": "headernavigation.tsx"
     },
     {
       "label": "HeaderNavigation()",
       "file_type": "code",
       "source_file": "src/components/navigation/HeaderNavigation.tsx",
-      "source_location": "L42",
+      "source_location": "L43",
       "id": "navigation_headernavigation_headernavigation",
-      "community": 6,
+      "community": 16,
       "norm_label": "headernavigation()"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "src/components/ui/Modal.tsx",
       "source_location": "L1",
       "id": "ui_modal",
-      "community": 53,
+      "community": 11,
       "norm_label": "modal.tsx"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "src/components/ui/Modal.tsx",
       "source_location": "L5",
       "id": "ui_modal_modalprops",
-      "community": 53,
+      "community": 11,
       "norm_label": "modalprops"
     },
     {
@@ -540,8 +540,26 @@
       "source_file": "src/components/ui/Modal.tsx",
       "source_location": "L14",
       "id": "ui_modal_modal",
-      "community": 53,
+      "community": 11,
       "norm_label": "modal()"
+    },
+    {
+      "label": "ProcessAlertToastContainer.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/ProcessAlertToastContainer.tsx",
+      "source_location": "L1",
+      "id": "ui_processalerttoastcontainer",
+      "community": 35,
+      "norm_label": "processalerttoastcontainer.tsx"
+    },
+    {
+      "label": "ProcessAlertToastContainer()",
+      "file_type": "code",
+      "source_file": "src/components/ui/ProcessAlertToastContainer.tsx",
+      "source_location": "L5",
+      "id": "ui_processalerttoastcontainer_processalerttoastcontainer",
+      "community": 35,
+      "norm_label": "processalerttoastcontainer()"
     },
     {
       "label": "ResizableSplitPane.tsx",
@@ -549,7 +567,7 @@
       "source_file": "src/components/ui/ResizableSplitPane.tsx",
       "source_location": "L1",
       "id": "ui_resizablesplitpane",
-      "community": 5,
+      "community": 36,
       "norm_label": "resizablesplitpane.tsx"
     },
     {
@@ -558,7 +576,7 @@
       "source_file": "src/components/ui/ResizableSplitPane.tsx",
       "source_location": "L3",
       "id": "ui_resizablesplitpane_resizablesplitpaneprops",
-      "community": 5,
+      "community": 36,
       "norm_label": "resizablesplitpaneprops"
     },
     {
@@ -567,7 +585,7 @@
       "source_file": "src/components/ui/ResizableSplitPane.tsx",
       "source_location": "L11",
       "id": "ui_resizablesplitpane_resizablesplitpane",
-      "community": 5,
+      "community": 36,
       "norm_label": "resizablesplitpane()"
     },
     {
@@ -576,7 +594,7 @@
       "source_file": "src/components/ui/SearchableSelect.tsx",
       "source_location": "L1",
       "id": "ui_searchableselect",
-      "community": 37,
+      "community": 30,
       "norm_label": "searchableselect.tsx"
     },
     {
@@ -585,7 +603,7 @@
       "source_file": "src/components/ui/SearchableSelect.tsx",
       "source_location": "L5",
       "id": "ui_searchableselect_selectoption",
-      "community": 37,
+      "community": 30,
       "norm_label": "selectoption"
     },
     {
@@ -594,7 +612,7 @@
       "source_file": "src/components/ui/SearchableSelect.tsx",
       "source_location": "L12",
       "id": "ui_searchableselect_searchableselectprops",
-      "community": 37,
+      "community": 30,
       "norm_label": "searchableselectprops"
     },
     {
@@ -603,7 +621,7 @@
       "source_file": "src/components/ui/SearchableSelect.tsx",
       "source_location": "L22",
       "id": "ui_searchableselect_searchableselect",
-      "community": 37,
+      "community": 30,
       "norm_label": "searchableselect()"
     },
     {
@@ -619,7 +637,7 @@
       "label": "TankTelemetryDashboardProps",
       "file_type": "code",
       "source_file": "src/components/ui/TankTelemetryDashboard.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "ui_tanktelemetrydashboard_tanktelemetrydashboardprops",
       "community": 17,
       "norm_label": "tanktelemetrydashboardprops"
@@ -628,7 +646,7 @@
       "label": "VariableHistory",
       "file_type": "code",
       "source_file": "src/components/ui/TankTelemetryDashboard.tsx",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "ui_tanktelemetrydashboard_variablehistory",
       "community": 17,
       "norm_label": "variablehistory"
@@ -637,9 +655,9 @@
       "label": "TankTelemetryDashboard()",
       "file_type": "code",
       "source_file": "src/components/ui/TankTelemetryDashboard.tsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "id": "ui_tanktelemetrydashboard_tanktelemetrydashboard",
-      "community": 37,
+      "community": 33,
       "norm_label": "tanktelemetrydashboard()"
     },
     {
@@ -1107,7 +1125,7 @@
       "source_file": "src/features/flow-v2/components/FlowV2EditorModal.tsx",
       "source_location": "L261",
       "id": "components_flowv2editormodal_flowv2editormodal",
-      "community": 10,
+      "community": 6,
       "norm_label": "flowv2editormodal()"
     },
     {
@@ -1251,7 +1269,7 @@
       "source_file": "src/features/flow-v2/components/GlobalPropertyPickerModal.tsx",
       "source_location": "L1",
       "id": "components_globalpropertypickermodal",
-      "community": 34,
+      "community": 37,
       "norm_label": "globalpropertypickermodal.tsx"
     },
     {
@@ -1260,7 +1278,7 @@
       "source_file": "src/features/flow-v2/components/GlobalPropertyPickerModal.tsx",
       "source_location": "L22",
       "id": "components_globalpropertypickermodal_globalpropertypickermodalprops",
-      "community": 34,
+      "community": 37,
       "norm_label": "globalpropertypickermodalprops"
     },
     {
@@ -1269,7 +1287,7 @@
       "source_file": "src/features/flow-v2/components/GlobalPropertyPickerModal.tsx",
       "source_location": "L30",
       "id": "components_globalpropertypickermodal_globalpropertypickermodal",
-      "community": 10,
+      "community": 37,
       "norm_label": "globalpropertypickermodal()"
     },
     {
@@ -1449,7 +1467,7 @@
       "source_file": "src/features/grid-dashboard/components/GridCanvas.tsx",
       "source_location": "L1",
       "id": "components_gridcanvas",
-      "community": 40,
+      "community": 44,
       "norm_label": "gridcanvas.tsx"
     },
     {
@@ -1458,7 +1476,7 @@
       "source_file": "src/features/grid-dashboard/components/GridCanvas.tsx",
       "source_location": "L7",
       "id": "components_gridcanvas_gridcanvasprops",
-      "community": 40,
+      "community": 44,
       "norm_label": "gridcanvasprops"
     },
     {
@@ -1467,7 +1485,7 @@
       "source_file": "src/features/grid-dashboard/components/GridCanvas.tsx",
       "source_location": "L18",
       "id": "components_gridcanvas_cellpos",
-      "community": 40,
+      "community": 44,
       "norm_label": "cellpos"
     },
     {
@@ -1476,7 +1494,7 @@
       "source_file": "src/features/grid-dashboard/components/GridCanvas.tsx",
       "source_location": "L23",
       "id": "components_gridcanvas_gridcanvas",
-      "community": 40,
+      "community": 44,
       "norm_label": "gridcanvas()"
     },
     {
@@ -1485,7 +1503,7 @@
       "source_file": "src/features/grid-dashboard/components/GridCardInspector.tsx",
       "source_location": "L1",
       "id": "components_gridcardinspector",
-      "community": 49,
+      "community": 44,
       "norm_label": "gridcardinspector.tsx"
     },
     {
@@ -1494,7 +1512,7 @@
       "source_file": "src/features/grid-dashboard/components/GridCardInspector.tsx",
       "source_location": "L5",
       "id": "components_gridcardinspector_gridcardinspectorprops",
-      "community": 49,
+      "community": 44,
       "norm_label": "gridcardinspectorprops"
     },
     {
@@ -1512,7 +1530,7 @@
       "source_file": "src/features/grid-dashboard/components/GridDashboardHeader.tsx",
       "source_location": "L1",
       "id": "components_griddashboardheader",
-      "community": 40,
+      "community": 44,
       "norm_label": "griddashboardheader.tsx"
     },
     {
@@ -1521,7 +1539,7 @@
       "source_file": "src/features/grid-dashboard/components/GridDashboardHeader.tsx",
       "source_location": "L6",
       "id": "components_griddashboardheader_griddashboardheaderprops",
-      "community": 40,
+      "community": 44,
       "norm_label": "griddashboardheaderprops"
     },
     {
@@ -1530,7 +1548,7 @@
       "source_file": "src/features/grid-dashboard/components/GridDashboardHeader.tsx",
       "source_location": "L17",
       "id": "components_griddashboardheader_griddashboardheader",
-      "community": 40,
+      "community": 44,
       "norm_label": "griddashboardheader()"
     },
     {
@@ -1566,7 +1584,7 @@
       "source_file": "src/features/grid-dashboard/components/GridSettingsModal.tsx",
       "source_location": "L1",
       "id": "components_gridsettingsmodal",
-      "community": 53,
+      "community": 44,
       "norm_label": "gridsettingsmodal.tsx"
     },
     {
@@ -1575,7 +1593,7 @@
       "source_file": "src/features/grid-dashboard/components/GridSettingsModal.tsx",
       "source_location": "L7",
       "id": "components_gridsettingsmodal_gridsettingsmodalprops",
-      "community": 40,
+      "community": 44,
       "norm_label": "gridsettingsmodalprops"
     },
     {
@@ -1593,7 +1611,7 @@
       "source_file": "src/features/grid-dashboard/components/IndustrialTankCard.tsx",
       "source_location": "L1",
       "id": "components_industrialtankcard",
-      "community": 40,
+      "community": 44,
       "norm_label": "industrialtankcard.tsx"
     },
     {
@@ -1602,7 +1620,7 @@
       "source_file": "src/features/grid-dashboard/components/IndustrialTankCard.tsx",
       "source_location": "L9",
       "id": "components_industrialtankcard_industrialtankcardprops",
-      "community": 40,
+      "community": 44,
       "norm_label": "industrialtankcardprops"
     },
     {
@@ -1611,7 +1629,7 @@
       "source_file": "src/features/grid-dashboard/components/IndustrialTankCard.tsx",
       "source_location": "L17",
       "id": "components_industrialtankcard_getlevelcolor",
-      "community": 40,
+      "community": 44,
       "norm_label": "getlevelcolor()"
     },
     {
@@ -1620,7 +1638,7 @@
       "source_file": "src/features/grid-dashboard/components/IndustrialTankCard.tsx",
       "source_location": "L24",
       "id": "components_industrialtankcard_resolveobjectpropvalue",
-      "community": 40,
+      "community": 44,
       "norm_label": "resolveobjectpropvalue()"
     },
     {
@@ -1629,7 +1647,7 @@
       "source_file": "src/features/grid-dashboard/components/IndustrialTankCard.tsx",
       "source_location": "L40",
       "id": "components_industrialtankcard_industrialtankcard",
-      "community": 40,
+      "community": 44,
       "norm_label": "industrialtankcard()"
     },
     {
@@ -1638,7 +1656,7 @@
       "source_file": "src/features/grid-dashboard/components/ObjectSelectorModal.tsx",
       "source_location": "L1",
       "id": "components_objectselectormodal",
-      "community": 53,
+      "community": 24,
       "norm_label": "objectselectormodal.tsx"
     },
     {
@@ -1647,7 +1665,7 @@
       "source_file": "src/features/grid-dashboard/components/ObjectSelectorModal.tsx",
       "source_location": "L7",
       "id": "components_objectselectormodal_objectselectormodalprops",
-      "community": 53,
+      "community": 24,
       "norm_label": "objectselectormodalprops"
     },
     {
@@ -1656,7 +1674,7 @@
       "source_file": "src/features/grid-dashboard/components/ObjectSelectorModal.tsx",
       "source_location": "L28",
       "id": "components_objectselectormodal_objectselectormodal",
-      "community": 53,
+      "community": 24,
       "norm_label": "objectselectormodal()"
     },
     {
@@ -1665,7 +1683,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartCard.tsx",
       "source_location": "L1",
       "id": "components_trendchartcard",
-      "community": 39,
+      "community": 44,
       "norm_label": "trendchartcard.tsx"
     },
     {
@@ -1674,7 +1692,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartCard.tsx",
       "source_location": "L12",
       "id": "components_trendchartcard_ygridticks",
-      "community": 39,
+      "community": 44,
       "norm_label": "ygridticks"
     },
     {
@@ -1683,7 +1701,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartCard.tsx",
       "source_location": "L13",
       "id": "components_trendchartcard_xgridticks",
-      "community": 39,
+      "community": 44,
       "norm_label": "xgridticks"
     },
     {
@@ -1692,7 +1710,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartCard.tsx",
       "source_location": "L15",
       "id": "components_trendchartcard_trendchartcardprops",
-      "community": 39,
+      "community": 44,
       "norm_label": "trendchartcardprops"
     },
     {
@@ -1701,7 +1719,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartCard.tsx",
       "source_location": "L23",
       "id": "components_trendchartcard_trendchartcard",
-      "community": 39,
+      "community": 44,
       "norm_label": "trendchartcard()"
     },
     {
@@ -1710,7 +1728,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartExpandedModal.tsx",
       "source_location": "L1",
       "id": "components_trendchartexpandedmodal",
-      "community": 39,
+      "community": 44,
       "norm_label": "trendchartexpandedmodal.tsx"
     },
     {
@@ -1719,7 +1737,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartExpandedModal.tsx",
       "source_location": "L10",
       "id": "components_trendchartexpandedmodal_trendchartexpandedmodalprops",
-      "community": 39,
+      "community": 44,
       "norm_label": "trendchartexpandedmodalprops"
     },
     {
@@ -1728,7 +1746,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartExpandedModal.tsx",
       "source_location": "L16",
       "id": "components_trendchartexpandedmodal_timewindow",
-      "community": 39,
+      "community": 44,
       "norm_label": "timewindow"
     },
     {
@@ -1737,7 +1755,7 @@
       "source_file": "src/features/grid-dashboard/components/TrendChartExpandedModal.tsx",
       "source_location": "L18",
       "id": "components_trendchartexpandedmodal_trendchartexpandedmodal",
-      "community": 39,
+      "community": 44,
       "norm_label": "trendchartexpandedmodal()"
     },
     {
@@ -1746,7 +1764,7 @@
       "source_file": "src/features/grid-dashboard/types.ts",
       "source_location": "L1",
       "id": "grid_dashboard_types",
-      "community": 49,
+      "community": 44,
       "norm_label": "types.ts"
     },
     {
@@ -1755,7 +1773,7 @@
       "source_file": "src/features/grid-dashboard/types.ts",
       "source_location": "L3",
       "id": "grid_dashboard_types_cardstatus",
-      "community": 49,
+      "community": 44,
       "norm_label": "cardstatus"
     },
     {
@@ -1764,7 +1782,7 @@
       "source_file": "src/features/grid-dashboard/types.ts",
       "source_location": "L5",
       "id": "grid_dashboard_types_tankcarddata",
-      "community": 49,
+      "community": 44,
       "norm_label": "tankcarddata"
     },
     {
@@ -1773,7 +1791,7 @@
       "source_file": "src/features/grid-dashboard/types.ts",
       "source_location": "L66",
       "id": "grid_dashboard_types_gridconfig",
-      "community": 40,
+      "community": 44,
       "norm_label": "gridconfig"
     },
     {
@@ -1800,7 +1818,7 @@
       "source_file": "src/features/grid-dashboard/utils/mockGenerator.ts",
       "source_location": "L1",
       "id": "utils_mockgenerator",
-      "community": 49,
+      "community": 44,
       "norm_label": "mockgenerator.ts"
     },
     {
@@ -1809,7 +1827,7 @@
       "source_file": "src/features/grid-dashboard/utils/mockGenerator.ts",
       "source_location": "L3",
       "id": "utils_mockgenerator_tank_presets",
-      "community": 49,
+      "community": 44,
       "norm_label": "tank_presets"
     },
     {
@@ -1818,7 +1836,7 @@
       "source_file": "src/features/grid-dashboard/utils/mockGenerator.ts",
       "source_location": "L16",
       "id": "utils_mockgenerator_status_list",
-      "community": 49,
+      "community": 44,
       "norm_label": "status_list"
     },
     {
@@ -1836,7 +1854,7 @@
       "source_file": "src/features/grid-dashboard/utils/mockGenerator.ts",
       "source_location": "L74",
       "id": "utils_mockgenerator_rerandomizetankvalues",
-      "community": 49,
+      "community": 44,
       "norm_label": "rerandomizetankvalues()"
     },
     {
@@ -1863,7 +1881,7 @@
       "source_file": "src/features/object-model/AssociatedWidgetsEditor.tsx",
       "source_location": "L1",
       "id": "object_model_associatedwidgetseditor",
-      "community": 53,
+      "community": 11,
       "norm_label": "associatedwidgetseditor.tsx"
     },
     {
@@ -1872,7 +1890,7 @@
       "source_file": "src/features/object-model/AssociatedWidgetsEditor.tsx",
       "source_location": "L20",
       "id": "object_model_associatedwidgetseditor_widgetthumbnail",
-      "community": 53,
+      "community": 11,
       "norm_label": "widgetthumbnail()"
     },
     {
@@ -1881,7 +1899,7 @@
       "source_file": "src/features/object-model/AssociatedWidgetsEditor.tsx",
       "source_location": "L203",
       "id": "object_model_associatedwidgetseditor_associatedwidgetseditor",
-      "community": 53,
+      "community": 52,
       "norm_label": "associatedwidgetseditor()"
     },
     {
@@ -2025,7 +2043,7 @@
       "source_file": "src/features/object-model/HistoryConfigModal.tsx",
       "source_location": "L1",
       "id": "object_model_historyconfigmodal",
-      "community": 53,
+      "community": 11,
       "norm_label": "historyconfigmodal.tsx"
     },
     {
@@ -2034,7 +2052,7 @@
       "source_file": "src/features/object-model/HistoryConfigModal.tsx",
       "source_location": "L12",
       "id": "object_model_historyconfigmodal_default_config",
-      "community": 53,
+      "community": 11,
       "norm_label": "default_config"
     },
     {
@@ -2043,7 +2061,7 @@
       "source_file": "src/features/object-model/HistoryConfigModal.tsx",
       "source_location": "L24",
       "id": "object_model_historyconfigmodal_mstohours",
-      "community": 53,
+      "community": 11,
       "norm_label": "mstohours()"
     },
     {
@@ -2052,7 +2070,7 @@
       "source_file": "src/features/object-model/HistoryConfigModal.tsx",
       "source_location": "L27",
       "id": "object_model_historyconfigmodal_hourstoms",
-      "community": 53,
+      "community": 11,
       "norm_label": "hourstoms()"
     },
     {
@@ -2061,7 +2079,7 @@
       "source_file": "src/features/object-model/HistoryConfigModal.tsx",
       "source_location": "L31",
       "id": "object_model_historyconfigmodal_historyconfigmodal",
-      "community": 53,
+      "community": 11,
       "norm_label": "historyconfigmodal()"
     },
     {
@@ -2088,7 +2106,7 @@
       "source_file": "src/features/object-model/MockConfigModal.tsx",
       "source_location": "L78",
       "id": "object_model_mockconfigmodal_mockconfigmodal",
-      "community": 8,
+      "community": 24,
       "norm_label": "mockconfigmodal()"
     },
     {
@@ -2151,7 +2169,7 @@
       "source_file": "src/features/object-model/SimulatorEditor.tsx",
       "source_location": "L1",
       "id": "object_model_simulatoreditor",
-      "community": 8,
+      "community": 24,
       "norm_label": "simulatoreditor.tsx"
     },
     {
@@ -2160,7 +2178,7 @@
       "source_file": "src/features/object-model/SimulatorEditor.tsx",
       "source_location": "L23",
       "id": "object_model_simulatoreditor_simulatoreditor",
-      "community": 8,
+      "community": 24,
       "norm_label": "simulatoreditor()"
     },
     {
@@ -2169,7 +2187,7 @@
       "source_file": "src/features/object-model/StrappingConfigEditor.tsx",
       "source_location": "L1",
       "id": "object_model_strappingconfigeditor",
-      "community": 51,
+      "community": 9,
       "norm_label": "strappingconfigeditor.tsx"
     },
     {
@@ -2178,7 +2196,7 @@
       "source_file": "src/features/object-model/StrappingConfigEditor.tsx",
       "source_location": "L23",
       "id": "object_model_strappingconfigeditor_default_strapping",
-      "community": 51,
+      "community": 9,
       "norm_label": "default_strapping"
     },
     {
@@ -2187,7 +2205,7 @@
       "source_file": "src/features/object-model/StrappingConfigEditor.tsx",
       "source_location": "L37",
       "id": "object_model_strappingconfigeditor_geometry_labels",
-      "community": 51,
+      "community": 9,
       "norm_label": "geometry_labels"
     },
     {
@@ -2196,7 +2214,7 @@
       "source_file": "src/features/object-model/StrappingConfigEditor.tsx",
       "source_location": "L44",
       "id": "object_model_strappingconfigeditor_geometry_curve_notes",
-      "community": 51,
+      "community": 9,
       "norm_label": "geometry_curve_notes"
     },
     {
@@ -2205,7 +2223,7 @@
       "source_file": "src/features/object-model/StrappingConfigEditor.tsx",
       "source_location": "L54",
       "id": "object_model_strappingconfigeditor_curvechartprops",
-      "community": 51,
+      "community": 9,
       "norm_label": "curvechartprops"
     },
     {
@@ -2214,7 +2232,7 @@
       "source_file": "src/features/object-model/StrappingConfigEditor.tsx",
       "source_location": "L62",
       "id": "object_model_strappingconfigeditor_curvechart",
-      "community": 51,
+      "community": 9,
       "norm_label": "curvechart()"
     },
     {
@@ -2232,7 +2250,7 @@
       "source_file": "src/features/object-model/WidgetMappingModal.tsx",
       "source_location": "L1",
       "id": "object_model_widgetmappingmodal",
-      "community": 53,
+      "community": 11,
       "norm_label": "widgetmappingmodal.tsx"
     },
     {
@@ -2241,7 +2259,7 @@
       "source_file": "src/features/object-model/WidgetMappingModal.tsx",
       "source_location": "L9",
       "id": "object_model_widgetmappingmodal_widgetmappingmodalprops",
-      "community": 31,
+      "community": 11,
       "norm_label": "widgetmappingmodalprops"
     },
     {
@@ -2250,7 +2268,7 @@
       "source_file": "src/features/object-model/WidgetMappingModal.tsx",
       "source_location": "L15",
       "id": "object_model_widgetmappingmodal_widgetmappingmodal",
-      "community": 53,
+      "community": 11,
       "norm_label": "widgetmappingmodal()"
     },
     {
@@ -2259,7 +2277,7 @@
       "source_file": "src/features/omm/components/OmmLayout.tsx",
       "source_location": "L1",
       "id": "components_ommlayout",
-      "community": 11,
+      "community": 15,
       "norm_label": "ommlayout.tsx"
     },
     {
@@ -2268,7 +2286,7 @@
       "source_file": "src/features/omm/components/OmmLayout.tsx",
       "source_location": "L21",
       "id": "components_ommlayout_view_tabs",
-      "community": 11,
+      "community": 15,
       "norm_label": "view_tabs"
     },
     {
@@ -2277,7 +2295,7 @@
       "source_file": "src/features/omm/components/OmmLayout.tsx",
       "source_location": "L35",
       "id": "components_ommlayout_ommlayout",
-      "community": 11,
+      "community": 16,
       "norm_label": "ommlayout()"
     },
     {
@@ -2313,7 +2331,7 @@
       "source_file": "src/features/omm/components/admin/AdminPanel.tsx",
       "source_location": "L22",
       "id": "admin_adminpanel_adminpanel",
-      "community": 11,
+      "community": 4,
       "norm_label": "adminpanel()"
     },
     {
@@ -2475,7 +2493,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L1",
       "id": "flow_ommtanknode",
-      "community": 29,
+      "community": 23,
       "norm_label": "ommtanknode.tsx"
     },
     {
@@ -2493,7 +2511,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L23",
       "id": "flow_ommtanknode_resolvegeometry",
-      "community": 29,
+      "community": 23,
       "norm_label": "resolvegeometry()"
     },
     {
@@ -2502,7 +2520,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L35",
       "id": "flow_ommtanknode_type_header_color",
-      "community": 29,
+      "community": 23,
       "norm_label": "type_header_color"
     },
     {
@@ -2511,7 +2529,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L51",
       "id": "flow_ommtanknode_statusdot",
-      "community": 29,
+      "community": 23,
       "norm_label": "statusdot()"
     },
     {
@@ -2520,7 +2538,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L63",
       "id": "flow_ommtanknode_levelbar",
-      "community": 29,
+      "community": 23,
       "norm_label": "levelbar()"
     },
     {
@@ -2529,7 +2547,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L75",
       "id": "flow_ommtanknode_metric",
-      "community": 29,
+      "community": 23,
       "norm_label": "metric()"
     },
     {
@@ -2538,7 +2556,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L86",
       "id": "flow_ommtanknode_compactnode",
-      "community": 29,
+      "community": 23,
       "norm_label": "compactnode()"
     },
     {
@@ -2547,7 +2565,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L225",
       "id": "flow_ommtanknode_detailednode",
-      "community": 29,
+      "community": 23,
       "norm_label": "detailednode()"
     },
     {
@@ -2556,7 +2574,7 @@
       "source_file": "src/features/omm/components/flow/OmmTankNode.tsx",
       "source_location": "L384",
       "id": "flow_ommtanknode_ommtanknode",
-      "community": 29,
+      "community": 23,
       "norm_label": "ommtanknode"
     },
     {
@@ -2565,7 +2583,7 @@
       "source_file": "src/features/omm/components/layout/OmmKpiHeader.tsx",
       "source_location": "L1",
       "id": "layout_ommkpiheader",
-      "community": 11,
+      "community": 15,
       "norm_label": "ommkpiheader.tsx"
     },
     {
@@ -2574,7 +2592,7 @@
       "source_file": "src/features/omm/components/layout/OmmKpiHeader.tsx",
       "source_location": "L14",
       "id": "layout_ommkpiheader_kpicardprops",
-      "community": 11,
+      "community": 15,
       "norm_label": "kpicardprops"
     },
     {
@@ -2583,7 +2601,7 @@
       "source_file": "src/features/omm/components/layout/OmmKpiHeader.tsx",
       "source_location": "L24",
       "id": "layout_ommkpiheader_kpicard",
-      "community": 11,
+      "community": 15,
       "norm_label": "kpicard()"
     },
     {
@@ -2592,7 +2610,7 @@
       "source_file": "src/features/omm/components/layout/OmmKpiHeader.tsx",
       "source_location": "L42",
       "id": "layout_ommkpiheader_ommkpiheader",
-      "community": 11,
+      "community": 15,
       "norm_label": "ommkpiheader()"
     },
     {
@@ -2601,7 +2619,7 @@
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L1",
       "id": "layout_ommtoolbar",
-      "community": 11,
+      "community": 15,
       "norm_label": "ommtoolbar.tsx"
     },
     {
@@ -2610,7 +2628,7 @@
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L15",
       "id": "layout_ommtoolbar_toolbarbuttonprops",
-      "community": 11,
+      "community": 15,
       "norm_label": "toolbarbuttonprops"
     },
     {
@@ -2619,7 +2637,7 @@
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L24",
       "id": "layout_ommtoolbar_toolbarbutton",
-      "community": 11,
+      "community": 15,
       "norm_label": "toolbarbutton()"
     },
     {
@@ -2628,7 +2646,7 @@
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L58",
       "id": "layout_ommtoolbar_separator",
-      "community": 11,
+      "community": 15,
       "norm_label": "separator()"
     },
     {
@@ -2637,7 +2655,7 @@
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L62",
       "id": "layout_ommtoolbar_ommtoolbar",
-      "community": 11,
+      "community": 15,
       "norm_label": "ommtoolbar()"
     },
     {
@@ -2646,7 +2664,7 @@
       "source_file": "src/features/omm/components/table/MovementTable.tsx",
       "source_location": "L1",
       "id": "table_movementtable",
-      "community": 15,
+      "community": 2,
       "norm_label": "movementtable.tsx"
     },
     {
@@ -2655,7 +2673,7 @@
       "source_file": "src/features/omm/components/table/MovementTable.tsx",
       "source_location": "L31",
       "id": "table_movementtable_grouprowrenderer",
-      "community": 15,
+      "community": 2,
       "norm_label": "grouprowrenderer()"
     },
     {
@@ -2664,7 +2682,7 @@
       "source_file": "src/features/omm/components/table/MovementTable.tsx",
       "source_location": "L64",
       "id": "table_movementtable_movementtable",
-      "community": 15,
+      "community": 2,
       "norm_label": "movementtable()"
     },
     {
@@ -2673,7 +2691,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L1",
       "id": "table_columndefs",
-      "community": 15,
+      "community": 2,
       "norm_label": "columndefs.tsx"
     },
     {
@@ -2682,7 +2700,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L10",
       "id": "table_columndefs_status_config",
-      "community": 15,
+      "community": 2,
       "norm_label": "status_config"
     },
     {
@@ -2691,7 +2709,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L18",
       "id": "table_columndefs_priority_config",
-      "community": 15,
+      "community": 2,
       "norm_label": "priority_config"
     },
     {
@@ -2700,7 +2718,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L28",
       "id": "table_columndefs_selectioncheckboxcell",
-      "community": 15,
+      "community": 2,
       "norm_label": "selectioncheckboxcell()"
     },
     {
@@ -2709,7 +2727,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L62",
       "id": "table_columndefs_statuscell",
-      "community": 15,
+      "community": 2,
       "norm_label": "statuscell()"
     },
     {
@@ -2718,7 +2736,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L110",
       "id": "table_columndefs_prioritycell",
-      "community": 15,
+      "community": 2,
       "norm_label": "prioritycell()"
     },
     {
@@ -2727,7 +2745,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L158",
       "id": "table_columndefs_progressinline",
-      "community": 15,
+      "community": 2,
       "norm_label": "progressinline()"
     },
     {
@@ -2736,7 +2754,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L174",
       "id": "table_columndefs_coldef",
-      "community": 15,
+      "community": 2,
       "norm_label": "coldef"
     },
     {
@@ -2745,7 +2763,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L176",
       "id": "table_columndefs_col",
-      "community": 15,
+      "community": 2,
       "norm_label": "col()"
     },
     {
@@ -2754,7 +2772,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L198",
       "id": "table_columndefs_numbercell",
-      "community": 15,
+      "community": 2,
       "norm_label": "numbercell()"
     },
     {
@@ -2763,7 +2781,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L212",
       "id": "table_columndefs_getremainingtime",
-      "community": 15,
+      "community": 2,
       "norm_label": "getremainingtime()"
     },
     {
@@ -2772,7 +2790,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L236",
       "id": "table_columndefs_tankcell",
-      "community": 15,
+      "community": 2,
       "norm_label": "tankcell()"
     },
     {
@@ -2781,7 +2799,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L249",
       "id": "table_columndefs_movementcolumndefs",
-      "community": 15,
+      "community": 2,
       "norm_label": "movementcolumndefs"
     },
     {
@@ -2790,7 +2808,7 @@
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L336",
       "id": "table_columndefs_default_visible_columns",
-      "community": 15,
+      "community": 2,
       "norm_label": "default_visible_columns"
     },
     {
@@ -2799,7 +2817,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L1",
       "id": "ui_movementmodal",
-      "community": 37,
+      "community": 33,
       "norm_label": "movementmodal.tsx"
     },
     {
@@ -2808,7 +2826,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L17",
       "id": "ui_movementmodal_priority_options",
-      "community": 37,
+      "community": 33,
       "norm_label": "priority_options"
     },
     {
@@ -2817,7 +2835,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L24",
       "id": "ui_movementmodal_status_labels",
-      "community": 37,
+      "community": 33,
       "norm_label": "status_labels"
     },
     {
@@ -2826,7 +2844,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L32",
       "id": "ui_movementmodal_status_colors",
-      "community": 37,
+      "community": 33,
       "norm_label": "status_colors"
     },
     {
@@ -2835,7 +2853,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L43",
       "id": "ui_movementmodal_modaltab",
-      "community": 37,
+      "community": 33,
       "norm_label": "modaltab"
     },
     {
@@ -2844,7 +2862,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L45",
       "id": "ui_movementmodal_tabs",
-      "community": 37,
+      "community": 33,
       "norm_label": "tabs"
     },
     {
@@ -2853,7 +2871,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L58",
       "id": "ui_movementmodal_formfield",
-      "community": 37,
+      "community": 33,
       "norm_label": "formfield()"
     },
     {
@@ -2862,7 +2880,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L78",
       "id": "ui_movementmodal_inforow",
-      "community": 37,
+      "community": 33,
       "norm_label": "inforow()"
     },
     {
@@ -2871,7 +2889,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L88",
       "id": "ui_movementmodal_progressbar",
-      "community": 37,
+      "community": 33,
       "norm_label": "progressbar()"
     },
     {
@@ -2880,7 +2898,7 @@
       "source_file": "src/features/omm/components/ui/MovementModal.tsx",
       "source_location": "L104",
       "id": "ui_movementmodal_movementmodal",
-      "community": 37,
+      "community": 15,
       "norm_label": "movementmodal()"
     },
     {
@@ -2889,7 +2907,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L1",
       "id": "ui_ommbadges",
-      "community": 24,
+      "community": 2,
       "norm_label": "ommbadges.tsx"
     },
     {
@@ -2898,7 +2916,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L7",
       "id": "ui_ommbadges_status_config",
-      "community": 24,
+      "community": 2,
       "norm_label": "status_config"
     },
     {
@@ -2907,7 +2925,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L15",
       "id": "ui_ommbadges_statusbadge",
-      "community": 24,
+      "community": 2,
       "norm_label": "statusbadge()"
     },
     {
@@ -2916,7 +2934,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L29",
       "id": "ui_ommbadges_priority_config",
-      "community": 24,
+      "community": 2,
       "norm_label": "priority_config"
     },
     {
@@ -2925,7 +2943,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L36",
       "id": "ui_ommbadges_prioritybadge",
-      "community": 24,
+      "community": 2,
       "norm_label": "prioritybadge()"
     },
     {
@@ -2934,7 +2952,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L44",
       "id": "ui_ommbadges_accuracybar",
-      "community": 24,
+      "community": 2,
       "norm_label": "accuracybar()"
     },
     {
@@ -2943,7 +2961,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L61",
       "id": "ui_ommbadges_progressbar",
-      "community": 24,
+      "community": 2,
       "norm_label": "progressbar()"
     },
     {
@@ -2952,7 +2970,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L81",
       "id": "ui_ommbadges_productdot",
-      "community": 24,
+      "community": 2,
       "norm_label": "productdot()"
     },
     {
@@ -2961,7 +2979,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L91",
       "id": "ui_ommbadges_flowdisplay",
-      "community": 24,
+      "community": 2,
       "norm_label": "flowdisplay()"
     },
     {
@@ -2970,7 +2988,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L100",
       "id": "ui_ommbadges_timedisplay",
-      "community": 24,
+      "community": 2,
       "norm_label": "timedisplay()"
     },
     {
@@ -2979,7 +2997,7 @@
       "source_file": "src/features/omm/components/ui/OmmBadges.tsx",
       "source_location": "L115",
       "id": "ui_ommbadges_volumedisplay",
-      "community": 24,
+      "community": 2,
       "norm_label": "volumedisplay()"
     },
     {
@@ -2988,7 +3006,7 @@
       "source_file": "src/features/omm/components/ui/OrderDialog.tsx",
       "source_location": "L1",
       "id": "ui_orderdialog",
-      "community": 37,
+      "community": 30,
       "norm_label": "orderdialog.tsx"
     },
     {
@@ -2997,7 +3015,7 @@
       "source_file": "src/features/omm/components/ui/OrderDialog.tsx",
       "source_location": "L7",
       "id": "ui_orderdialog_orderdialog",
-      "community": 37,
+      "community": 30,
       "norm_label": "orderdialog()"
     },
     {
@@ -3006,7 +3024,7 @@
       "source_file": "src/features/omm/components/ui/SimulationControlModal.tsx",
       "source_location": "L1",
       "id": "ui_simulationcontrolmodal",
-      "community": 15,
+      "community": 2,
       "norm_label": "simulationcontrolmodal.tsx"
     },
     {
@@ -3015,7 +3033,7 @@
       "source_file": "src/features/omm/components/ui/SimulationControlModal.tsx",
       "source_location": "L5",
       "id": "ui_simulationcontrolmodal_simulationcontrolmodalprops",
-      "community": 15,
+      "community": 2,
       "norm_label": "simulationcontrolmodalprops"
     },
     {
@@ -3024,7 +3042,7 @@
       "source_file": "src/features/omm/components/ui/SimulationControlModal.tsx",
       "source_location": "L10",
       "id": "ui_simulationcontrolmodal_simulationcontrolmodal",
-      "community": 15,
+      "community": 2,
       "norm_label": "simulationcontrolmodal()"
     },
     {
@@ -3033,7 +3051,7 @@
       "source_file": "src/features/omm/components/ui/TankTelemetryModal.tsx",
       "source_location": "L1",
       "id": "ui_tanktelemetrymodal",
-      "community": 37,
+      "community": 33,
       "norm_label": "tanktelemetrymodal.tsx"
     },
     {
@@ -3042,7 +3060,7 @@
       "source_file": "src/features/omm/components/ui/TankTelemetryModal.tsx",
       "source_location": "L5",
       "id": "ui_tanktelemetrymodal_tanktelemetrymodalprops",
-      "community": 37,
+      "community": 33,
       "norm_label": "tanktelemetrymodalprops"
     },
     {
@@ -3051,7 +3069,7 @@
       "source_file": "src/features/omm/components/ui/TankTelemetryModal.tsx",
       "source_location": "L11",
       "id": "ui_tanktelemetrymodal_tanktelemetrymodal",
-      "community": 37,
+      "community": 33,
       "norm_label": "tanktelemetrymodal()"
     },
     {
@@ -3123,7 +3141,7 @@
       "source_file": "src/features/omm/components/views/CutoffHistory.tsx",
       "source_location": "L328",
       "id": "views_cutoffhistory_cutoffhistory",
-      "community": 11,
+      "community": 4,
       "norm_label": "cutoffhistory()"
     },
     {
@@ -3132,7 +3150,7 @@
       "source_file": "src/features/omm/components/views/InventoryDashboard.tsx",
       "source_location": "L1",
       "id": "views_inventorydashboard",
-      "community": 11,
+      "community": 15,
       "norm_label": "inventorydashboard.tsx"
     },
     {
@@ -3141,7 +3159,7 @@
       "source_file": "src/features/omm/components/views/InventoryDashboard.tsx",
       "source_location": "L8",
       "id": "views_inventorydashboard_donutslice",
-      "community": 11,
+      "community": 15,
       "norm_label": "donutslice"
     },
     {
@@ -3150,7 +3168,7 @@
       "source_file": "src/features/omm/components/views/InventoryDashboard.tsx",
       "source_location": "L10",
       "id": "views_inventorydashboard_donutchart",
-      "community": 11,
+      "community": 15,
       "norm_label": "donutchart()"
     },
     {
@@ -3159,7 +3177,7 @@
       "source_file": "src/features/omm/components/views/InventoryDashboard.tsx",
       "source_location": "L55",
       "id": "views_inventorydashboard_inventorydashboard",
-      "community": 11,
+      "community": 15,
       "norm_label": "inventorydashboard()"
     },
     {
@@ -3168,7 +3186,7 @@
       "source_file": "src/features/omm/components/views/MovementTimeline.tsx",
       "source_location": "L1",
       "id": "views_movementtimeline",
-      "community": 24,
+      "community": 2,
       "norm_label": "movementtimeline.tsx"
     },
     {
@@ -3177,7 +3195,7 @@
       "source_file": "src/features/omm/components/views/MovementTimeline.tsx",
       "source_location": "L7",
       "id": "views_movementtimeline_status_colors",
-      "community": 24,
+      "community": 2,
       "norm_label": "status_colors"
     },
     {
@@ -3186,7 +3204,7 @@
       "source_file": "src/features/omm/components/views/MovementTimeline.tsx",
       "source_location": "L19",
       "id": "views_movementtimeline_movementtimeline",
-      "community": 24,
+      "community": 2,
       "norm_label": "movementtimeline()"
     },
     {
@@ -3195,16 +3213,16 @@
       "source_file": "src/features/omm/components/views/OverviewDashboard.tsx",
       "source_location": "L1",
       "id": "views_overviewdashboard",
-      "community": 11,
+      "community": 24,
       "norm_label": "overviewdashboard.tsx"
     },
     {
       "label": "OverviewDashboard()",
       "file_type": "code",
       "source_file": "src/features/omm/components/views/OverviewDashboard.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "id": "views_overviewdashboard_overviewdashboard",
-      "community": 11,
+      "community": 24,
       "norm_label": "overviewdashboard()"
     },
     {
@@ -3267,7 +3285,7 @@
       "source_file": "src/features/omm/components/views/PlantOverview.tsx",
       "source_location": "L379",
       "id": "views_plantoverview_plantoverview",
-      "community": 20,
+      "community": 15,
       "norm_label": "plantoverview()"
     },
     {
@@ -3276,7 +3294,7 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L1",
       "id": "views_simulationcalculator",
-      "community": 51,
+      "community": 30,
       "norm_label": "simulationcalculator.tsx"
     },
     {
@@ -3285,7 +3303,7 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L25",
       "id": "views_simulationcalculator_multitrendchart",
-      "community": 51,
+      "community": 30,
       "norm_label": "multitrendchart()"
     },
     {
@@ -3294,7 +3312,7 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L192",
       "id": "views_simulationcalculator_simulationcalculator",
-      "community": 11,
+      "community": 30,
       "norm_label": "simulationcalculator()"
     },
     {
@@ -3753,7 +3771,7 @@
       "source_file": "src/features/omm/store/useOmmStore.ts",
       "source_location": "L196",
       "id": "store_useommstore_useommstore",
-      "community": 15,
+      "community": 2,
       "norm_label": "useommstore"
     },
     {
@@ -3780,7 +3798,7 @@
       "source_file": "src/features/omm/types/index.ts",
       "source_location": "L11",
       "id": "types_index_ommpriority",
-      "community": 37,
+      "community": 30,
       "norm_label": "ommpriority"
     },
     {
@@ -3978,7 +3996,7 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L1",
       "id": "utils_strappingutils",
-      "community": 51,
+      "community": 30,
       "norm_label": "strappingutils.ts"
     },
     {
@@ -3987,7 +4005,7 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L7",
       "id": "utils_strappingutils_getstrappingconfig",
-      "community": 51,
+      "community": 30,
       "norm_label": "getstrappingconfig()"
     },
     {
@@ -3996,7 +4014,7 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L16",
       "id": "utils_strappingutils_convertleveltovolume",
-      "community": 51,
+      "community": 30,
       "norm_label": "convertleveltovolume()"
     },
     {
@@ -4005,7 +4023,7 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L45",
       "id": "utils_strappingutils_convertvolumetolevel",
-      "community": 51,
+      "community": 30,
       "norm_label": "convertvolumetolevel()"
     },
     {
@@ -4014,7 +4032,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L1",
       "id": "screen_designer_screencanvaseditor",
-      "community": 47,
+      "community": 36,
       "norm_label": "screencanvaseditor.tsx"
     },
     {
@@ -4023,7 +4041,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L33",
       "id": "screen_designer_screencanvaseditor_widgetinstancerenderer",
-      "community": 47,
+      "community": 36,
       "norm_label": "widgetinstancerenderer()"
     },
     {
@@ -4032,7 +4050,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L140",
       "id": "screen_designer_screencanvaseditor_variabledisplayrenderer",
-      "community": 47,
+      "community": 36,
       "norm_label": "variabledisplayrenderer()"
     },
     {
@@ -4041,7 +4059,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L181",
       "id": "screen_designer_screencanvaseditor_elementrenderer",
-      "community": 47,
+      "community": 36,
       "norm_label": "elementrenderer()"
     },
     {
@@ -4050,7 +4068,7 @@
       "source_file": "src/features/screen-designer/ScreenCanvasEditor.tsx",
       "source_location": "L494",
       "id": "screen_designer_screencanvaseditor_screencanvaseditor",
-      "community": 5,
+      "community": 36,
       "norm_label": "screencanvaseditor()"
     },
     {
@@ -4122,7 +4140,7 @@
       "source_file": "src/features/screen-designer/ScreenElementInspector.tsx",
       "source_location": "L331",
       "id": "screen_designer_screenelementinspector_screenelementinspector",
-      "community": 5,
+      "community": 36,
       "norm_label": "screenelementinspector()"
     },
     {
@@ -4131,7 +4149,7 @@
       "source_file": "src/features/screen-designer/ScreenExplorerPanel.tsx",
       "source_location": "L1",
       "id": "screen_designer_screenexplorerpanel",
-      "community": 31,
+      "community": 36,
       "norm_label": "screenexplorerpanel.tsx"
     },
     {
@@ -4140,7 +4158,7 @@
       "source_file": "src/features/screen-designer/ScreenExplorerPanel.tsx",
       "source_location": "L25",
       "id": "screen_designer_screenexplorerpanel_explorertab",
-      "community": 31,
+      "community": 36,
       "norm_label": "explorertab"
     },
     {
@@ -4149,7 +4167,7 @@
       "source_file": "src/features/screen-designer/ScreenExplorerPanel.tsx",
       "source_location": "L27",
       "id": "screen_designer_screenexplorerpanel_screenexplorerpanel",
-      "community": 19,
+      "community": 36,
       "norm_label": "screenexplorerpanel()"
     },
     {
@@ -4185,7 +4203,7 @@
       "source_file": "src/features/screen-designer/ScreenTree.tsx",
       "source_location": "L34",
       "id": "screen_designer_screentree_screentree",
-      "community": 5,
+      "community": 36,
       "norm_label": "screentree()"
     },
     {
@@ -4590,7 +4608,7 @@
       "source_file": "src/hooks/useResizeObserver.ts",
       "source_location": "L1",
       "id": "hooks_useresizeobserver",
-      "community": 39,
+      "community": 44,
       "norm_label": "useresizeobserver.ts"
     },
     {
@@ -4599,7 +4617,7 @@
       "source_file": "src/hooks/useResizeObserver.ts",
       "source_location": "L3",
       "id": "hooks_useresizeobserver_useresizeobserver",
-      "community": 39,
+      "community": 44,
       "norm_label": "useresizeobserver()"
     },
     {
@@ -4626,7 +4644,7 @@
       "source_file": "src/layouts/ScreenLayout.tsx",
       "source_location": "L1",
       "id": "layouts_screenlayout",
-      "community": 5,
+      "community": 36,
       "norm_label": "screenlayout.tsx"
     },
     {
@@ -4635,7 +4653,7 @@
       "source_file": "src/layouts/ScreenLayout.tsx",
       "source_location": "L11",
       "id": "layouts_screenlayout_screenlayout",
-      "community": 5,
+      "community": 36,
       "norm_label": "screenlayout()"
     },
     {
@@ -4707,7 +4725,7 @@
       "source_file": "src/pages/DatabaseAnalyticsPage.tsx",
       "source_location": "L1",
       "id": "pages_databaseanalyticspage",
-      "community": 53,
+      "community": 11,
       "norm_label": "databaseanalyticspage.tsx"
     },
     {
@@ -4716,7 +4734,7 @@
       "source_file": "src/pages/DatabaseAnalyticsPage.tsx",
       "source_location": "L25",
       "id": "pages_databaseanalyticspage_tablestats",
-      "community": 53,
+      "community": 11,
       "norm_label": "tablestats"
     },
     {
@@ -4725,7 +4743,7 @@
       "source_file": "src/pages/DatabaseAnalyticsPage.tsx",
       "source_location": "L34",
       "id": "pages_databaseanalyticspage_dbhistorypoint",
-      "community": 53,
+      "community": 11,
       "norm_label": "dbhistorypoint"
     },
     {
@@ -4734,7 +4752,7 @@
       "source_file": "src/pages/DatabaseAnalyticsPage.tsx",
       "source_location": "L39",
       "id": "pages_databaseanalyticspage_performancehistorypoint",
-      "community": 53,
+      "community": 11,
       "norm_label": "performancehistorypoint"
     },
     {
@@ -4743,7 +4761,7 @@
       "source_file": "src/pages/DatabaseAnalyticsPage.tsx",
       "source_location": "L46",
       "id": "pages_databaseanalyticspage_databaseanalyticspage",
-      "community": 53,
+      "community": 11,
       "norm_label": "databaseanalyticspage()"
     },
     {
@@ -4932,7 +4950,7 @@
       "source_file": "src/pages/OmmPage.tsx",
       "source_location": "L1",
       "id": "pages_ommpage",
-      "community": 6,
+      "community": 16,
       "norm_label": "ommpage.tsx"
     },
     {
@@ -4941,7 +4959,7 @@
       "source_file": "src/pages/OmmPage.tsx",
       "source_location": "L6",
       "id": "pages_ommpage_ommpage",
-      "community": 6,
+      "community": 16,
       "norm_label": "ommpage()"
     },
     {
@@ -4981,12 +4999,48 @@
       "norm_label": "orchestrapage()"
     },
     {
+      "label": "ProcessAlertsPage.tsx",
+      "file_type": "code",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L1",
+      "id": "pages_processalertspage",
+      "community": 35,
+      "norm_label": "processalertspage.tsx"
+    },
+    {
+      "label": "getAreaColor()",
+      "file_type": "code",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L28",
+      "id": "pages_processalertspage_getareacolor",
+      "community": 35,
+      "norm_label": "getareacolor()"
+    },
+    {
+      "label": "getAreaCode()",
+      "file_type": "code",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L35",
+      "id": "pages_processalertspage_getareacode",
+      "community": 35,
+      "norm_label": "getareacode()"
+    },
+    {
+      "label": "ProcessAlertsPage()",
+      "file_type": "code",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L42",
+      "id": "pages_processalertspage_processalertspage",
+      "community": 6,
+      "norm_label": "processalertspage()"
+    },
+    {
       "label": "RuntimePage.tsx",
       "file_type": "code",
       "source_file": "src/pages/RuntimePage.tsx",
       "source_location": "L1",
       "id": "pages_runtimepage",
-      "community": 6,
+      "community": 35,
       "norm_label": "runtimepage.tsx"
     },
     {
@@ -4995,7 +5049,7 @@
       "source_file": "src/pages/RuntimePage.tsx",
       "source_location": "L38",
       "id": "pages_runtimepage_savedview",
-      "community": 6,
+      "community": 35,
       "norm_label": "savedview"
     },
     {
@@ -5013,7 +5067,7 @@
       "source_file": "src/pages/ScreenDesignerPage.tsx",
       "source_location": "L1",
       "id": "pages_screendesignerpage",
-      "community": 5,
+      "community": 36,
       "norm_label": "screendesignerpage.tsx"
     },
     {
@@ -5022,7 +5076,7 @@
       "source_file": "src/pages/ScreenDesignerPage.tsx",
       "source_location": "L4",
       "id": "pages_screendesignerpage_screendesignerpage",
-      "community": 5,
+      "community": 36,
       "norm_label": "screendesignerpage()"
     },
     {
@@ -5067,7 +5121,7 @@
       "source_file": "src/pages/ScreenRuntimePage.tsx",
       "source_location": "L262",
       "id": "pages_screenruntimepage_screenruntimepage",
-      "community": 6,
+      "community": 47,
       "norm_label": "screenruntimepage()"
     },
     {
@@ -5094,7 +5148,7 @@
       "source_file": "src/pages/SimulatorPage.tsx",
       "source_location": "L1",
       "id": "pages_simulatorpage",
-      "community": 6,
+      "community": 24,
       "norm_label": "simulatorpage.tsx"
     },
     {
@@ -5103,7 +5157,7 @@
       "source_file": "src/pages/SimulatorPage.tsx",
       "source_location": "L31",
       "id": "pages_simulatorpage_objectpropertysimrow",
-      "community": 6,
+      "community": 24,
       "norm_label": "objectpropertysimrow"
     },
     {
@@ -5112,7 +5166,7 @@
       "source_file": "src/pages/SimulatorPage.tsx",
       "source_location": "L41",
       "id": "pages_simulatorpage_simulatorpage",
-      "community": 6,
+      "community": 24,
       "norm_label": "simulatorpage()"
     },
     {
@@ -5301,7 +5355,7 @@
       "source_file": "src/repository/AssociatedWidgetRepository.ts",
       "source_location": "L55",
       "id": "repository_associatedwidgetrepository_associatedwidgetrepo",
-      "community": 34,
+      "community": 37,
       "norm_label": "associatedwidgetrepo"
     },
     {
@@ -5589,7 +5643,7 @@
       "source_file": "src/repository/MockConfigRepository.ts",
       "source_location": "L57",
       "id": "repository_mockconfigrepository_mockconfigrepo",
-      "community": 34,
+      "community": 37,
       "norm_label": "mockconfigrepo"
     },
     {
@@ -5746,6 +5800,114 @@
       "norm_label": "opcrepo"
     },
     {
+      "label": "ProcessAlertRepository.ts",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L1",
+      "id": "repository_processalertrepository",
+      "community": 35,
+      "norm_label": "processalertrepository.ts"
+    },
+    {
+      "label": "ProcessAlertRepository",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L9",
+      "id": "repository_processalertrepository_processalertrepository",
+      "community": 35,
+      "norm_label": "processalertrepository"
+    },
+    {
+      "label": ".getRules()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L10",
+      "id": "repository_processalertrepository_processalertrepository_getrules",
+      "community": 35,
+      "norm_label": ".getrules()"
+    },
+    {
+      "label": ".saveRules()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L19",
+      "id": "repository_processalertrepository_processalertrepository_saverules",
+      "community": 35,
+      "norm_label": ".saverules()"
+    },
+    {
+      "label": ".getDefinitions()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L23",
+      "id": "repository_processalertrepository_processalertrepository_getdefinitions",
+      "community": 35,
+      "norm_label": ".getdefinitions()"
+    },
+    {
+      "label": ".saveDefinitions()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L32",
+      "id": "repository_processalertrepository_processalertrepository_savedefinitions",
+      "community": 35,
+      "norm_label": ".savedefinitions()"
+    },
+    {
+      "label": ".getOccurrences()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L36",
+      "id": "repository_processalertrepository_processalertrepository_getoccurrences",
+      "community": 35,
+      "norm_label": ".getoccurrences()"
+    },
+    {
+      "label": ".saveOccurrences()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L45",
+      "id": "repository_processalertrepository_processalertrepository_saveoccurrences",
+      "community": 35,
+      "norm_label": ".saveoccurrences()"
+    },
+    {
+      "label": ".saveOccurrence()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L52",
+      "id": "repository_processalertrepository_processalertrepository_saveoccurrence",
+      "community": 35,
+      "norm_label": ".saveoccurrence()"
+    },
+    {
+      "label": ".deleteOccurrence()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L64",
+      "id": "repository_processalertrepository_processalertrepository_deleteoccurrence",
+      "community": 35,
+      "norm_label": ".deleteoccurrence()"
+    },
+    {
+      "label": ".clear()",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L74",
+      "id": "repository_processalertrepository_processalertrepository_clear",
+      "community": 35,
+      "norm_label": ".clear()"
+    },
+    {
+      "label": "processAlertRepo",
+      "file_type": "code",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L80",
+      "id": "repository_processalertrepository_processalertrepo",
+      "community": 35,
+      "norm_label": "processalertrepo"
+    },
+    {
       "label": "PropertyRepository.ts",
       "file_type": "code",
       "source_file": "src/repository/PropertyRepository.ts",
@@ -5832,7 +5994,7 @@
       "source_file": "src/repository/PropertyRepository.ts",
       "source_location": "L56",
       "id": "repository_propertyrepository_propertyrepo",
-      "community": 31,
+      "community": 36,
       "norm_label": "propertyrepo"
     },
     {
@@ -5841,7 +6003,7 @@
       "source_file": "src/repository/ScreenFolderRepository.ts",
       "source_location": "L1",
       "id": "repository_screenfolderrepository",
-      "community": 2,
+      "community": 9,
       "norm_label": "screenfolderrepository.ts"
     },
     {
@@ -5850,7 +6012,7 @@
       "source_file": "src/repository/ScreenFolderRepository.ts",
       "source_location": "L7",
       "id": "repository_screenfolderrepository_loadfolders",
-      "community": 2,
+      "community": 9,
       "norm_label": "loadfolders()"
     },
     {
@@ -5859,7 +6021,7 @@
       "source_file": "src/repository/ScreenFolderRepository.ts",
       "source_location": "L16",
       "id": "repository_screenfolderrepository_savefolders",
-      "community": 2,
+      "community": 9,
       "norm_label": "savefolders()"
     },
     {
@@ -5868,7 +6030,7 @@
       "source_file": "src/repository/ScreenFolderRepository.ts",
       "source_location": "L20",
       "id": "repository_screenfolderrepository_loadnodes",
-      "community": 2,
+      "community": 9,
       "norm_label": "loadnodes()"
     },
     {
@@ -5877,7 +6039,7 @@
       "source_file": "src/repository/ScreenFolderRepository.ts",
       "source_location": "L29",
       "id": "repository_screenfolderrepository_savenodes",
-      "community": 2,
+      "community": 9,
       "norm_label": "savenodes()"
     },
     {
@@ -5886,7 +6048,7 @@
       "source_file": "src/repository/ScreenFolderRepository.ts",
       "source_location": "L33",
       "id": "repository_screenfolderrepository_screenfolderrepo",
-      "community": 2,
+      "community": 9,
       "norm_label": "screenfolderrepo"
     },
     {
@@ -5895,7 +6057,7 @@
       "source_file": "src/repository/ScreenRepository.ts",
       "source_location": "L1",
       "id": "repository_screenrepository",
-      "community": 35,
+      "community": 5,
       "norm_label": "screenrepository.ts"
     },
     {
@@ -5904,7 +6066,7 @@
       "source_file": "src/repository/ScreenRepository.ts",
       "source_location": "L6",
       "id": "repository_screenrepository_load",
-      "community": 35,
+      "community": 5,
       "norm_label": "load()"
     },
     {
@@ -5913,7 +6075,7 @@
       "source_file": "src/repository/ScreenRepository.ts",
       "source_location": "L15",
       "id": "repository_screenrepository_save",
-      "community": 35,
+      "community": 5,
       "norm_label": "save()"
     },
     {
@@ -5922,7 +6084,7 @@
       "source_file": "src/repository/ScreenRepository.ts",
       "source_location": "L19",
       "id": "repository_screenrepository_screenrepo",
-      "community": 47,
+      "community": 5,
       "norm_label": "screenrepo"
     },
     {
@@ -6012,7 +6174,7 @@
       "source_file": "src/repository/ScriptRepository.ts",
       "source_location": "L55",
       "id": "repository_scriptrepository_scriptrepo",
-      "community": 10,
+      "community": 31,
       "norm_label": "scriptrepo"
     },
     {
@@ -6021,7 +6183,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L1",
       "id": "repository_templaterepository",
-      "community": 35,
+      "community": 34,
       "norm_label": "templaterepository.ts"
     },
     {
@@ -6030,7 +6192,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L5",
       "id": "repository_templaterepository_templaterepository",
-      "community": 35,
+      "community": 34,
       "norm_label": "templaterepository"
     },
     {
@@ -6039,7 +6201,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L6",
       "id": "repository_templaterepository_templaterepository_getall",
-      "community": 35,
+      "community": 34,
       "norm_label": ".getall()"
     },
     {
@@ -6048,7 +6210,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L15",
       "id": "repository_templaterepository_templaterepository_getbyid",
-      "community": 35,
+      "community": 34,
       "norm_label": ".getbyid()"
     },
     {
@@ -6057,7 +6219,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L20",
       "id": "repository_templaterepository_templaterepository_save",
-      "community": 35,
+      "community": 34,
       "norm_label": ".save()"
     },
     {
@@ -6066,7 +6228,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L32",
       "id": "repository_templaterepository_templaterepository_delete",
-      "community": 35,
+      "community": 34,
       "norm_label": ".delete()"
     },
     {
@@ -6075,7 +6237,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L40",
       "id": "repository_templaterepository_templaterepository_saveall",
-      "community": 35,
+      "community": 34,
       "norm_label": ".saveall()"
     },
     {
@@ -6084,7 +6246,7 @@
       "source_file": "src/repository/TemplateRepository.ts",
       "source_location": "L45",
       "id": "repository_templaterepository_templaterepo",
-      "community": 51,
+      "community": 9,
       "norm_label": "templaterepo"
     },
     {
@@ -6174,7 +6336,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L1",
       "id": "repository_widgetrepository",
-      "community": 46,
+      "community": 38,
       "norm_label": "widgetrepository.ts"
     },
     {
@@ -6183,7 +6345,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L4",
       "id": "repository_widgetrepository_widgetrepository",
-      "community": 46,
+      "community": 38,
       "norm_label": "widgetrepository"
     },
     {
@@ -6192,7 +6354,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L5",
       "id": "repository_widgetrepository_widgetrepository_getall",
-      "community": 46,
+      "community": 38,
       "norm_label": ".getall()"
     },
     {
@@ -6201,7 +6363,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L14",
       "id": "repository_widgetrepository_widgetrepository_getbyid",
-      "community": 46,
+      "community": 38,
       "norm_label": ".getbyid()"
     },
     {
@@ -6210,7 +6372,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L19",
       "id": "repository_widgetrepository_widgetrepository_save",
-      "community": 46,
+      "community": 38,
       "norm_label": ".save()"
     },
     {
@@ -6219,7 +6381,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L32",
       "id": "repository_widgetrepository_widgetrepository_delete",
-      "community": 46,
+      "community": 38,
       "norm_label": ".delete()"
     },
     {
@@ -6228,7 +6390,7 @@
       "source_file": "src/repository/WidgetRepository.ts",
       "source_location": "L40",
       "id": "repository_widgetrepository_widgetrepository_saveall",
-      "community": 46,
+      "community": 38,
       "norm_label": ".saveall()"
     },
     {
@@ -6246,7 +6408,7 @@
       "source_file": "src/repository/storageKey.ts",
       "source_location": "L1",
       "id": "repository_storagekey",
-      "community": 35,
+      "community": 9,
       "norm_label": "storagekey.ts"
     },
     {
@@ -6255,7 +6417,7 @@
       "source_file": "src/repository/storageKey.ts",
       "source_location": "L1",
       "id": "repository_storagekey_storage_keys",
-      "community": 35,
+      "community": 9,
       "norm_label": "storage_keys"
     },
     {
@@ -6372,7 +6534,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L1",
       "id": "services_historyengine",
-      "community": 23,
+      "community": 44,
       "norm_label": "historyengine.ts"
     },
     {
@@ -6381,7 +6543,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L7",
       "id": "services_historyengine_lastrecordedat",
-      "community": 23,
+      "community": 44,
       "norm_label": "lastrecordedat"
     },
     {
@@ -6390,7 +6552,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L9",
       "id": "services_historyengine_lastrecordedvalue",
-      "community": 23,
+      "community": 44,
       "norm_label": "lastrecordedvalue"
     },
     {
@@ -6399,7 +6561,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L11",
       "id": "services_historyengine_monitoredkeys",
-      "community": 23,
+      "community": 44,
       "norm_label": "monitoredkeys"
     },
     {
@@ -6408,7 +6570,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L13",
       "id": "services_historyengine_store",
-      "community": 23,
+      "community": 44,
       "norm_label": "store"
     },
     {
@@ -6417,7 +6579,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L17",
       "id": "services_historyengine_key",
-      "community": 23,
+      "community": 44,
       "norm_label": "key()"
     },
     {
@@ -6426,7 +6588,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L21",
       "id": "services_historyengine_loadfromstorage",
-      "community": 23,
+      "community": 44,
       "norm_label": "loadfromstorage()"
     },
     {
@@ -6435,7 +6597,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L25",
       "id": "services_historyengine_schedulepersist",
-      "community": 23,
+      "community": 44,
       "norm_label": "schedulepersist()"
     },
     {
@@ -6444,7 +6606,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L29",
       "id": "services_historyengine_purgeexpiredsamples",
-      "community": 23,
+      "community": 44,
       "norm_label": "purgeexpiredsamples()"
     },
     {
@@ -6453,7 +6615,7 @@
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L44",
       "id": "services_historyengine_historyengine",
-      "community": 39,
+      "community": 44,
       "norm_label": "historyengine"
     },
     {
@@ -6556,12 +6718,66 @@
       "norm_label": ".getdefaultmockconfig()"
     },
     {
+      "label": "ProcessAlertEngine.ts",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L1",
+      "id": "services_processalertengine",
+      "community": 35,
+      "norm_label": "processalertengine.ts"
+    },
+    {
+      "label": "MovementSyncEntry",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L8",
+      "id": "services_processalertengine_movementsyncentry",
+      "community": 35,
+      "norm_label": "movementsyncentry"
+    },
+    {
+      "label": "ProcessAlertEngine",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L32",
+      "id": "services_processalertengine_processalertengine",
+      "community": 35,
+      "norm_label": "processalertengine"
+    },
+    {
+      "label": ".evaluate()",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L35",
+      "id": "services_processalertengine_processalertengine_evaluate",
+      "community": 35,
+      "norm_label": ".evaluate()"
+    },
+    {
+      "label": ".getObjectAreaId()",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L478",
+      "id": "services_processalertengine_processalertengine_getobjectareaid",
+      "community": 35,
+      "norm_label": ".getobjectareaid()"
+    },
+    {
+      "label": ".formatDescription()",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L489",
+      "id": "services_processalertengine_processalertengine_formatdescription",
+      "community": 35,
+      "norm_label": ".formatdescription()"
+    },
+    {
       "label": "PropertyBrowserService.ts",
       "file_type": "code",
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L1",
       "id": "services_propertybrowserservice",
-      "community": 34,
+      "community": 37,
       "norm_label": "propertybrowserservice.ts"
     },
     {
@@ -6570,7 +6786,7 @@
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L11",
       "id": "services_propertybrowserservice_indexedproperty",
-      "community": 34,
+      "community": 37,
       "norm_label": "indexedproperty"
     },
     {
@@ -6579,7 +6795,7 @@
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L34",
       "id": "services_propertybrowserservice_propertybrowserservice",
-      "community": 34,
+      "community": 37,
       "norm_label": "propertybrowserservice"
     },
     {
@@ -6588,7 +6804,7 @@
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L37",
       "id": "services_propertybrowserservice_propertybrowserservice_rebuildindex",
-      "community": 34,
+      "community": 37,
       "norm_label": ".rebuildindex()"
     },
     {
@@ -6597,7 +6813,7 @@
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L172",
       "id": "services_propertybrowserservice_propertybrowserservice_getindex",
-      "community": 34,
+      "community": 37,
       "norm_label": ".getindex()"
     },
     {
@@ -6606,7 +6822,7 @@
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L176",
       "id": "services_propertybrowserservice_propertybrowserservice_search",
-      "community": 34,
+      "community": 37,
       "norm_label": ".search()"
     },
     {
@@ -6721,7 +6937,7 @@
       "label": "MovementEntity",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "services_simulationengine_movemententity",
       "community": 35,
       "norm_label": "movemententity"
@@ -6730,7 +6946,7 @@
       "label": "OmmMovementSyncEntry",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L32",
+      "source_location": "L33",
       "id": "services_simulationengine_ommmovementsyncentry",
       "community": 35,
       "norm_label": "ommmovementsyncentry"
@@ -6739,91 +6955,100 @@
       "label": "SimulationEngine",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L58",
+      "source_location": "L59",
       "id": "services_simulationengine_simulationengine",
-      "community": 35,
+      "community": 29,
       "norm_label": "simulationengine"
     },
     {
       "label": ".start()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L65",
+      "source_location": "L66",
       "id": "services_simulationengine_simulationengine_start",
-      "community": 35,
+      "community": 29,
       "norm_label": ".start()"
     },
     {
       "label": ".stop()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L74",
+      "source_location": "L75",
       "id": "services_simulationengine_simulationengine_stop",
-      "community": 35,
+      "community": 29,
       "norm_label": ".stop()"
     },
     {
       "label": ".setSpeed()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L82",
+      "source_location": "L83",
       "id": "services_simulationengine_simulationengine_setspeed",
-      "community": 35,
+      "community": 29,
       "norm_label": ".setspeed()"
     },
     {
       "label": ".getIsRunning()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L86",
+      "source_location": "L87",
       "id": "services_simulationengine_simulationengine_getisrunning",
-      "community": 35,
+      "community": 29,
       "norm_label": ".getisrunning()"
     },
     {
       "label": ".subscribe()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L90",
+      "source_location": "L91",
       "id": "services_simulationengine_simulationengine_subscribe",
-      "community": 35,
+      "community": 29,
       "norm_label": ".subscribe()"
     },
     {
       "label": ".notifyListeners()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L97",
+      "source_location": "L98",
       "id": "services_simulationengine_simulationengine_notifylisteners",
-      "community": 35,
+      "community": 29,
       "norm_label": ".notifylisteners()"
     },
     {
       "label": ".tick()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L101",
+      "source_location": "L102",
       "id": "services_simulationengine_simulationengine_tick",
-      "community": 35,
+      "community": 29,
       "norm_label": ".tick()"
     },
     {
       "label": ".updateProp()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L274",
+      "source_location": "L278",
       "id": "services_simulationengine_simulationengine_updateprop",
-      "community": 35,
+      "community": 29,
       "norm_label": ".updateprop()"
     },
     {
       "label": ".evaluateAlarms()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
-      "source_location": "L285",
+      "source_location": "L289",
       "id": "services_simulationengine_simulationengine_evaluatealarms",
-      "community": 35,
+      "community": 29,
       "norm_label": ".evaluatealarms()"
+    },
+    {
+      "label": ".evaluateProcessAlerts()",
+      "file_type": "code",
+      "source_file": "src/services/simulationEngine.ts",
+      "source_location": "L307",
+      "id": "services_simulationengine_simulationengine_evaluateprocessalerts",
+      "community": 29,
+      "norm_label": ".evaluateprocessalerts()"
     },
     {
       "label": "useActiveDirectoryStore.ts",
@@ -7420,12 +7645,93 @@
       "norm_label": "getchildrenidsrecursive()"
     },
     {
+      "label": "useProcessAlertStore.ts",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L1",
+      "id": "store_useprocessalertstore",
+      "community": 35,
+      "norm_label": "useprocessalertstore.ts"
+    },
+    {
+      "label": "ProcessAlertStoreState",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L8",
+      "id": "store_useprocessalertstore_processalertstorestate",
+      "community": 35,
+      "norm_label": "processalertstorestate"
+    },
+    {
+      "label": "ProcessAlertStoreActions",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L26",
+      "id": "store_useprocessalertstore_processalertstoreactions",
+      "community": 35,
+      "norm_label": "processalertstoreactions"
+    },
+    {
+      "label": "ProcessAlertStore",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L47",
+      "id": "store_useprocessalertstore_processalertstore",
+      "community": 35,
+      "norm_label": "processalertstore"
+    },
+    {
+      "label": "DEFAULT_RULES",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L49",
+      "id": "store_useprocessalertstore_default_rules",
+      "community": 35,
+      "norm_label": "default_rules"
+    },
+    {
+      "label": "DEFAULT_DEFINITIONS",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L196",
+      "id": "store_useprocessalertstore_default_definitions",
+      "community": 35,
+      "norm_label": "default_definitions"
+    },
+    {
+      "label": "useProcessAlertStore",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L307",
+      "id": "store_useprocessalertstore_useprocessalertstore",
+      "community": 35,
+      "norm_label": "useprocessalertstore"
+    },
+    {
+      "label": "playSynthesizedSound()",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L687",
+      "id": "store_useprocessalertstore_playsynthesizedsound",
+      "community": 35,
+      "norm_label": "playsynthesizedsound()"
+    },
+    {
+      "label": "getMockOccurrences()",
+      "file_type": "code",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L776",
+      "id": "store_useprocessalertstore_getmockoccurrences",
+      "community": 35,
+      "norm_label": "getmockoccurrences()"
+    },
+    {
       "label": "useScreenStore.ts",
       "file_type": "code",
       "source_file": "src/store/useScreenStore.ts",
       "source_location": "L1",
       "id": "store_usescreenstore",
-      "community": 2,
+      "community": 5,
       "norm_label": "usescreenstore.ts"
     },
     {
@@ -7434,7 +7740,7 @@
       "source_file": "src/store/useScreenStore.ts",
       "source_location": "L15",
       "id": "store_usescreenstore_screentooltype",
-      "community": 2,
+      "community": 5,
       "norm_label": "screentooltype"
     },
     {
@@ -7443,7 +7749,7 @@
       "source_file": "src/store/useScreenStore.ts",
       "source_location": "L23",
       "id": "store_usescreenstore_screenstorestate",
-      "community": 2,
+      "community": 5,
       "norm_label": "screenstorestate"
     },
     {
@@ -7461,7 +7767,7 @@
       "source_file": "src/store/useScreenStore.ts",
       "source_location": "L128",
       "id": "store_usescreenstore_usescreenstore",
-      "community": 5,
+      "community": 36,
       "norm_label": "usescreenstore"
     },
     {
@@ -7875,7 +8181,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L1",
       "id": "types_domain",
-      "community": 2,
+      "community": 5,
       "norm_label": "domain.ts"
     },
     {
@@ -7911,7 +8217,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L29",
       "id": "types_domain_templateentity",
-      "community": 35,
+      "community": 34,
       "norm_label": "templateentity"
     },
     {
@@ -7929,7 +8235,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L52",
       "id": "types_domain_tankgeometrytype",
-      "community": 25,
+      "community": 23,
       "norm_label": "tankgeometrytype"
     },
     {
@@ -7938,7 +8244,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L63",
       "id": "types_domain_strappingpoint",
-      "community": 51,
+      "community": 9,
       "norm_label": "strappingpoint"
     },
     {
@@ -7947,7 +8253,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L70",
       "id": "types_domain_strappinglevelunit",
-      "community": 2,
+      "community": 5,
       "norm_label": "strappinglevelunit"
     },
     {
@@ -7956,7 +8262,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L71",
       "id": "types_domain_strappingvolumeunit",
-      "community": 2,
+      "community": 5,
       "norm_label": "strappingvolumeunit"
     },
     {
@@ -7965,7 +8271,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L78",
       "id": "types_domain_tankstrappingconfig",
-      "community": 51,
+      "community": 9,
       "norm_label": "tankstrappingconfig"
     },
     {
@@ -7974,7 +8280,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L97",
       "id": "types_domain_fieldbinding",
-      "community": 49,
+      "community": 44,
       "norm_label": "fieldbinding"
     },
     {
@@ -8010,7 +8316,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L159",
       "id": "types_domain_propertyhistoryconfig",
-      "community": 53,
+      "community": 11,
       "norm_label": "propertyhistoryconfig"
     },
     {
@@ -8019,7 +8325,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L174",
       "id": "types_domain_samplequality",
-      "community": 23,
+      "community": 44,
       "norm_label": "samplequality"
     },
     {
@@ -8073,7 +8379,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L235",
       "id": "types_domain_mergedproperty",
-      "community": 31,
+      "community": 24,
       "norm_label": "mergedproperty"
     },
     {
@@ -8127,7 +8433,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L303",
       "id": "types_domain_mergedassociatedwidget",
-      "community": 31,
+      "community": 11,
       "norm_label": "mergedassociatedwidget"
     },
     {
@@ -8181,7 +8487,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L364",
       "id": "types_domain_widgetanalogrange",
-      "community": 2,
+      "community": 5,
       "norm_label": "widgetanalogrange"
     },
     {
@@ -8190,7 +8496,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L372",
       "id": "types_domain_filllevelconfig",
-      "community": 2,
+      "community": 5,
       "norm_label": "filllevelconfig"
     },
     {
@@ -8217,7 +8523,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L418",
       "id": "types_domain_widgetentity",
-      "community": 46,
+      "community": 38,
       "norm_label": "widgetentity"
     },
     {
@@ -8244,7 +8550,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L451",
       "id": "types_domain_widgettreenode",
-      "community": 52,
+      "community": 5,
       "norm_label": "widgettreenode"
     },
     {
@@ -8253,7 +8559,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L466",
       "id": "types_domain_screenelementtype",
-      "community": 2,
+      "community": 5,
       "norm_label": "screenelementtype"
     },
     {
@@ -8262,7 +8568,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L475",
       "id": "types_domain_screenelement",
-      "community": 2,
+      "community": 5,
       "norm_label": "screenelement"
     },
     {
@@ -8271,7 +8577,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L532",
       "id": "types_domain_screenentity",
-      "community": 2,
+      "community": 5,
       "norm_label": "screenentity"
     },
     {
@@ -8280,7 +8586,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L545",
       "id": "types_domain_screenfolderentity",
-      "community": 2,
+      "community": 5,
       "norm_label": "screenfolderentity"
     },
     {
@@ -8289,7 +8595,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L554",
       "id": "types_domain_screennodeentity",
-      "community": 2,
+      "community": 5,
       "norm_label": "screennodeentity"
     },
     {
@@ -8298,7 +8604,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L564",
       "id": "types_domain_screentreenode",
-      "community": 2,
+      "community": 5,
       "norm_label": "screentreenode"
     },
     {
@@ -8307,7 +8613,7 @@
       "source_file": "src/types/domain.ts",
       "source_location": "L579",
       "id": "types_domain_alarmconditiontype",
-      "community": 2,
+      "community": 5,
       "norm_label": "alarmconditiontype"
     },
     {
@@ -8730,7 +9036,7 @@
       "source_file": "src/types/mock.ts",
       "source_location": "L38",
       "id": "types_mock_mergedmockconfig",
-      "community": 6,
+      "community": 24,
       "norm_label": "mergedmockconfig"
     },
     {
@@ -8786,6 +9092,60 @@
       "id": "types_opc_opcconnectorinterface",
       "community": 19,
       "norm_label": "opcconnectorinterface"
+    },
+    {
+      "label": "processAlert.ts",
+      "file_type": "code",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L1",
+      "id": "types_processalert",
+      "community": 35,
+      "norm_label": "processalert.ts"
+    },
+    {
+      "label": "ProcessAlertSeverity",
+      "file_type": "code",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L1",
+      "id": "types_processalert_processalertseverity",
+      "community": 35,
+      "norm_label": "processalertseverity"
+    },
+    {
+      "label": "ProcessAlertStatus",
+      "file_type": "code",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L3",
+      "id": "types_processalert_processalertstatus",
+      "community": 35,
+      "norm_label": "processalertstatus"
+    },
+    {
+      "label": "ProcessAlertRule",
+      "file_type": "code",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L5",
+      "id": "types_processalert_processalertrule",
+      "community": 35,
+      "norm_label": "processalertrule"
+    },
+    {
+      "label": "ProcessAlertDefinition",
+      "file_type": "code",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L22",
+      "id": "types_processalert_processalertdefinition",
+      "community": 35,
+      "norm_label": "processalertdefinition"
+    },
+    {
+      "label": "ProcessAlertOccur",
+      "file_type": "code",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L35",
+      "id": "types_processalert_processalertoccur",
+      "community": 35,
+      "norm_label": "processalertoccur"
     },
     {
       "label": "security.ts",
@@ -8883,7 +9243,7 @@
       "source_file": "src/utils/cn.ts",
       "source_location": "L1",
       "id": "utils_cn",
-      "community": 53,
+      "community": 11,
       "norm_label": "cn.ts"
     },
     {
@@ -8892,7 +9252,7 @@
       "source_file": "src/utils/cn.ts",
       "source_location": "L4",
       "id": "utils_cn_cn",
-      "community": 53,
+      "community": 24,
       "norm_label": "cn()"
     },
     {
@@ -9535,11 +9895,29 @@
       "norm_label": "vite.config.ts"
     },
     {
+      "label": "ToastContainer()",
+      "file_type": "code",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L994",
+      "community": 35,
+      "norm_label": "toastcontainer()",
+      "id": "pages_processalertspage_toastcontainer"
+    },
+    {
+      "label": ".getOccurKey()",
+      "file_type": "code",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L451",
+      "community": 35,
+      "norm_label": ".getoccurkey()",
+      "id": "services_processalertengine_processalertengine_getoccurkey"
+    },
+    {
       "label": ".recordHistory()",
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
       "source_location": "L287",
-      "community": 35,
+      "community": 29,
       "norm_label": ".recordhistory()",
       "id": "services_simulationengine_simulationengine_recordhistory"
     },
@@ -9548,7 +9926,7 @@
       "file_type": "code",
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L36",
-      "community": 23,
+      "community": 44,
       "norm_label": "pendingpersist",
       "id": "services_historyengine_pendingpersist"
     },
@@ -9602,7 +9980,7 @@
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
       "source_location": "L379",
-      "community": 35,
+      "community": 29,
       "norm_label": ".checkhighalarm()",
       "id": "services_simulationengine_simulationengine_checkhighalarm"
     },
@@ -9611,7 +9989,7 @@
       "file_type": "code",
       "source_file": "src/services/simulationEngine.ts",
       "source_location": "L418",
-      "community": 35,
+      "community": 29,
       "norm_label": ".checklowalarm()",
       "id": "services_simulationengine_simulationengine_checklowalarm"
     },
@@ -9620,7 +9998,7 @@
       "file_type": "code",
       "source_file": "src/services/HistoryEngine.ts",
       "source_location": "L36",
-      "community": 23,
+      "community": 44,
       "norm_label": "persistkey()",
       "id": "services_historyengine_persistkey"
     },
@@ -9746,7 +10124,7 @@
       "file_type": "code",
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L70",
-      "community": 11,
+      "community": 15,
       "norm_label": "groupbyoption",
       "id": "layout_ommtoolbar_groupbyoption"
     },
@@ -9755,7 +10133,7 @@
       "file_type": "code",
       "source_file": "src/features/omm/components/layout/OmmToolbar.tsx",
       "source_location": "L75",
-      "community": 11,
+      "community": 15,
       "norm_label": "group_by_options",
       "id": "layout_ommtoolbar_group_by_options"
     },
@@ -9764,7 +10142,7 @@
       "file_type": "code",
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L38",
-      "community": 15,
+      "community": 2,
       "norm_label": "statuscellselector()",
       "id": "table_columndefs_statuscellselector"
     },
@@ -9773,7 +10151,7 @@
       "file_type": "code",
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L95",
-      "community": 15,
+      "community": 2,
       "norm_label": "prioritycellselector()",
       "id": "table_columndefs_prioritycellselector"
     },
@@ -9782,7 +10160,7 @@
       "file_type": "code",
       "source_file": "src/features/omm/components/table/columnDefs.tsx",
       "source_location": "L149",
-      "community": 15,
+      "community": 2,
       "norm_label": "typecellselector()",
       "id": "table_columndefs_typecellselector"
     },
@@ -9917,7 +10295,7 @@
       "file_type": "code",
       "source_file": "src/features/grid-dashboard/types.ts",
       "source_location": "L3",
-      "community": 49,
+      "community": 44,
       "norm_label": "cardvisiblefields",
       "id": "grid_dashboard_types_cardvisiblefields"
     },
@@ -10818,6 +11196,28 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/App.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "pages_processalertspage"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "pages_processalertspage_processalertspage"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
       "source_location": "L8",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -11055,6 +11455,28 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "ui_processalerttoastcontainer"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_app",
+      "target": "ui_processalerttoastcontainer_processalerttoastcontainer"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/main.tsx",
       "source_location": "L4",
       "weight": 1.0,
@@ -11261,9 +11683,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "components_tankgeometrysvg",
-      "confidence_score": 1.0
+      "target": "components_tankgeometrysvg"
     },
     {
       "relation": "references",
@@ -11349,9 +11771,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "components_tankgeometrysvg_tankgeometrysvg",
-      "confidence_score": 1.0
+      "target": "components_tankgeometrysvg_tankgeometrysvg"
     },
     {
       "relation": "imports_from",
@@ -11549,6 +11971,28 @@
       "confidence_score": 1.0,
       "source": "navigation_headernavigation",
       "target": "store_useopcstore_useopcstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/navigation/HeaderNavigation.tsx",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "navigation_headernavigation",
+      "target": "store_useprocessalertstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/navigation/HeaderNavigation.tsx",
+      "source_location": "L38",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "navigation_headernavigation",
+      "target": "store_useprocessalertstore_useprocessalertstore"
     },
     {
       "relation": "imports_from",
@@ -11774,6 +12218,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "navigation_headernavigation"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/pages/RuntimePage.tsx",
       "source_location": "L23",
       "weight": 1.0,
@@ -11857,6 +12312,17 @@
       "weight": 1.0,
       "source": "navigation_headernavigation_headernavigation",
       "target": "store_useobjectmodelstore_useobjectmodelstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/navigation/HeaderNavigation.tsx",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "navigation_headernavigation_headernavigation",
+      "target": "store_useprocessalertstore_useprocessalertstore"
     },
     {
       "relation": "calls",
@@ -11977,6 +12443,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pages_opcbrowserpage",
+      "target": "navigation_headernavigation_headernavigation"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
       "target": "navigation_headernavigation_headernavigation"
     },
     {
@@ -12558,6 +13035,49 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/ProcessAlertToastContainer.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_processalerttoastcontainer",
+      "target": "store_useprocessalertstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/ProcessAlertToastContainer.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_processalerttoastcontainer",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/ProcessAlertToastContainer.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_processalerttoastcontainer",
+      "target": "ui_processalerttoastcontainer_processalerttoastcontainer"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/ui/ProcessAlertToastContainer.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "ui_processalerttoastcontainer_processalerttoastcontainer",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/layouts/IDELayout.tsx",
       "source_location": "L4",
       "weight": 1.0,
@@ -12721,9 +13241,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "ui_searchableselect",
-      "confidence_score": 1.0
+      "target": "ui_searchableselect"
     },
     {
       "relation": "imports",
@@ -12765,9 +13285,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "ui_searchableselect_searchableselect",
-      "confidence_score": 1.0
+      "target": "ui_searchableselect_searchableselect"
     },
     {
       "relation": "imports_from",
@@ -12878,6 +13398,28 @@
       "confidence_score": 1.0,
       "source": "ui_tanktelemetrydashboard",
       "target": "store_useommstore_useommstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/TankTelemetryDashboard.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_tanktelemetrydashboard",
+      "target": "store_useprocessalertstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/TankTelemetryDashboard.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ui_tanktelemetrydashboard",
+      "target": "store_useprocessalertstore_useprocessalertstore"
     },
     {
       "relation": "contains",
@@ -13028,6 +13570,17 @@
       "weight": 1.0,
       "source": "ui_tanktelemetrydashboard_tanktelemetrydashboard",
       "target": "store_useommstore_useommstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/ui/TankTelemetryDashboard.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "ui_tanktelemetrydashboard_tanktelemetrydashboard",
+      "target": "store_useprocessalertstore_useprocessalertstore"
     },
     {
       "relation": "imports",
@@ -20284,9 +20837,9 @@
       "source_file": "src/features/omm/components/OmmLayout.tsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_ommlayout",
-      "target": "views_simulationcalculator",
-      "confidence_score": 1.0
+      "target": "views_simulationcalculator"
     },
     {
       "relation": "imports",
@@ -20295,9 +20848,9 @@
       "source_file": "src/features/omm/components/OmmLayout.tsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "components_ommlayout",
-      "target": "views_simulationcalculator_simulationcalculator",
-      "confidence_score": 1.0
+      "target": "views_simulationcalculator_simulationcalculator"
     },
     {
       "relation": "imports_from",
@@ -22775,6 +23328,28 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_overviewdashboard",
+      "target": "store_useprocessalertstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/omm/components/views/OverviewDashboard.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_overviewdashboard",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/omm/components/views/OverviewDashboard.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_overviewdashboard",
       "target": "utils_cn"
     },
     {
@@ -22819,6 +23394,17 @@
       "weight": 1.0,
       "source": "views_overviewdashboard_overviewdashboard",
       "target": "store_useommstore_useommstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/features/omm/components/views/OverviewDashboard.tsx",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "views_overviewdashboard_overviewdashboard",
+      "target": "store_useprocessalertstore_useprocessalertstore"
     },
     {
       "relation": "calls",
@@ -23016,9 +23602,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "store_useommstore",
-      "confidence_score": 1.0
+      "target": "store_useommstore"
     },
     {
       "relation": "imports",
@@ -23027,9 +23613,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "store_useommstore_useommstore",
-      "confidence_score": 1.0
+      "target": "store_useommstore_useommstore"
     },
     {
       "relation": "imports_from",
@@ -23038,9 +23624,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "utils_cn",
-      "confidence_score": 1.0
+      "target": "utils_cn"
     },
     {
       "relation": "imports",
@@ -23049,9 +23635,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "utils_cn_cn",
-      "confidence_score": 1.0
+      "target": "utils_cn_cn"
     },
     {
       "relation": "imports_from",
@@ -23060,9 +23646,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "utils_strappingutils",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils"
     },
     {
       "relation": "imports",
@@ -23071,9 +23657,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "utils_strappingutils_convertleveltovolume",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils_convertleveltovolume"
     },
     {
       "relation": "imports",
@@ -23082,9 +23668,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "utils_strappingutils_convertvolumetolevel",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils_convertvolumetolevel"
     },
     {
       "relation": "imports",
@@ -23093,9 +23679,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "utils_strappingutils_getstrappingconfig",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils_getstrappingconfig"
     },
     {
       "relation": "contains",
@@ -23103,9 +23689,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "views_simulationcalculator_multitrendchart",
-      "confidence_score": 1.0
+      "target": "views_simulationcalculator_multitrendchart"
     },
     {
       "relation": "contains",
@@ -23113,9 +23699,9 @@
       "source_file": "src/features/omm/components/views/SimulationCalculator.tsx",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_simulationcalculator",
-      "target": "views_simulationcalculator_simulationcalculator",
-      "confidence_score": 1.0
+      "target": "views_simulationcalculator_simulationcalculator"
     },
     {
       "relation": "calls",
@@ -25283,6 +25869,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useommstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/pages/SimulatorPage.tsx",
       "source_location": "L24",
       "weight": 1.0,
@@ -26091,6 +26688,28 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useommstore_useommstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "pages_processalertspage_processalertspage",
+      "target": "store_useommstore_useommstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/pages/SimulatorPage.tsx",
       "source_location": "L24",
       "weight": 1.0,
@@ -26590,9 +27209,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "repository_objectrepository",
-      "confidence_score": 1.0
+      "target": "repository_objectrepository"
     },
     {
       "relation": "imports",
@@ -26601,9 +27220,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "repository_objectrepository_objectrepo",
-      "confidence_score": 1.0
+      "target": "repository_objectrepository_objectrepo"
     },
     {
       "relation": "imports_from",
@@ -26612,9 +27231,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "types_domain",
-      "confidence_score": 1.0
+      "target": "types_domain"
     },
     {
       "relation": "imports",
@@ -26623,9 +27242,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "types_domain_tankstrappingconfig",
-      "confidence_score": 1.0
+      "target": "types_domain_tankstrappingconfig"
     },
     {
       "relation": "contains",
@@ -26633,9 +27252,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "utils_strappingutils_convertleveltovolume",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils_convertleveltovolume"
     },
     {
       "relation": "contains",
@@ -26643,9 +27262,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "utils_strappingutils_convertvolumetolevel",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils_convertvolumetolevel"
     },
     {
       "relation": "contains",
@@ -26653,9 +27272,9 @@
       "source_file": "src/features/omm/utils/strappingUtils.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_strappingutils",
-      "target": "utils_strappingutils_getstrappingconfig",
-      "confidence_score": 1.0
+      "target": "utils_strappingutils_getstrappingconfig"
     },
     {
       "relation": "imports_from",
@@ -30476,6 +31095,244 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "pages_processalertspage",
+      "target": "pages_processalertspage_getareacode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "pages_processalertspage",
+      "target": "pages_processalertspage_getareacolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "pages_processalertspage_processalertspage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L994",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "pages_processalertspage_toastcontainer"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useauthstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useauthstore_useauthstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useobjectmodelstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useobjectmodelstore_useobjectmodelstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useprocessalertstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useprocessalertstore_playsynthesizedsound"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "types_processalert"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "types_processalert_processalertseverity"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "types_processalert_processalertstatus"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "utils_cn"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "pages_processalertspage",
+      "target": "utils_cn_cn"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "pages_processalertspage_processalertspage",
+      "target": "store_useauthstore_useauthstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "pages_processalertspage_processalertspage",
+      "target": "store_useobjectmodelstore_useobjectmodelstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "pages_processalertspage_processalertspage",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L293",
+      "weight": 1.0,
+      "source": "pages_processalertspage_processalertspage",
+      "target": "utils_cn_cn"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/pages/RuntimePage.tsx",
       "source_location": "L29",
       "weight": 1.0,
@@ -33892,6 +34749,435 @@
       "confidence_score": 1.0,
       "source": "store_useopcstore",
       "target": "repository_opcrepository_opcrepo"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepo"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "types_processalert"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "utils_safestorage"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "utils_safestorage_safegetitem"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository",
+      "target": "utils_safestorage_safesetitem"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "repository_processalertrepository"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "repository_processalertrepository"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_clear"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L51",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_deleteoccurrence"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_getdefinitions"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_getoccurrences"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_getrules"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_savedefinitions"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_saveoccurrence"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_saveoccurrences"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository",
+      "target": "repository_processalertrepository_processalertrepository_saverules"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_getrules",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_getrules",
+      "target": "utils_safestorage_safegetitem"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saverules",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saverules",
+      "target": "utils_safestorage_safesetitem"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_getdefinitions",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_getdefinitions",
+      "target": "utils_safestorage_safegetitem"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_savedefinitions",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_savedefinitions",
+      "target": "utils_safestorage_safesetitem"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_deleteoccurrence",
+      "target": "repository_processalertrepository_processalertrepository_getoccurrences"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_getoccurrences",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_getoccurrences",
+      "target": "utils_safestorage_safegetitem"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saveoccurrence",
+      "target": "repository_processalertrepository_processalertrepository_getoccurrences"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L55",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_deleteoccurrence",
+      "target": "repository_processalertrepository_processalertrepository_saveoccurrences"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saveoccurrence",
+      "target": "repository_processalertrepository_processalertrepository_saveoccurrences"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saveoccurrences",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saveoccurrences",
+      "target": "utils_safestorage_safesetitem"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_saveoccurrence",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/repository/ProcessAlertRepository.ts",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "repository_processalertrepository_processalertrepository_clear",
+      "target": "utils_safestorage_safesetitem"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "repository_processalertrepository_processalertrepo"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "repository_processalertrepository_processalertrepo"
     },
     {
       "relation": "contains",
@@ -37878,6 +39164,242 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "services_processalertengine_movementsyncentry"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "services_processalertengine_processalertengine"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "store_uselogstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "store_uselogstore_uselogstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "store_useprocessalertstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "store_useprocessalertstore_playsynthesizedsound"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "types_domain"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "types_domain_objectentity"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "types_processalert"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/simulationEngine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_simulationengine",
+      "target": "services_processalertengine"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine",
+      "target": "services_processalertengine_processalertengine_evaluate"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L455",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine",
+      "target": "services_processalertengine_processalertengine_formatdescription"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L478",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine",
+      "target": "services_processalertengine_processalertengine_getobjectareaid"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L451",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine",
+      "target": "services_processalertengine_processalertengine_getoccurkey"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/simulationEngine.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_simulationengine",
+      "target": "services_processalertengine_processalertengine"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine_evaluate",
+      "target": "types_domain_objectentity"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L478",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine_getobjectareaid",
+      "target": "types_domain_objectentity"
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ProcessAlertEngine.ts",
+      "source_location": "L455",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_processalertengine_processalertengine_formatdescription",
+      "target": "types_domain_objectentity"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/services/PropertyBrowserService.ts",
       "source_location": "L11",
       "weight": 1.0,
@@ -38536,6 +40058,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "src/services/simulationEngine.ts",
+      "source_location": "L307",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_simulationengine_simulationengine",
+      "target": "services_simulationengine_simulationengine_evaluateprocessalerts"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/simulationEngine.ts",
       "source_location": "L58",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -38654,6 +40186,17 @@
       "confidence_score": 1.0,
       "source": "services_simulationengine_simulationengine_tick",
       "target": "services_simulationengine_simulationengine_evaluatealarms"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/simulationEngine.ts",
+      "source_location": "L273",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_simulationengine_simulationengine_tick",
+      "target": "services_simulationengine_simulationengine_evaluateprocessalerts"
     },
     {
       "relation": "calls",
@@ -39750,6 +41293,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_uselogstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/store/useSecurityStore.ts",
       "source_location": "L5",
       "weight": 1.0,
@@ -39788,6 +41342,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "store_useobjectmodelstore",
+      "target": "store_uselogstore_uselogstore"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
       "target": "store_uselogstore_uselogstore"
     },
     {
@@ -40585,6 +42150,229 @@
       "confidence_score": 1.0,
       "source": "store_useopcstore_opcstorestate",
       "target": "types_opc_opcnodetype"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L196",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_default_definitions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_default_rules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L565",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_getmockoccurrences"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L469",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_playsynthesizedsound"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_processalertstore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_processalertstoreactions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_processalertstorestate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L197",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "store_useprocessalertstore_useprocessalertstore"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "types_processalert"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore",
+      "target": "types_processalert_processalertseverity"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstorestate",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstorestate",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstorestate",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstorestate",
+      "target": "types_processalert_processalertseverity"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstoreactions",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstoreactions",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "src/store/useProcessAlertStore.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "store_useprocessalertstore_processalertstoreactions",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/ProcessAlertsPage.tsx",
+      "source_location": "L995",
+      "weight": 1.0,
+      "source": "pages_processalertspage_toastcontainer",
+      "target": "store_useprocessalertstore_useprocessalertstore"
     },
     {
       "relation": "contains",
@@ -43088,6 +44876,56 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_processalert",
+      "target": "types_processalert_processalertdefinition"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_processalert",
+      "target": "types_processalert_processalertoccur"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_processalert",
+      "target": "types_processalert_processalertrule"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_processalert",
+      "target": "types_processalert_processalertseverity"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/types/processAlert.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "types_processalert",
+      "target": "types_processalert_processalertstatus"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/types/security.ts",
       "source_location": "L37",
       "weight": 1.0,
@@ -44049,5 +45887,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1d43546ae5b55a196cd36eadd4d7e84290c7c2ee"
+  "built_at_commit": "ef963b11b4bd06bd54c75382342ea3b212aa4ad5"
 }

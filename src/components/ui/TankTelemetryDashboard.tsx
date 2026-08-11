@@ -4,9 +4,10 @@ import { inheritanceService } from '../../services/InheritanceService';
 import { historyEngine } from '../../services/HistoryEngine';
 import { TankGeometrySvg } from '../TankGeometrySvg';
 import { MiniTrendChart } from './MiniTrendChart';
-import { Thermometer, Gauge, Droplets, Activity, Percent, Database, HelpCircle } from 'lucide-react';
+import { Thermometer, Gauge, Droplets, Activity, Percent, Database, HelpCircle, AlertTriangle } from 'lucide-react';
 import { generateTrendHistory, type TrendDirection } from '../../utils/trendHistorySimulator';
 import { useOmmStore } from '../../features/omm/store/useOmmStore';
+import { useProcessAlertStore } from '../../store/useProcessAlertStore';
 
 
 interface TankTelemetryDashboardProps {
@@ -26,6 +27,13 @@ interface VariableHistory {
 
 export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ objectId, compact = false }) => {
   const { objects, templates, simulatedValues, init } = useObjectModelStore();
+  const processAlerts = useProcessAlertStore((s) => s.occurrences);
+
+  const activeTankAlerts = useMemo(() => {
+    return (processAlerts || []).filter(
+      (o) => o.relatedObjectId === objectId && o.status.startsWith('active')
+    );
+  }, [processAlerts, objectId]);
 
   useEffect(() => {
     init();
@@ -244,6 +252,14 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
   if (compact) {
     return (
       <div className="flex flex-col h-full w-full bg-slate-50/30 dark:bg-slate-950/20 text-slate-900 dark:text-slate-100 overflow-hidden select-none p-3 space-y-3">
+        {activeTankAlerts.length > 0 && (
+          <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 p-2 rounded-lg flex items-center gap-1.5 text-[10px] font-semibold animate-pulse shrink-0">
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate flex-1">
+              {activeTankAlerts.length === 1 ? activeTankAlerts[0].name : `${activeTankAlerts.length} Alertas de Processo`}
+            </span>
+          </div>
+        )}
         {/* Top Header Card: Tank Icon + Volume & Capacity Info */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 flex items-center justify-between shrink-0 shadow-2xs">
           {/* Left: Compact Tank Icon */}
@@ -349,6 +365,14 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
 
   return (
     <div className="flex flex-col h-full w-full bg-slate-50/30 dark:bg-slate-950/20 text-slate-900 dark:text-slate-100 overflow-hidden select-none">
+      {activeTankAlerts.length > 0 && (
+        <div className="mx-4 sm:mx-5 mt-4 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 p-2.5 rounded-xl flex items-center gap-2 text-xs font-semibold animate-pulse shrink-0">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span className="truncate flex-1">
+            {activeTankAlerts.length} Alerta{activeTankAlerts.length !== 1 ? 's' : ''} de Processo: {activeTankAlerts.map(a => a.name).join(', ')}
+          </span>
+        </div>
+      )}
       
       {/* Upper Telemetry Overview Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 p-4 sm:p-5 flex-1 overflow-y-auto">

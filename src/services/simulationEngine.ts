@@ -3,6 +3,7 @@ import { objectRepo } from '../repository/ObjectRepository';
 import { STORAGE_KEYS } from '../repository/storageKey';
 import { AlarmEngine } from './AlarmEngine';
 import { inheritanceService } from './InheritanceService';
+import { ProcessAlertEngine } from './ProcessAlertEngine';
 
 export interface MovementEntity {
   id: string;
@@ -268,6 +269,9 @@ export class SimulationEngine {
     // Check Alarm Thresholds
     this.evaluateAlarms(propsByObject);
 
+    // Check Process Alert Rules
+    this.evaluateProcessAlerts(propsByObject, ommMovements);
+
     this.notifyListeners();
   }
 
@@ -298,6 +302,23 @@ export class SimulationEngine {
       objects,
       (objectId, type) => inheritanceService.getMergedProperties(objectId, type)
     );
+  }
+
+  private evaluateProcessAlerts(
+    propsByObject: Record<string, Record<string, any>>,
+    ommMovements: any[]
+  ): void {
+    const objects = objectRepo.getAll();
+    const simValues: Record<string, string> = {};
+
+    Object.keys(propsByObject).forEach((objId) => {
+      const objProps = propsByObject[objId];
+      Object.keys(objProps).forEach((propName) => {
+        simValues[`${objId}:${propName}`] = objProps[propName].defaultValue;
+      });
+    });
+
+    ProcessAlertEngine.evaluate(simValues, objects, ommMovements);
   }
 }
 

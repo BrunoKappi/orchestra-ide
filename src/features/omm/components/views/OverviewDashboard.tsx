@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useOmmStore } from '../../store/useOmmStore';
 import { useObjectModelStore } from '../../../../store/useObjectModelStore';
+import { useProcessAlertStore } from '../../../../store/useProcessAlertStore';
 import { cn } from '../../../../utils/cn';
 
 export const OverviewDashboard: React.FC = () => {
@@ -51,6 +52,12 @@ export const OverviewDashboard: React.FC = () => {
       evt.status === 'Active Unacknowledged' || evt.status === 'Active Acknowledged'
     ).length,
     [alarmEvents]
+  );
+
+  const processAlerts = useProcessAlertStore((s) => s.occurrences);
+  const activeAlertsCount = useMemo(() =>
+    (processAlerts || []).filter((o) => o.status !== 'resolved' && o.status !== 'expired').length,
+    [processAlerts]
   );
 
   // Operational Completion Rate
@@ -102,7 +109,7 @@ export const OverviewDashboard: React.FC = () => {
     <div className="flex-1 overflow-y-auto p-6 space-y-6 text-slate-800 dark:text-slate-100 select-none">
       
       {/* 1. Global Metrics Banner */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* KPI 1: Active Transfers */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xs flex items-center justify-between">
           <div className="space-y-1">
@@ -158,6 +165,22 @@ export const OverviewDashboard: React.FC = () => {
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
+
+        {/* KPI 5: Active Process Alerts */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-2xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold text-slate-455 uppercase tracking-wider">Alertas de Processo</span>
+            <h3 className="text-2xl font-bold font-mono text-amber-500">{activeAlertsCount}</h3>
+            <p className="text-[10px] text-slate-550">Alertas operacionais ativos</p>
+          </div>
+          <div className={cn("p-3 rounded-xl border", 
+            activeAlertsCount > 0 
+              ? "bg-amber-500/15 text-amber-500 border-amber-500/30" 
+              : "bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-750"
+          )}>
+            <AlertTriangle className={cn("w-5 h-5", activeAlertsCount > 0 && "animate-pulse")} />
+          </div>
+        </div>
       </div>
 
       {/* 2. Operations Center Grid */}
@@ -198,6 +221,14 @@ export const OverviewDashboard: React.FC = () => {
                             <span className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-sky-600 dark:group-hover:text-sky-405 transition-colors">
                               {mov.number || mov.id.toUpperCase()}
                             </span>
+                            {processAlerts.some(
+                              (o) => o.relatedMovementId === mov.id && o.status.startsWith('active')
+                            ) && (
+                              <span className="flex h-2 w-2 relative" title="Alertas de processo ativos">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                              </span>
+                            )}
                             <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/15">
                               {mov.productName || mov.productId.replace('prod-', '').toUpperCase()}
                             </span>

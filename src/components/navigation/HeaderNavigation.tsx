@@ -35,16 +35,27 @@ import { useFlowStore } from "../../store/useFlowStore";
 import { useOpcStore } from "../../store/useOpcStore";
 import { useOmmStore } from "../../features/omm/store/useOmmStore";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useProcessAlertStore } from "../../store/useProcessAlertStore";
 import { historyEngine } from "../../services/HistoryEngine";
 import { Modal } from "../ui/Modal";
 import { cn } from "../../utils/cn";
 
 export const HeaderNavigation = () => {
   const { theme, toggleTheme, alarmEvents, init } = useObjectModelStore();
+  const initAlerts = useProcessAlertStore((s) => s.init);
+  const processAlerts = useProcessAlertStore((s) => s.occurrences);
 
   useEffect(() => {
     init();
   }, [init]);
+
+  useEffect(() => {
+    initAlerts();
+  }, [initAlerts]);
+
+  const activeAlertsCount = (processAlerts || []).filter(
+    (o) => o.status === "active_unacknowledged",
+  ).length;
 
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem("archestra_navbar_collapsed") === "true";
@@ -135,6 +146,15 @@ export const HeaderNavigation = () => {
       activeTextClass: "text-rose-600 dark:text-rose-455",
       badge: activeUnackCount > 0 ? activeUnackCount : undefined,
       animate: activeUnackCount > 0 ? "animate-bounce" : undefined,
+    },
+    {
+      to: "/process-alerts",
+      label: "Alertas de Processo",
+      icon: AlertTriangle,
+      colorClass: "text-amber-500",
+      activeTextClass: "text-amber-600 dark:text-amber-400",
+      badge: activeAlertsCount > 0 ? activeAlertsCount : undefined,
+      animate: activeAlertsCount > 0 ? "animate-pulse" : undefined,
     },
     {
       to: "/historian",
@@ -282,6 +302,7 @@ export const HeaderNavigation = () => {
     
     // Clear stores in memory
     useOmmStore.getState().clearAll();
+    useProcessAlertStore.getState().clearAll();
     historyEngine.clearAll();
     
     // Force OMM refresh and OPC re-init
@@ -300,7 +321,11 @@ export const HeaderNavigation = () => {
     }
     keysToRemove.forEach((k) => localStorage.removeItem(k));
     localStorage.removeItem('grid_dashboard_layout');
+    localStorage.removeItem('omm_process_alert_rules_v1');
+    localStorage.removeItem('omm_process_alert_definitions_v1');
+    localStorage.removeItem('omm_process_alert_occurrences_v1');
     useObjectModelStore.getState().resetAllData();
+    useProcessAlertStore.getState().resetToDefaults();
     useOpcStore.getState().init();
     useWidgetStore.getState().init();
     useScreenStore.getState().init();
