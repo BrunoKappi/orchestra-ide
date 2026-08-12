@@ -128,6 +128,7 @@ export const MovementTable: React.FC = () => {
     enableMultiRowSelection: true,
     columnResizeMode: 'onChange',
     enableColumnResizing: true,
+    autoResetPageIndex: false,
   });
 
   const tableRows = table.getRowModel().rows;

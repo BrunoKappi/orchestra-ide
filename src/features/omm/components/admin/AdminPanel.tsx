@@ -153,6 +153,7 @@ export const AdminPanel: React.FC = () => {
             <tr>
               <th className="p-3">Código</th>
               <th className="p-3">Nome</th>
+              <th className="p-3">Cor</th>
               <th className="p-3">Descrição</th>
               <th className="p-3">Status</th>
               <th className="p-3 text-right">Ações</th>
@@ -163,6 +164,12 @@ export const AdminPanel: React.FC = () => {
               <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                 <td className="p-3 font-mono font-bold text-sky-600 dark:text-sky-400">{item.code}</td>
                 <td className="p-3 font-medium text-slate-800 dark:text-slate-200">{item.name}</td>
+                <td className="p-3">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                    <span className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-slate-700 shadow-sm shrink-0" style={{ backgroundColor: item.color || '#3b82f6' }} />
+                    <span className="text-slate-600 dark:text-slate-400 font-semibold">{item.color || '#3b82f6'}</span>
+                  </div>
+                </td>
                 <td className="p-3 text-slate-500 dark:text-slate-400 truncate max-w-xs">{item.description}</td>
                 <td className="p-3">
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${item.active ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>
@@ -479,6 +486,7 @@ const AdminEditModal: React.FC<AdminEditModalProps> = ({
         code: item.code ?? '',
         name: item.name ?? '',
         description: item.description ?? '',
+        color: item.color ?? '#0ea5e9',
         active: item.active ?? true,
       };
     }
@@ -637,6 +645,23 @@ const AdminEditModal: React.FC<AdminEditModalProps> = ({
                   onChange={(e) => handleChange('name', e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-850 dark:text-slate-100 focus:outline-none focus:border-sky-500"
                 />
+              </div>
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-600 dark:text-slate-400">Cor de Identificação</label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={formData.color || '#0ea5e9'}
+                    onChange={(e) => handleChange('color', e.target.value)}
+                    className="w-8 h-8 rounded border border-slate-200 dark:border-slate-700 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={formData.color || '#0ea5e9'}
+                    onChange={(e) => handleChange('color', e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-slate-850 dark:text-slate-100 font-mono text-[10px] focus:outline-none focus:border-sky-500"
+                  />
+                </div>
               </div>
               <div className="space-y-1">
                 <label className="font-semibold text-slate-600 dark:text-slate-400">Descrição</label>

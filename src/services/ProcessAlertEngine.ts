@@ -31,38 +31,61 @@ interface MovementSyncEntry {
 
 export class ProcessAlertEngine {
   private static lastSoundPlayedAt: Record<string, number> = {};
+  private static absentTicks: Record<string, number> = {};
+  private static readonly GRACE_PERIOD_TICKS = 3;
+  // After resolving, keep the fired guard alive for this duration to prevent
+  // immediate re-trigger when the condition is still true on the next tick.
+  private static readonly FIRED_KEY_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   public static evaluate(
     simulatedValues: Record<string, string>,
     objects: ObjectEntity[],
     ommMovements: MovementSyncEntry[]
   ): void {
+    const nowMs = Date.now();
+    const nowIso = new Date(nowMs).toISOString();
+
     const rules = processAlertRepo.getRules();
     const definitions = processAlertRepo.getDefinitions();
     const occurrences = processAlertRepo.getOccurrences();
 
     const activeDefs = definitions.filter((d) => d.enabled);
     
-    // Split current occurrences
     const testOccs = occurrences.filter((o) => o.isTest);
     const evalOccs = occurrences.filter((o) => !o.isTest);
 
-    // Filter evalOccs into active and inactive
     const activeEvalOccs = evalOccs.filter((o) => o.status === 'active_unacknowledged' || o.status === 'active_acknowledged');
     const inactiveEvalOccs = evalOccs.filter((o) => o.status === 'resolved' || o.status === 'expired');
 
-    // Map active occurrences by alertKey: definitionId:movementId:objectId
     const occsMap = new Map<string, ProcessAlertOccur>();
+    const recentlyFiredKeys = new Set<string>();
+
     activeEvalOccs.forEach((occ) => {
       const key = occ.definitionId 
         ? `${occ.definitionId}:${occ.relatedMovementId ?? ''}:${occ.relatedObjectId ?? ''}`
         : `${occ.ruleId}:${occ.relatedMovementId ?? ''}:${occ.relatedObjectId ?? ''}`;
-      occsMap.set(key, occ);
+      occsMap.set(key, { ...occ });
+      recentlyFiredKeys.add(key);
     });
 
-    const now = new Date();
-    const nowIso = now.toISOString();
-    const nowMs = now.getTime();
+    inactiveEvalOccs.forEach((occ) => {
+      const key = occ.definitionId
+        ? `${occ.definitionId}:${occ.relatedMovementId ?? ''}:${occ.relatedObjectId ?? ''}`
+        : `${occ.ruleId}:${occ.relatedMovementId ?? ''}:${occ.relatedObjectId ?? ''}`;
+      
+      if (occ.resolvedAt) {
+        const resolvedMs = new Date(occ.resolvedAt).getTime();
+        // Keep guard alive for TTL after resolution
+        if (nowMs - resolvedMs < this.FIRED_KEY_TTL_MS) {
+          recentlyFiredKeys.add(key);
+        }
+      } else {
+        const activatedMs = new Date(occ.activatedAt).getTime();
+        if (nowMs - activatedMs < this.FIRED_KEY_TTL_MS) {
+          recentlyFiredKeys.add(key);
+        }
+      }
+    });
 
     const activeKeysInThisTick = new Set<string>();
 
@@ -79,7 +102,9 @@ export class ProcessAlertEngine {
       const movId = movement?.id ?? null;
       const objId = object?.id ?? null;
       const alertKey = `${defId}:${movId ?? ''}:${objId ?? ''}`;
+      
       activeKeysInThisTick.add(alertKey);
+      delete this.absentTicks[alertKey];
 
       const existing = occsMap.get(alertKey);
 
@@ -88,19 +113,18 @@ export class ProcessAlertEngine {
         existing.conditionSummary = conditionSummary;
         
         if (rule.repeatIntervalSec > 0) {
-          if (this.lastSoundPlayedAt[alertKey] === undefined) {
-            this.lastSoundPlayedAt[alertKey] = nowMs;
-          }
-          const lastPlay = this.lastSoundPlayedAt[alertKey];
+          const lastPlay = this.lastSoundPlayedAt[alertKey] || 0;
           if (nowMs - lastPlay >= rule.repeatIntervalSec * 1000) {
             playSynthesizedSound(rule.soundFile, rule.soundVolume / 100);
             this.lastSoundPlayedAt[alertKey] = nowMs;
             existing.lastNotifiedAt = nowIso;
           }
         }
-        
         occsMap.set(alertKey, existing);
       } else {
+        // Primary guard: block if this alert already fired and hasn't been fully cleared
+        if (recentlyFiredKeys.has(alertKey)) return;
+
         const newOcc: ProcessAlertOccur = {
           id: `occ-${uuidv4()}`,
           ruleId: rule.id,
@@ -142,7 +166,7 @@ export class ProcessAlertEngine {
           entity: 'Alerta',
           operation: 'CREATE',
           action: 'Alerta de Processo Ativado',
-          description: `Alerta de Processo "${newOcc.name}" (${newOcc.code}) foi gerado para ${object ? 'objeto ' + object.name : 'movimento ' + newOcc.relatedMovementNumber}.`,
+          description: `Alerta de Processo "${newOcc.name}" (${newOcc.code}) foi gerado.`,
           severity: newOcc.severity === 'critical' ? 'Aviso' : 'Informação',
           result: 'Sucesso',
           origin: 'sistema',
@@ -151,328 +175,233 @@ export class ProcessAlertEngine {
       }
     };
 
-    // Evaluate each enabled definition
+    const getMovementArea = (mov: MovementSyncEntry): string | null => {
+      if (mov.areaId) return mov.areaId;
+      const srcId = mov.sourceTankId || mov.originId;
+      if (srcId) {
+        const areaProp = simulatedValues[`${srcId}:Area`];
+        if (areaProp) {
+          if (areaProp.includes('300')) return 'area-300';
+          if (areaProp.includes('400')) return 'area-400';
+          if (areaProp.includes('500')) return 'area-500';
+        }
+        const srcObj = objects.find((o) => o.id === srcId || o.name === srcId);
+        if (srcObj) return ProcessAlertEngine.getObjectAreaId(srcObj);
+      }
+      return null;
+    };
+
     activeDefs.forEach((def) => {
       const rule = rules.find((r) => r.id === def.ruleId);
       if (!rule || !rule.enabled) return;
 
-      // 1. Início Atrasado (movement_delayed_start)
       if (rule.type === 'movement_delayed_start') {
-        const startDelayMin = rule.params.startDelayMin ?? 5;
+        const startDelayMin = def.customParams?.startDelayMin ?? rule.params.startDelayMin ?? 5;
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Issued' && mov.plannedStartAt) {
             const startMs = new Date(mov.plannedStartAt).getTime();
             if (nowMs > startMs + startDelayMin * 60 * 1000) {
               const delayMins = Math.round((nowMs - startMs) / 60000);
-              flagAlert(
-                def,
-                rule,
-                mov,
-                null,
-                `tempo > plannedStartAt + ${startDelayMin} min`,
-                `${delayMins} min de atraso`,
-                `${startDelayMin} min`
-              );
+              flagAlert(def, rule, mov, null, `tempo > plannedStartAt + ${startDelayMin} min`, `${delayMins} min de atraso`, `${startDelayMin} min`);
             }
           }
         });
       }
 
-      // 2. Término Atrasado (movement_delayed_end)
       if (rule.type === 'movement_delayed_end') {
-        const endDelayMin = rule.params.endDelayMin ?? 10;
+        const endDelayMin = def.customParams?.endDelayMin ?? rule.params.endDelayMin ?? 10;
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Active' && mov.plannedEndAt) {
             const endMs = new Date(mov.plannedEndAt).getTime();
             if (nowMs > endMs + endDelayMin * 60 * 1000) {
               const delayMins = Math.round((nowMs - endMs) / 60000);
-              flagAlert(
-                def,
-                rule,
-                mov,
-                null,
-                `tempo > plannedEndAt + ${endDelayMin} min`,
-                `${delayMins} min de atraso`,
-                `${endDelayMin} min`
-              );
+              flagAlert(def, rule, mov, null, `tempo > plannedEndAt + ${endDelayMin} min`, `${delayMins} min de atraso`, `${endDelayMin} min`);
             }
           }
         });
       }
 
-      // 3. Próximo da Meta (movement_near_goal)
       if (rule.type === 'movement_near_goal') {
-        const threshold = rule.params.progressPctThreshold ?? 90;
+        const customThreshold = def.customParams?.progressPctThreshold ? Number(def.customParams.progressPctThreshold) : null;
+        const defaultThreshold = Number(rule.params.progressPctThreshold ?? 90);
+        
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Active') {
             const progress = mov.percentComplete ?? 0;
-            if (progress >= threshold && progress < 100) {
-              flagAlert(
-                def,
-                rule,
-                mov,
-                null,
-                `progresso >= ${threshold}%`,
-                `${progress.toFixed(1)}%`,
-                `${threshold}%`
-              );
+            
+            // Check custom threshold if it exists
+            if (customThreshold !== null && progress >= customThreshold && progress < 100) {
+              flagAlert(def, rule, mov, null, `progresso >= ${customThreshold}% (Custom)`, `${progress.toFixed(1)}%`, `${customThreshold}%`);
+            }
+            
+            // Check default threshold (always check unless custom is exactly the same)
+            if (progress >= defaultThreshold && progress < 100 && customThreshold !== defaultThreshold) {
+              // Pass a cloned definition with a modified ID to generate a separate alert key for the default threshold
+              const defaultDef = { ...def, id: `${def.id}-default`, name: `${def.name} (Padrão)` };
+              flagAlert(defaultDef, rule, mov, null, `progresso >= ${defaultThreshold}% (Padrão)`, `${progress.toFixed(1)}%`, `${defaultThreshold}%`);
             }
           }
         });
       }
 
-      // 4. Meta Atingida (movement_goal_reached)
       if (rule.type === 'movement_goal_reached') {
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Completed') {
-            flagAlert(
-              def,
-              rule,
-              mov,
-              null,
-              'status === Completed',
-              '100% de volume transferido',
-              '100%'
-            );
+            flagAlert(def, rule, mov, null, 'status === Completed', '100% de volume transferido', '100%');
           }
         });
       }
 
-      // 5. Conclusão Física Pendente (movement_physical_completion_pending)
       if (rule.type === 'movement_physical_completion_pending') {
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Completed') {
-            flagAlert(
-              def,
-              rule,
-              mov,
-              null,
-              'Transferência física concluída (aguardando fechamento)',
-              'Conclusão Física Efetuada',
-              'Status: Closed'
-            );
+            flagAlert(def, rule, mov, null, 'Transferência física concluída (aguardando fechamento)', 'Conclusão Física Efetuada', 'Status: Closed');
           }
         });
       }
 
-      // 6. Desvio de Comportamento na Movimentação (movement_deviation)
       if (rule.type === 'movement_deviation') {
+        const flowDeviationPct = Number(def.customParams?.flowDeviationPct ?? rule.params.flowDeviationPct ?? 50);
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Active' && !mov.simPaused) {
             const plannedFlow = mov.plannedFlow || 100;
             const currentFlow = mov.currentFlow || 0;
-            
-            if (currentFlow < plannedFlow * 0.5) {
-              flagAlert(
-                def,
-                rule,
-                mov,
-                null,
-                `vazão real < 50% da vazão planejada`,
-                `${currentFlow.toFixed(1)} m³/h`,
-                `>= ${(plannedFlow * 0.5).toFixed(1)} m³/h`
-              );
+            const factor = (100 - flowDeviationPct) / 100;
+            if (currentFlow < plannedFlow * factor) {
+              flagAlert(def, rule, mov, null, `vazão real < ${100 - flowDeviationPct}% da vazão planejada`, `${currentFlow.toFixed(1)} m³/h`, `>= ${(plannedFlow * factor).toFixed(1)} m³/h`);
             }
           }
         });
       }
 
-      // 7. Divergência de Transferência (movement_divergence)
       if (rule.type === 'movement_divergence') {
-        const tolerance = rule.params.divergenceTolerancePct ?? 5;
+        const tolerance = Number(def.customParams?.divergenceTolerancePct ?? rule.params.divergenceTolerancePct ?? 5);
         ommMovements.forEach((mov) => {
           if (def.targetMovementId && mov.id !== def.targetMovementId) return;
-          if (mov.areaId !== def.areaId) return;
+          const movArea = getMovementArea(mov);
+          if (def.areaId && movArea && movArea !== def.areaId) return;
 
           if (mov.status === 'Active' && !mov.simPaused) {
             const timeSeed = nowMs / 5000;
             const simulatedDivergencePct = Math.max(0, 1.5 + Math.sin(timeSeed) * 4.2);
-            
             if (simulatedDivergencePct > tolerance) {
-              flagAlert(
-                def,
-                rule,
-                mov,
-                null,
-                `divergência observada > ${tolerance}%`,
-                `${simulatedDivergencePct.toFixed(1)}%`,
-                `< ${tolerance}%`
-              );
+              flagAlert(def, rule, mov, null, `divergência observada > ${tolerance}%`, `${simulatedDivergencePct.toFixed(1)}%`, `< ${tolerance}%`);
             }
           }
         });
       }
 
-      // 8. Alerta Preditivo TTL (process_ttl)
       if (rule.type === 'process_ttl') {
-        const ttlThresholdMin = rule.params.ttlThresholdMin ?? 30;
-        
+        const ttlThresholdMin = def.customParams?.ttlThresholdMin ?? def.customParams?.ttlMinThreshold ?? rule.params.ttlThresholdMin ?? rule.params.ttlMinThreshold ?? 30;
         objects.forEach((obj) => {
           if (def.targetObjectId && obj.id !== def.targetObjectId) return;
           if (this.getObjectAreaId(obj) !== def.areaId) return;
-
-          const isDeployed = obj.isDeployed !== false;
-          if (!isDeployed) return;
+          if (obj.isDeployed === false) return;
 
           const tag = simulatedValues[`${obj.id}:Tag`] || obj.name;
-          const isTank = tag.startsWith('TK-') || tag.startsWith('V-');
-          if (!isTank) return;
+          if (!(tag.startsWith('TK-') || tag.startsWith('V-'))) return;
 
-          const volumeRaw = simulatedValues[`${obj.id}:Volume`];
-          const flowRaw = simulatedValues[`${obj.id}:Flow`];
-          const capacityRaw = simulatedValues[`${obj.id}:Capacity`] || '15000';
-
-          if (!volumeRaw || !flowRaw) return;
-
-          const volume = parseFloat(volumeRaw);
-          const flow = parseFloat(flowRaw);
-          const capacity = parseFloat(capacityRaw);
+          const volume = parseFloat(simulatedValues[`${obj.id}:Volume`]);
+          const flow = parseFloat(simulatedValues[`${obj.id}:Flow`]);
+          const capacity = parseFloat(simulatedValues[`${obj.id}:Capacity`] || '15000');
 
           if (isNaN(volume) || isNaN(flow) || isNaN(capacity) || flow === 0) return;
 
           if (flow > 0) {
             const highLimit = 0.9 * capacity;
             if (volume < highLimit) {
-              const ttlHours = (highLimit - volume) / flow;
-              const ttlMins = ttlHours * 60;
-              
+              const ttlMins = ((highLimit - volume) / flow) * 60;
               if (ttlMins > 0 && ttlMins <= ttlThresholdMin) {
                 const relatedMov = ommMovements.find(m => m.status === 'Active' && (m.destinationId === obj.id || m.destinationTankId === obj.id)) || null;
-                
-                flagAlert(
-                  def,
-                  rule,
-                  relatedMov,
-                  obj,
-                  `TTL operacional alto < ${ttlThresholdMin} min (Enchendo)`,
-                  `${Math.round(ttlMins)} min (até 90%)`,
-                  `${ttlThresholdMin} min`
-                );
+                flagAlert(def, rule, relatedMov, obj, `TTL operacional alto < ${ttlThresholdMin} min (Enchendo)`, `${Math.round(ttlMins)} min (até 90%)`, `${ttlThresholdMin} min`);
               }
             }
-          } 
-          else if (flow < 0) {
+          } else if (flow < 0) {
             const lowLimit = 0.1 * capacity;
             if (volume > lowLimit) {
-              const ttlHours = (volume - lowLimit) / Math.abs(flow);
-              const ttlMins = ttlHours * 60;
-
+              const ttlMins = ((volume - lowLimit) / Math.abs(flow)) * 60;
               if (ttlMins > 0 && ttlMins <= ttlThresholdMin) {
                 const relatedMov = ommMovements.find(m => m.status === 'Active' && (m.originId === obj.id || m.sourceTankId === obj.id)) || null;
-
-                flagAlert(
-                  def,
-                  rule,
-                  relatedMov,
-                  obj,
-                  `TTL operacional baixo < ${ttlThresholdMin} min (Esvaziando)`,
-                  `${Math.round(ttlMins)} min (até 10%)`,
-                  `${ttlThresholdMin} min`
-                );
+                flagAlert(def, rule, relatedMov, obj, `TTL operacional baixo < ${ttlThresholdMin} min (Esvaziando)`, `${Math.round(ttlMins)} min (até 10%)`, `${ttlThresholdMin} min`);
               }
             }
           }
         });
       }
 
-      // 9. Evolução Inesperada do Processo (process_unexpected_evolution)
       if (rule.type === 'process_unexpected_evolution') {
         objects.forEach((obj) => {
           if (def.targetObjectId && obj.id !== def.targetObjectId) return;
           if (this.getObjectAreaId(obj) !== def.areaId) return;
+          if (obj.isDeployed === false) return;
 
-          const isDeployed = obj.isDeployed !== false;
-          if (!isDeployed) return;
+          const flow = parseFloat(simulatedValues[`${obj.id}:Flow`]);
+          if (isNaN(flow) || Math.abs(flow) <= 15) return;
 
-          const tag = simulatedValues[`${obj.id}:Tag`] || obj.name;
-          const isTank = tag.startsWith('TK-') || tag.startsWith('V-');
-          if (!isTank) return;
-
-          const flowRaw = simulatedValues[`${obj.id}:Flow`];
-          if (!flowRaw) return;
-
-          const flow = parseFloat(flowRaw);
-          if (isNaN(flow)) return;
-
-          if (Math.abs(flow) > 15) {
-            const hasActiveMov = ommMovements.some(
-              (m) => m.status === 'Active' && 
-                (m.originId === obj.id || m.sourceTankId === obj.id || 
-                 m.destinationId === obj.id || m.destinationTankId === obj.id)
-            );
-
-            if (!hasActiveMov) {
-              flagAlert(
-                def,
-                rule,
-                null,
-                obj,
-                'Variação de vazão sem movimento operacional ativo',
-                `${flow > 0 ? '+' : ''}${flow.toFixed(1)} m³/h`,
-                '0.0 m³/h'
-              );
-            }
+          const hasActiveMov = ommMovements.some((m) => m.status === 'Active' && (m.originId === obj.id || m.sourceTankId === obj.id || m.destinationId === obj.id || m.destinationTankId === obj.id));
+          if (!hasActiveMov) {
+            flagAlert(def, rule, null, obj, 'Variação de vazão sem movimento operacional ativo', `${flow > 0 ? '+' : ''}${flow.toFixed(1)} m³/h`, '0.0 m³/h');
           }
         });
       }
     });
 
-    // -------------------------------------------------------------------------
-    // RESOLUÇÃO DE ALERTAS INATIVOS
-    // -------------------------------------------------------------------------
     const finalOccurrences: ProcessAlertOccur[] = [...testOccs, ...inactiveEvalOccs];
 
     occsMap.forEach((occ, key) => {
       if (activeKeysInThisTick.has(key)) {
         finalOccurrences.push(occ);
       } else {
-        if (occ.status.startsWith('active')) {
-          occ.status = 'resolved';
-          occ.resolvedAt = nowIso;
-          
-          delete this.lastSoundPlayedAt[key];
-
-          useLogStore.getState().addLog({
-            user: 'Sistema',
-            module: 'Alertas de Processo',
-            entity: 'Alerta',
-            operation: 'CLOSE',
-            action: 'Alerta de Processo Resolvido',
-            description: `Condição de alerta "${occ.name}" (${occ.code}) retornou ao normal. Alerta resolvido automaticamente.`,
-            severity: 'Informação',
-            result: 'Sucesso',
-            origin: 'sistema',
-            targetId: occ.id,
-          });
+        this.absentTicks[key] = (this.absentTicks[key] || 0) + 1;
+        if (this.absentTicks[key] >= this.GRACE_PERIOD_TICKS) {
+          if (occ.status.startsWith('active')) {
+            occ.status = 'resolved';
+            occ.resolvedAt = nowIso;
+            delete this.lastSoundPlayedAt[key];
+          }
+          finalOccurrences.push(occ);
+        } else {
+          finalOccurrences.push(occ);
         }
-        finalOccurrences.push(occ);
       }
     });
 
-    processAlertRepo.saveOccurrences(finalOccurrences);
+    const occsBefore = JSON.stringify(occurrences);
+    const occsAfter = JSON.stringify(finalOccurrences);
 
-    const store = useProcessAlertStore.getState();
-    if (store.isInitialized) {
-      store.refresh();
+    if (occsBefore !== occsAfter) {
+      processAlertRepo.saveOccurrences(finalOccurrences);
+
+      const store = useProcessAlertStore.getState();
+      if (store.isInitialized) {
+        store.refresh();
+      }
     }
+
   }
 
   private static getObjectAreaId(obj: ObjectEntity): string {

@@ -153,7 +153,7 @@ export class SimulationEngine {
 
       if (!srcProps || !destProps) return;
 
-      const flowRate = ommMov.simFlowRate > 0 ? ommMov.simFlowRate : (ommMov.plannedFlow || 100);
+      const flowRate = (ommMov.simFlowRate !== undefined && ommMov.simFlowRate !== null) ? ommMov.simFlowRate : (ommMov.plannedFlow || 100);
       // Delta time in hours for 1s tick with speed multiplier
       const deltaTimeHours = (1 * this.speedMult) / 3600;
       let deltaVol = flowRate * deltaTimeHours;
@@ -229,7 +229,7 @@ export class SimulationEngine {
         sourceTankTag: m.originId || m.sourceTankId,
         destinationTankId: m.destinationId || m.destinationTankId,
         destinationTankTag: m.destinationId || m.destinationTankId,
-        flowRate: m.simFlowRate || m.plannedFlow || 100,
+        flowRate: (m.simFlowRate !== undefined && m.simFlowRate !== null) ? m.simFlowRate : (m.plannedFlow || 100),
         plannedVolume: m.plannedVolume,
         volumeMoved: m.currentVolume,
         remainingVolume: Math.max(0, m.plannedVolume - m.currentVolume),

@@ -28,6 +28,7 @@ export interface ProcessAlertDefinition {
   areaId: string; // ID da Área relacionada (ref: OmmArea)
   targetObjectId: string | null; // Opcional: filtro para objeto específico (ex: tank ID)
   targetMovementId: string | null; // Opcional: filtro para movimento específico (ex: movement ID)
+  customParams?: Record<string, any>; // Opcional: parâmetros sobrescritos em relação ao preset
   createdAt: string;
   updatedAt: string;
 }

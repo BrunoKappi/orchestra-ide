@@ -198,7 +198,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-delayed-start',
     code: 'AL-OMM-01',
     name: 'Início Atrasado — Olefinas',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-delayed-start',
     areaId: 'area-500',
     targetObjectId: null,
@@ -210,7 +210,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-delayed-end',
     code: 'AL-OMM-02',
     name: 'Atraso de Término — Nafta',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-delayed-end',
     areaId: 'area-300',
     targetObjectId: null,
@@ -222,7 +222,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-near-goal',
     code: 'AL-OMM-03',
     name: 'Progresso da Meta — Nafta',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-near-goal',
     areaId: 'area-300',
     targetObjectId: null,
@@ -234,7 +234,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-goal-reached',
     code: 'AL-OMM-04',
     name: 'Meta Atingida — Eteno',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-goal-reached',
     areaId: 'area-500',
     targetObjectId: null,
@@ -246,7 +246,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-physical-completion',
     code: 'AL-OMM-05',
     name: 'Encerramento Pendente — Olefinas',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-physical-completion-pending',
     areaId: 'area-500',
     targetObjectId: null,
@@ -258,7 +258,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-deviation',
     code: 'AL-OMM-06',
     name: 'Desvio de Vazão — Intermediários',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-movement-deviation',
     areaId: 'area-400',
     targetObjectId: null,
@@ -270,7 +270,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-divergence',
     code: 'AL-OMM-07',
     name: 'Divergência de Transferência — Olefinas',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-transfer-divergence',
     areaId: 'area-500',
     targetObjectId: null,
@@ -282,7 +282,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-ttl',
     code: 'AL-PRED-01',
     name: 'Tempo Limite (TTL) — Matéria-Prima',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-process-ttl',
     areaId: 'area-300',
     targetObjectId: null,
@@ -294,7 +294,7 @@ export const DEFAULT_DEFINITIONS: ProcessAlertDefinition[] = [
     id: 'def-unexpected',
     code: 'AL-PRED-02',
     name: 'Evolução Inesperada — Nafta',
-    enabled: true,
+    enabled: false,
     ruleId: 'rule-unexpected-evolution',
     areaId: 'area-300',
     targetObjectId: null,
@@ -477,11 +477,12 @@ export const useProcessAlertStore = create<ProcessAlertStore>()(
         id: `def-${uuidv4()}`,
         code: data.code || `AL-${Math.floor(100 + Math.random() * 900)}`,
         name: data.name || 'Alerta Sem Nome',
-        enabled: data.enabled ?? true,
+        enabled: data.enabled ?? false,
         ruleId: data.ruleId || '',
         areaId: data.areaId || '',
         targetObjectId: data.targetObjectId || null,
         targetMovementId: data.targetMovementId || null,
+        customParams: data.customParams && Object.keys(data.customParams).length > 0 ? data.customParams : undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -510,8 +511,14 @@ export const useProcessAlertStore = create<ProcessAlertStore>()(
         defs[index] = {
           ...defs[index],
           ...updates,
+          customParams: updates.customParams !== undefined ? updates.customParams : defs[index].customParams,
           updatedAt: new Date().toISOString(),
         };
+        // Ensure if customParams is explicitly empty or undefined in payload, we wipe it if requested (though we send undefined if empty).
+        if ('customParams' in updates && !updates.customParams) {
+           defs[index].customParams = undefined;
+        }
+        
         processAlertRepo.saveDefinitions(defs);
         get().refresh();
 
@@ -624,17 +631,32 @@ export const useProcessAlertStore = create<ProcessAlertStore>()(
     addToast: (occ) => {
       const toastId = `toast-${uuidv4()}`;
       set((state) => {
-        state.activeToasts.push({
-          id: toastId,
-          occurId: occ.id,
-          code: occ.code,
-          name: occ.name,
-          description: occ.description,
-          severity: occ.severity,
-          colorHighlight: occ.colorHighlight,
-          activatedAt: occ.activatedAt,
-          isTest: occ.isTest,
-        });
+        const isDuplicate = state.activeToasts.some(
+          (t) =>
+            t.occurId === occ.id ||
+            (t.code === occ.code &&
+             t.name === occ.name &&
+             t.severity === occ.severity)
+        );
+
+        if (isDuplicate) return state;
+
+        return {
+          activeToasts: [
+            ...state.activeToasts,
+            {
+              id: toastId,
+              occurId: occ.id,
+              code: occ.code,
+              name: occ.name,
+              description: occ.description,
+              severity: occ.severity,
+              colorHighlight: occ.colorHighlight,
+              activatedAt: occ.activatedAt,
+              isTest: occ.isTest,
+            }
+          ]
+        };
       });
 
       setTimeout(() => {
@@ -689,6 +711,9 @@ export function playSynthesizedSound(soundType: string, volume: number = 0.5) {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
     const gainNode = ctx.createGain();
     gainNode.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
     gainNode.connect(ctx.destination);

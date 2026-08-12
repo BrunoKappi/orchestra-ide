@@ -49,7 +49,8 @@ export class AlarmEngine {
           if (!rule.enabled) return;
 
           const alarmKey = `${obj.id}:${prop.name}:${rule.id}`;
-          const currentAlarm = updatedEventsMap.get(alarmKey);
+          const existingAlarm = updatedEventsMap.get(alarmKey);
+          const currentAlarm = existingAlarm ? { ...existingAlarm } : undefined;
 
           // Determine if condition is met
           const conditionMet = this.isConditionMet(rawValue, prop.dataType, rule, currentAlarm);
@@ -139,8 +140,13 @@ export class AlarmEngine {
       });
     });
 
-    // Save back to repository
-    alarmRepo.saveAll(Array.from(updatedEventsMap.values()));
+    const newEvents = Array.from(updatedEventsMap.values());
+    const beforeJson = JSON.stringify(activeEvents);
+    const afterJson = JSON.stringify(newEvents);
+
+    if (beforeJson !== afterJson) {
+      alarmRepo.saveAll(newEvents);
+    }
   }
 
   /**

@@ -542,6 +542,9 @@ export const useOmmStore = create<OmmStore>()(
       if (!existing) return;
       const ts = new Date().toISOString();
       const updated = { ...existing, ...data, updatedAt: ts, lastUpdatedAt: ts };
+      if (data.simFlowRate !== undefined && existing.status === 'Active') {
+        updated.currentFlow = data.simFlowRate;
+      }
       movementRepo.save(updated);
 
       // Sync to global movements so simulationEngine uses updated plannedVolume/status
@@ -563,7 +566,7 @@ export const useOmmStore = create<OmmStore>()(
       const update: Partial<OmmMovement> = { status, updatedAt: ts, lastUpdatedAt: ts };
       if (status === 'Active') {
         // Activating: reset flow but keep currentVolume
-        update.currentFlow = existing.simFlowRate || existing.plannedFlow || 100;
+        update.currentFlow = existing.simFlowRate ?? existing.plannedFlow ?? 100;
         update.activatedAt = simTime;
       }
       if (status === 'Completed') {
@@ -614,7 +617,12 @@ export const useOmmStore = create<OmmStore>()(
     setMovementFlowRate: (id, rate) => {
       const mov = movementRepo.getById(id);
       if (!mov) return;
-      const updated = { ...mov, simFlowRate: rate, updatedAt: new Date().toISOString() };
+      const updated = {
+        ...mov,
+        simFlowRate: rate,
+        currentFlow: mov.status === 'Active' ? rate : mov.currentFlow,
+        updatedAt: new Date().toISOString(),
+      };
       movementRepo.save(updated);
       const allMovements = movementRepo.getAll();
       syncActiveMovementsToGlobal(allMovements);

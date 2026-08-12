@@ -33,14 +33,46 @@ import type {
 } from "../types/processAlert";
 import { cn } from "../utils/cn";
 
-const getAreaColor = (areaId: string) => {
+const getParamLabel = (key: string): string => {
+  switch (key) {
+    case "startDelayMin":
+      return "Atraso de Início Mínimo (min)";
+    case "endDelayMin":
+      return "Atraso de Término Mínimo (min)";
+    case "progressPctThreshold":
+      return "Limite do Progresso (%)";
+    case "divergenceTolerancePct":
+      return "Tolerância Divergência (%)";
+    case "ttlThresholdMin":
+    case "ttlMinThreshold":
+      return "Limite de Tempo Preditivo (min)";
+    case "pendingMin":
+      return "Tempo Limite para Encerramento (min)";
+    case "flowDeviationPct":
+      return "Tolerância de Desvio de Vazão (%)";
+    case "rateThreshold":
+      return "Taxa Limite de Evolução (m³/h)";
+    default:
+      return key;
+  }
+};
+
+const getAreaColor = (areaId: string, areasList?: any[]) => {
+  if (areasList && areasList.length > 0) {
+    const found = areasList.find((a) => a.id === areaId);
+    if (found?.color) return found.color;
+  }
   if (areaId === "area-300") return "#0ea5e9"; // Blue / Sky
-  if (areaId === "area-400") return "#10b981"; // Emerald
+  if (areaId === "area-400") return "#ec4899"; // Pink / Emerald
   if (areaId === "area-500") return "#f59e0b"; // Amber
   return "#64748b"; // Slate
 };
 
-const getAreaCode = (areaId: string) => {
+const getAreaCode = (areaId: string, areasList?: any[]) => {
+  if (areasList && areasList.length > 0) {
+    const found = areasList.find((a) => a.id === areaId);
+    if (found?.code) return found.code;
+  }
   if (areaId === "area-300") return "UN-300";
   if (areaId === "area-400") return "UN-400";
   if (areaId === "area-500") return "UN-500";
@@ -108,7 +140,9 @@ export const ProcessAlertsPage: React.FC = () => {
   const [defRuleId, setDefRuleId] = useState("");
   const [defAreaId, setDefAreaId] = useState("");
   const [defTargetObjectId, setDefTargetObjectId] = useState("");
-  const [defEnabled, setDefEnabled] = useState(true);
+  const [defEnabled, setDefEnabled] = useState(false);
+  const [defOverrideParams, setDefOverrideParams] = useState(false);
+  const [defCustomParams, setDefCustomParams] = useState<Record<string, any>>({});
 
   // Reset selected items when changing tabs
   useEffect(() => {
@@ -136,10 +170,13 @@ export const ProcessAlertsPage: React.FC = () => {
     setEditingDefId(null);
     setDefCode(`AL-${Math.floor(100 + Math.random() * 900)}`);
     setDefName("");
-    setDefRuleId(rules[0]?.id || "");
+    const initialRule = rules[0];
+    setDefRuleId(initialRule?.id || "");
     setDefAreaId(areas[0]?.id || "");
     setDefTargetObjectId("");
-    setDefEnabled(true);
+    setDefEnabled(false);
+    setDefOverrideParams(false);
+    setDefCustomParams({});
     setIsDefModalOpen(true);
   };
 
@@ -152,18 +189,22 @@ export const ProcessAlertsPage: React.FC = () => {
     setDefAreaId(def.areaId);
     setDefTargetObjectId(def.targetObjectId || "");
     setDefEnabled(def.enabled);
+    const hasCustom = !!def.customParams && Object.keys(def.customParams).length > 0;
+    setDefOverrideParams(hasCustom);
+    setDefCustomParams(def.customParams ? { ...def.customParams } : {});
     setIsDefModalOpen(true);
   };
 
   // Save Definition Form
   const handleSaveDefinition = () => {
-    const payload = {
+    const payload: Partial<ProcessAlertDefinition> = {
       code: defCode,
       name: defName,
       ruleId: defRuleId,
       areaId: defAreaId,
       targetObjectId: defTargetObjectId || null,
       enabled: defEnabled,
+      customParams: defOverrideParams && Object.keys(defCustomParams).length > 0 ? defCustomParams : undefined,
     };
 
     if (editingDefId) {
@@ -197,11 +238,14 @@ export const ProcessAlertsPage: React.FC = () => {
     // Filter by Active vs History
     if (activeTab === "active") {
       list = list.filter(
-        (o) => o.status !== "resolved" && o.status !== "expired",
+        (o) => o.status === "active_unacknowledged",
       );
     } else if (activeTab === "history") {
       list = list.filter(
-        (o) => o.status === "resolved" || o.status === "expired",
+        (o) =>
+          o.status === "active_acknowledged" ||
+          o.status === "resolved" ||
+          o.status === "expired",
       );
     }
 
@@ -1499,6 +1543,7 @@ export const ProcessAlertsPage: React.FC = () => {
                   Habilitado desde a criação:
                 </span>
                 <button
+                  type="button"
                   onClick={() => setDefEnabled(!defEnabled)}
                   className={cn(
                     "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
@@ -1514,6 +1559,74 @@ export const ProcessAlertsPage: React.FC = () => {
                   />
                 </button>
               </div>
+
+              {/* Preset Parameter Override Section */}
+              {(() => {
+                const selectedRule = rules.find((r) => r.id === defRuleId);
+                if (!selectedRule || !selectedRule.params || Object.keys(selectedRule.params).length === 0) {
+                  return null;
+                }
+
+                return (
+                  <div className="border-t border-slate-150 dark:border-slate-800 pt-3 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-slate-700 dark:text-slate-300 font-bold flex items-center gap-2 cursor-pointer text-xs">
+                        <input
+                          type="checkbox"
+                          checked={defOverrideParams}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setDefOverrideParams(checked);
+                            if (checked && Object.keys(defCustomParams).length === 0 && selectedRule.params) {
+                              setDefCustomParams({ ...selectedRule.params });
+                            }
+                          }}
+                          className="rounded border-slate-300 dark:border-slate-700 text-sky-500 focus:ring-sky-500 w-4 h-4 cursor-pointer"
+                        />
+                        Sobrescrever valor de referência do preset
+                      </label>
+                    </div>
+
+                    {defOverrideParams && (
+                      <div className="pl-6 space-y-3 pt-1 bg-slate-50/50 dark:bg-slate-950/30 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/60">
+                        {Object.keys(selectedRule.params).map((paramKey) => {
+                          const defaultVal = selectedRule.params[paramKey];
+                          const currentVal =
+                            defCustomParams[paramKey] !== undefined
+                              ? defCustomParams[paramKey]
+                              : defaultVal;
+                          const labelText = getParamLabel(paramKey);
+
+                          return (
+                            <div key={paramKey} className="flex flex-col gap-1">
+                              <div className="flex justify-between items-center text-[11px]">
+                                <span className="font-bold text-slate-700 dark:text-slate-300">
+                                  {labelText}:
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-mono">
+                                  (Preset padrão: {defaultVal})
+                                </span>
+                              </div>
+                              <input
+                                type="number"
+                                value={currentVal}
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value);
+                                  setDefCustomParams((prev) => ({
+                                    ...prev,
+                                    [paramKey]: isNaN(val) ? 0 : val,
+                                  }));
+                                }}
+                                className="w-full px-3 py-1.5 border rounded-lg text-xs font-mono font-bold bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Modal Footer */}

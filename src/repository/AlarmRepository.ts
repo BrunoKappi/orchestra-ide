@@ -5,13 +5,22 @@ import { safeGetItem, safeSetItem } from '../utils/safeStorage';
 const MAX_ALARM_EVENTS = 200;
 
 export class AlarmRepository {
+  private cache: AlarmEvent[] | null = null;
+
+  public invalidateCache(): void {
+    this.cache = null;
+  }
+
   public getAll(): AlarmEvent[] {
-    try {
-      const data = safeGetItem(STORAGE_KEYS.ALARM_EVENTS);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
+    if (!this.cache) {
+      try {
+        const data = safeGetItem(STORAGE_KEYS.ALARM_EVENTS);
+        this.cache = data ? JSON.parse(data) : [];
+      } catch {
+        this.cache = [];
+      }
     }
+    return this.cache!;
   }
 
   public getById(id: string): AlarmEvent | null {
@@ -37,6 +46,7 @@ export class AlarmRepository {
 
   public saveAll(events: AlarmEvent[]): void {
     const capped = events.length > MAX_ALARM_EVENTS ? events.slice(-MAX_ALARM_EVENTS) : events;
+    this.cache = capped;
     safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(capped));
   }
 
@@ -44,11 +54,13 @@ export class AlarmRepository {
     let all = this.getAll();
     const initialLen = all.length;
     all = all.filter((evt) => evt.id !== id);
+    this.cache = all;
     safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(all));
     return all.length < initialLen;
   }
 
   public clear(): void {
+    this.cache = [];
     safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify([]));
   }
 }

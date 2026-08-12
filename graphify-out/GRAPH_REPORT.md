@@ -1,16 +1,16 @@
-# Graph Report - MVP 2  (2026-08-11)
+# Graph Report - MVP 2  (2026-08-12)
 
 ## Corpus Check
-- 190 files · ~221,616 words
+- 190 files · ~222,743 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1170 nodes · 3313 edges · 46 communities (39 shown, 7 thin omitted)
+- 1174 nodes · 3320 edges · 40 communities (36 shown, 4 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 6 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ef963b11`
+- Built from commit: `91af8941`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,34 +31,28 @@
 - [[_COMMUNITY_Community 13|Community 13]]
 - [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 15|Community 15]]
-- [[_COMMUNITY_Community 16|Community 16]]
 - [[_COMMUNITY_Community 17|Community 17]]
 - [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
 - [[_COMMUNITY_Community 22|Community 22]]
-- [[_COMMUNITY_Community 23|Community 23]]
-- [[_COMMUNITY_Community 24|Community 24]]
 - [[_COMMUNITY_Community 25|Community 25]]
-- [[_COMMUNITY_Community 26|Community 26]]
 - [[_COMMUNITY_Community 27|Community 27]]
 - [[_COMMUNITY_Community 28|Community 28]]
 - [[_COMMUNITY_Community 29|Community 29]]
 - [[_COMMUNITY_Community 30|Community 30]]
-- [[_COMMUNITY_Community 31|Community 31]]
 - [[_COMMUNITY_Community 32|Community 32]]
-- [[_COMMUNITY_Community 33|Community 33]]
-- [[_COMMUNITY_Community 34|Community 34]]
 - [[_COMMUNITY_Community 35|Community 35]]
 - [[_COMMUNITY_Community 36|Community 36]]
-- [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_Community 38|Community 38]]
-- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 40|Community 40]]
 - [[_COMMUNITY_Community 43|Community 43]]
 - [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 47|Community 47]]
 - [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 51|Community 51]]
 - [[_COMMUNITY_Community 52|Community 52]]
 
 ## God Nodes (most connected - your core abstractions)
@@ -70,8 +64,8 @@
 6. `useWidgetStore` - 25 edges
 7. `safeSetItem()` - 25 edges
 8. `STORAGE_KEYS` - 23 edges
-9. `HeaderNavigation()` - 22 edges
-10. `ObjectModelStoreState` - 22 edges
+9. `ObjectEntity` - 23 edges
+10. `HeaderNavigation()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `WidgetThumbnail()` --calls--> `cn()`  [EXTRACTED]
@@ -88,91 +82,87 @@
 ## Import Cycles
 - 3-file cycle: `src/features/widget-editor/Dynamics/FillDynamicEditor.tsx -> src/features/widget-editor/WidgetInspectorPanel.tsx -> src/features/widget-editor/Dynamics/StrokeDynamicEditor.tsx -> src/features/widget-editor/Dynamics/FillDynamicEditor.tsx`
 
-## Communities (46 total, 7 thin omitted)
+## Communities (40 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.21
-Nodes (13): widgetFolderRepo, WidgetFolderRepository, widgetRepo, WidgetSeedService, InspectorTabType, ToolType, WidgetStoreState, WidgetCustomPropertyDataType (+5 more)
+Cohesion: 0.19
+Nodes (14): widgetFolderRepo, WidgetFolderRepository, widgetRepo, WidgetInstanceRenderer(), WidgetSeedService, InspectorTabType, ToolType, WidgetStoreState (+6 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.05
 Nodes (53): AnalyticsTab(), ConnectionDesignerTab(), CustomFlowNode, nodeIcons, categoryIcons, DataSourcesTab(), BlockDefinition, FlowBlockLibrary() (+45 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.09
-Nodes (29): useOmmStore, ColDef, DEFAULT_VISIBLE_COLUMNS, movementColumnDefs, NumberCell(), PRIORITY_CONFIG, PriorityCell(), PriorityCellSelector() (+21 more)
+Cohesion: 0.06
+Nodes (41): OmmLayout(), VIEW_TABS, KpiCardProps, OmmKpiHeader(), GROUP_BY_OPTIONS, GroupByOption, OmmToolbar(), ToolbarButton() (+33 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.05
 Nodes (37): dependencies, bpmn-js, clsx, dayjs, @hookform/resolvers, immer, lucide-react, react (+29 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.05
-Nodes (84): AdminEditModalProps, AdminPanel(), AdminSection, Column, CrudTableProps, EditModalProps, FieldDef, SECTIONS (+76 more)
+Cohesion: 0.10
+Nodes (48): alarmRepo, alignmentRepo, areaRepo, auditRepo, clearAllOmmData(), cutoffRepo, defaultSimState, engUnitRepo (+40 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.11
-Nodes (17): screenRepo, ContextMenuState, RenameState, ScreenStoreState, ScreenToolType, AlarmConditionType, FillLevelConfig, ScreenElement (+9 more)
+Cohesion: 0.14
+Nodes (16): AssociatedWidgetsEditor(), WidgetThumbnail(), DerivationTree(), WidgetMappingModal(), WidgetMappingModalProps, AlarmConditionType, DerivationTreeNode, FillLevelConfig (+8 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.17
-Nodes (11): FlowV2EditorModal(), FlowsV2Page(), HomePage(), LoginPage(), ProcessAlertsPage(), RuntimePage(), AuthGuard(), AuthGuardProps (+3 more)
+Cohesion: 0.14
+Nodes (15): HeaderNavigation(), FlowsV2Page(), GridDashboardPage(), HomePage(), LoginPage(), OmmPage(), ProcessAlertsPage(), ToastContainer() (+7 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.05
 Nodes (52): ActiveDirectoryTab(), ACTIONS, MODULES, PermissionMatrixView(), UserModal(), UserModalProps, SecurityPage(), ActiveDirectoryActions (+44 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.24
-Nodes (11): AlarmConfigModal(), CentralEditor(), ExportImportModal(), PropertiesTable(), PropertyFormData, PropertyModal(), propertySchema, StrappingConfigEditor() (+3 more)
+Cohesion: 0.20
+Nodes (18): ObjectSelectorModal(), ObjectSelectorModalProps, AlarmConfigModal(), CentralEditor(), EquipmentGraphicConfigEditor(), ExportImportModal(), MockConfigModal(), PRESET_OPTIONS (+10 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.07
-Nodes (29): CurveChartProps, DEFAULT_STRAPPING, GEOMETRY_CURVE_NOTES, GEOMETRY_LABELS, deploymentRepo, screenFolderRepo, STORAGE_KEYS, templateRepo (+21 more)
+Cohesion: 0.11
+Nodes (17): DEFAULT_CONFIG, DEFAULT_FIELD_BINDINGS, GEOMETRY_OPTIONS, getFillColor(), PROPERTY_UNITS, activeEvents, currentConfig, id (+9 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.06
-Nodes (51): edgeTypes, FlowV2Canvas(), FlowV2CanvasProps, nodeTypes, FlowV2EditorContent(), FlowV2Header(), FlowV2HeaderProps, FlowV2InspectorPanel() (+43 more)
+Nodes (52): edgeTypes, FlowV2Canvas(), FlowV2CanvasProps, nodeTypes, FlowV2EditorContent(), FlowV2EditorModal(), FlowV2Header(), FlowV2HeaderProps (+44 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.16
-Nodes (14): WidgetThumbnail(), DEFAULT_CONFIG, HistoryConfigModal(), msToHours(), WidgetMappingModal(), WidgetMappingModalProps, DatabaseAnalyticsPage(), DBHistoryPoint (+6 more)
+Cohesion: 0.26
+Nodes (7): historyRepo, movementRepo, OmmSimulationEngine, simulateWaveform(), OmmEvent, OmmMovement, OmmSimulatorState
 
 ### Community 12 - "Community 12"
-Cohesion: 0.42
-Nodes (3): DeploymentRepository, DeploymentFolderEntity, DeploymentNodeEntity
+Cohesion: 0.43
+Nodes (5): UniversalMappingTab(), getNodeIcon(), OpcBrowserPage(), App(), useOpcStore
 
 ### Community 13 - "Community 13"
-Cohesion: 0.24
-Nodes (11): IDELayout(), DeploymentTree(), DerivationTree(), OrchestraPage(), DeploymentTreeNode, DerivationTreeNode, ContextMenu(), ContextMenuItem (+3 more)
+Cohesion: 0.27
+Nodes (8): IDELayout(), DeploymentTree(), OrchestraPage(), DeploymentTreeNode, ContextMenu(), ContextMenuItem, ContextMenuProps, buildDeploymentTree()
 
 ### Community 14 - "Community 14"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.12
-Nodes (12): VIEW_TABS, KpiCardProps, OmmKpiHeader(), GROUP_BY_OPTIONS, GroupByOption, OmmToolbar(), ToolbarButton(), ToolbarButtonProps (+4 more)
-
-### Community 16 - "Community 16"
-Cohesion: 0.18
-Nodes (11): OmmLayout(), HeaderNavigation(), LogsPage(), OmmPage(), LogStore, LogStoreActions, LogStoreState, useLogStore (+3 more)
+Cohesion: 0.17
+Nodes (8): AdminEditModalProps, AdminPanel(), AdminSection, Column, CrudTableProps, EditModalProps, FieldDef, SECTIONS
 
 ### Community 17 - "Community 17"
-Cohesion: 0.17
-Nodes (12): MiniTrendChart(), MiniTrendChartProps, TankTelemetryDashboardProps, VariableHistory, generateRamp(), generateSinusoidal(), generateTrendHistory(), GenerateTrendHistoryOptions (+4 more)
+Cohesion: 0.20
+Nodes (8): RuntimePage(), SavedView, historyEngine, MiniTrendChart(), MiniTrendChartProps, TankTelemetryDashboard(), TankTelemetryDashboardProps, VariableHistory
 
 ### Community 18 - "Community 18"
-Cohesion: 0.27
-Nodes (6): PRESET_OPTIONS, MockConfigRepository, MockSimulationService, MockConfig, MockConfigParams, MockPresetType
+Cohesion: 0.05
+Nodes (44): GlobalPropertyPickerModal(), GlobalPropertyPickerModalProps, CurveChartProps, DEFAULT_STRAPPING, GEOMETRY_CURVE_NOTES, GEOMETRY_LABELS, ObjectPropertySimRow, associatedWidgetRepo (+36 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.21
-Nodes (13): UniversalMappingTab(), getNodeIcon(), OpcBrowserPage(), opcRepo, OpcRepository, App(), OpcStoreState, useOpcStore (+5 more)
+Cohesion: 0.30
+Nodes (8): opcRepo, OpcRepository, OpcStoreState, OpcConnectorInterface, OpcDataType, OpcNodeEntity, OpcNodeType, OpcQuality
 
 ### Community 20 - "Community 20"
-Cohesion: 0.12
-Nodes (15): edgeTypes, InteractiveDiagramCanvas(), nodeTypes, TankFlowVisualizer(), TankFlowVisualizerProps, OmmFlowEdge, OmmFlowEdgeData, STATUS_EDGE_STYLE (+7 more)
+Cohesion: 0.09
+Nodes (24): TankGeometrySvg(), edgeTypes, InteractiveDiagramCanvas(), nodeTypes, TankFlowVisualizer(), TankFlowVisualizerProps, OmmFlowEdge, OmmFlowEdgeData (+16 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.12
@@ -182,85 +172,77 @@ Nodes (16): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, lib
 Cohesion: 0.17
 Nodes (11): ActionType, ActiveEventState, ConditionNode, EventAction, EventConfig, EventHistoryLog, LeafCondition, LeafConditionType (+3 more)
 
-### Community 23 - "Community 23"
-Cohesion: 0.15
-Nodes (8): TankGeometrySvg(), TankGeometrySvgProps, CompactNode(), DetailedNode(), OmmTankNode, resolveGeometry(), TYPE_HEADER_COLOR, TankGeometryType
-
-### Community 24 - "Community 24"
-Cohesion: 0.24
-Nodes (10): ObjectSelectorModal(), ObjectSelectorModalProps, MockConfigModal(), SimulatorEditor(), ObjectPropertySimRow, SimulatorPage(), MergedProperty, MergedMockConfig (+2 more)
-
 ### Community 25 - "Community 25"
-Cohesion: 0.29
-Nodes (7): DEFAULT_CONFIG, DEFAULT_FIELD_BINDINGS, EquipmentGraphicConfigEditor(), GEOMETRY_OPTIONS, getFillColor(), PROPERTY_UNITS, EquipmentGraphicConfig
+Cohesion: 0.21
+Nodes (8): PropertyFormData, propertySchema, DatabaseAnalyticsPage(), DBHistoryPoint, PerformanceHistoryPoint, TableStats, Modal(), ModalProps
 
 ### Community 27 - "Community 27"
 Cohesion: 0.26
 Nodes (3): BaseRepository, SingletonRepository, if()
 
 ### Community 28 - "Community 28"
-Cohesion: 0.20
-Nodes (9): CHART_PADDING, ChartData, CURVE_COLORS, HistorianPage(), PeriodPreset, SelectedVariable, TrendChart(), TrendChartProps (+1 more)
+Cohesion: 0.22
+Nodes (8): CHART_PADDING, ChartData, CURVE_COLORS, PeriodPreset, SelectedVariable, TrendChart(), TrendChartProps, HistorySample
 
 ### Community 30 - "Community 30"
-Cohesion: 0.20
-Nodes (9): OmmPriority, OrderDialog(), SearchableSelect(), SearchableSelectProps, SelectOption, convertLevelToVolume(), convertVolumeToLevel(), getStrappingConfig() (+1 more)
-
-### Community 31 - "Community 31"
-Cohesion: 0.35
-Nodes (6): scriptRepo, ExportImportService, InheritanceService, EntityType, ExportDataPayload, MergedScript
+Cohesion: 0.09
+Nodes (18): objectRepo, OmmPriority, ModalTab, MovementModal(), PRIORITY_OPTIONS, STATUS_COLORS, STATUS_LABELS, TABS (+10 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.16
 Nodes (18): FillDynamicEditor(), FillDynamicEditorProps, FillLevelDynamicEditor(), FillLevelDynamicEditorProps, StrokeDynamicEditor(), StrokeDynamicEditorProps, validateDynamicRule(), ValidationError (+10 more)
 
-### Community 33 - "Community 33"
-Cohesion: 0.18
-Nodes (8): ModalTab, PRIORITY_OPTIONS, STATUS_COLORS, STATUS_LABELS, TABS, TankTelemetryDashboard(), TankTelemetryModal(), TankTelemetryModalProps
-
 ### Community 35 - "Community 35"
-Cohesion: 0.07
-Nodes (32): ToastContainer(), SavedView, alarmRepo, AlarmRepository, ObjectRepository, processAlertRepo, ProcessAlertRepository, PropertyRepository (+24 more)
+Cohesion: 0.05
+Nodes (39): LogsPage(), alarmRepo, AlarmRepository, ObjectRepository, processAlertRepo, ProcessAlertRepository, PropertyRepository, STORAGE_KEYS (+31 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.17
-Nodes (12): ScreenLayout(), ScreenDesignerPage(), propertyRepo, ScreenCanvasEditor(), WidgetInstanceRenderer(), ScreenElementInspector(), ExplorerTab, ScreenExplorerPanel() (+4 more)
+Cohesion: 0.10
+Nodes (18): ScreenLayout(), ScreenDesignerPage(), screenFolderRepo, ScreenCanvasEditor(), ScreenElementInspector(), ExplorerTab, ScreenExplorerPanel(), ContextMenuState (+10 more)
 
-### Community 37 - "Community 37"
-Cohesion: 0.29
-Nodes (6): GlobalPropertyPickerModal(), GlobalPropertyPickerModalProps, associatedWidgetRepo, mockConfigRepo, IndexedProperty, PropertyBrowserService
+### Community 40 - "Community 40"
+Cohesion: 0.12
+Nodes (10): DEFAULT_CONFIG, HistoryConfigModal(), msToHours(), lastRecordedAt, lastRecordedValue, monitoredKeys, pendingPersist, Store (+2 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.06
-Nodes (47): CellPos, GridCanvas(), GridCanvasProps, GridCardInspector(), GridCardInspectorProps, GridDashboardHeader(), GridDashboardHeaderProps, GridScreenManagerModal() (+39 more)
+Nodes (50): CellPos, GridCanvas(), GridCanvasProps, GridCardInspector(), GridCardInspectorProps, GridDashboardHeader(), GridDashboardHeaderProps, GridScreenManagerModal() (+42 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.21
-Nodes (11): RuntimeWidgetInstance(), ScreenRuntimePage(), extractPropertyName(), FillLevelStyle, resolveColorDynamic(), resolveCustomPropValue(), ResolvedWidgetElementStyle, resolveFillLevelDynamic() (+3 more)
+Cohesion: 0.16
+Nodes (12): RuntimeWidgetInstance(), ScreenRuntimePage(), screenRepo, extractPropertyName(), FillLevelStyle, resolveColorDynamic(), resolveCustomPropValue(), ResolvedWidgetElementStyle (+4 more)
+
+### Community 49 - "Community 49"
+Cohesion: 0.22
+Nodes (6): CutoffStatus, OmmCutoffSnapshot, CompareViewProps, CutoffCardProps, CutoffHistory(), STATUS_CONFIG
+
+### Community 51 - "Community 51"
+Cohesion: 0.25
+Nodes (11): markOmmSeeded(), hoursAgo(), hoursFromNow(), makeAlignments(), makeEquipments(), makeMovement(), movNum(), nextCutoff() (+3 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.18
-Nodes (12): WidgetLayout(), AssociatedWidgetsEditor(), WidgetsPage(), buildTree(), useWidgetStore, WidgetBindingProperty, ToolButton(), ToolButtonProps (+4 more)
+Cohesion: 0.17
+Nodes (12): WidgetLayout(), WidgetsPage(), buildTree(), useWidgetStore, ResizableSplitPane(), ResizableSplitPaneProps, ToolButton(), ToolButtonProps (+4 more)
 
 ## Knowledge Gaps
 - **279 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+274 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `Community 24` to `Community 5`, `Community 6`, `Community 8`, `Community 9`, `Community 10`, `Community 11`, `Community 13`, `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 25`, `Community 28`, `Community 30`, `Community 32`, `Community 35`, `Community 36`, `Community 37`, `Community 44`, `Community 52`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
-- **Why does `useOmmStore` connect `Community 2` to `Community 33`, `Community 35`, `Community 4`, `Community 6`, `Community 9`, `Community 44`, `Community 15`, `Community 16`, `Community 17`, `Community 20`, `Community 24`, `Community 30`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Why does `useObjectModelStore` connect `Community 8` to `Community 5`, `Community 6`, `Community 7`, `Community 9`, `Community 10`, `Community 11`, `Community 13`, `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 24`, `Community 25`, `Community 28`, `Community 33`, `Community 35`, `Community 36`, `Community 37`, `Community 44`, `Community 47`, `Community 52`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+- **Why does `cn()` connect `Community 8` to `Community 32`, `Community 35`, `Community 36`, `Community 5`, `Community 6`, `Community 40`, `Community 9`, `Community 10`, `Community 44`, `Community 13`, `Community 12`, `Community 17`, `Community 18`, `Community 20`, `Community 52`, `Community 25`, `Community 28`, `Community 30`?**
+  _High betweenness centrality (0.085) - this node is a cross-community bridge._
+- **Why does `useObjectModelStore` connect `Community 8` to `Community 36`, `Community 5`, `Community 6`, `Community 7`, `Community 40`, `Community 9`, `Community 10`, `Community 44`, `Community 13`, `Community 12`, `Community 47`, `Community 17`, `Community 18`, `Community 25`, `Community 28`?**
+  _High betweenness centrality (0.058) - this node is a cross-community bridge._
+- **Why does `useOmmStore` connect `Community 2` to `Community 4`, `Community 6`, `Community 8`, `Community 9`, `Community 44`, `Community 15`, `Community 17`, `Community 49`, `Community 20`, `Community 30`?**
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
 - **What connects `name`, `private`, `version` to the rest of the system?**
   _279 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.05348101265822785 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.08961593172119488 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06077694235588972 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._

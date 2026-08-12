@@ -730,18 +730,33 @@ export const SimulatorPage: React.FC = () => {
                           <div className="inline-flex items-center gap-1">
                             <input
                               type="number"
-                              min={1}
+                              min={0}
                               step={10}
                               value={currentFlowRate}
                               onChange={(e) => {
                                 const val = parseFloat(e.target.value) || 0;
                                 setEditingFlowRates((prev) => ({ ...prev, [mov.id]: val }));
                               }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  setMovementFlowRate(mov.id, currentFlowRate);
+                                  setEditingFlowRates((prev) => {
+                                    const next = { ...prev };
+                                    delete next[mov.id];
+                                    return next;
+                                  });
+                                }
+                              }}
                               className="w-16 px-1.5 py-0.5 text-[11px] font-mono font-bold bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded outline-none text-slate-900 dark:text-slate-100 text-center"
                             />
                             <button
                               onClick={() => {
                                 setMovementFlowRate(mov.id, currentFlowRate);
+                                setEditingFlowRates((prev) => {
+                                  const next = { ...prev };
+                                  delete next[mov.id];
+                                  return next;
+                                });
                               }}
                               className="px-1.5 py-0.5 bg-sky-600 hover:bg-sky-500 text-white rounded text-[10px] font-bold cursor-pointer transition-colors"
                             >

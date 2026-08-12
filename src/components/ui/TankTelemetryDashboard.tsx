@@ -31,7 +31,7 @@ export const TankTelemetryDashboard: React.FC<TankTelemetryDashboardProps> = ({ 
 
   const activeTankAlerts = useMemo(() => {
     return (processAlerts || []).filter(
-      (o) => o.relatedObjectId === objectId && o.status.startsWith('active')
+      (o) => o.relatedObjectId === objectId && o.status === 'active_unacknowledged'
     );
   }, [processAlerts, objectId]);
 

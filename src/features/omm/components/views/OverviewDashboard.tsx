@@ -56,7 +56,7 @@ export const OverviewDashboard: React.FC = () => {
 
   const processAlerts = useProcessAlertStore((s) => s.occurrences);
   const activeAlertsCount = useMemo(() =>
-    (processAlerts || []).filter((o) => o.status !== 'resolved' && o.status !== 'expired').length,
+    (processAlerts || []).filter((o) => o.status === 'active_unacknowledged').length,
     [processAlerts]
   );
 
@@ -222,7 +222,7 @@ export const OverviewDashboard: React.FC = () => {
                               {mov.number || mov.id.toUpperCase()}
                             </span>
                             {processAlerts.some(
-                              (o) => o.relatedMovementId === mov.id && o.status.startsWith('active')
+                              (o) => o.relatedMovementId === mov.id && o.status === 'active_unacknowledged'
                             ) && (
                               <span className="flex h-2 w-2 relative" title="Alertas de processo ativos">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>

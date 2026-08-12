@@ -169,7 +169,7 @@ export const MovementModal: React.FC = () => {
       setPlannedFlow(currentMovement.plannedFlow);
       setEngUnitId(currentMovement.engUnitId);
       setNotes(currentMovement.notes);
-      setSimFlowRate(currentMovement.simFlowRate);
+      setSimFlowRate(currentMovement.simFlowRate ?? currentMovement.plannedFlow ?? 100);
     } else {
       setOrderId(orders[0]?.id ?? '');
       setDescription('');
@@ -188,6 +188,12 @@ export const MovementModal: React.FC = () => {
       setSimFlowRate(100);
     }
   }, [isOpen, editingId]);
+
+  useEffect(() => {
+    if (isOpen && currentMovement && !dirty) {
+      setSimFlowRate(currentMovement.simFlowRate ?? currentMovement.plannedFlow ?? 100);
+    }
+  }, [isOpen, currentMovement?.simFlowRate, dirty]);
 
   const mark = useCallback(() => setDirty(true), []);
 

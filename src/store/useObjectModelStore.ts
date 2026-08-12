@@ -262,7 +262,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       historyEngine.init();
       simulationEngine.start(10);
       simulationEngine.subscribe(() => {
-        get().refreshData();
+        get().tickSimulation();
       });
 
       get().refreshData();
