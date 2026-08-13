@@ -20,7 +20,7 @@ export class AlarmRepository {
         this.cache = [];
       }
     }
-    return this.cache!;
+    return [...this.cache!];
   }
 
   public getById(id: string): AlarmEvent | null {
@@ -40,13 +40,14 @@ export class AlarmRepository {
     if (all.length > MAX_ALARM_EVENTS) {
       all.splice(0, all.length - MAX_ALARM_EVENTS);
     }
+    this.cache = all;
     safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(all));
     return event;
   }
 
   public saveAll(events: AlarmEvent[]): void {
     const capped = events.length > MAX_ALARM_EVENTS ? events.slice(-MAX_ALARM_EVENTS) : events;
-    this.cache = capped;
+    this.cache = [...capped];
     safeSetItem(STORAGE_KEYS.ALARM_EVENTS, JSON.stringify(capped));
   }
 

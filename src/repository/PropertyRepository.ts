@@ -18,7 +18,7 @@ export class PropertyRepository {
         this.cache = [];
       }
     }
-    return this.cache!;
+    return [...this.cache!];
   }
 
   public getByTargetId(targetId: string): PropertyEntity[] {
@@ -40,6 +40,7 @@ export class PropertyRepository {
     } else {
       all.push(updated);
     }
+    this.cache = all;
     safeSetItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(all));
     return updated;
   }
@@ -61,7 +62,7 @@ export class PropertyRepository {
   }
 
   public saveAll(properties: PropertyEntity[]): void {
-    this.cache = properties;
+    this.cache = [...properties];
     safeSetItem(STORAGE_KEYS.PROPERTIES, JSON.stringify(properties));
   }
 }

@@ -18,7 +18,7 @@ export class ObjectRepository {
         this.cache = [];
       }
     }
-    return this.cache!;
+    return [...this.cache!];
   }
 
   public getById(id: string): ObjectEntity | null {
@@ -40,6 +40,7 @@ export class ObjectRepository {
     } else {
       all.push(updated);
     }
+    this.cache = all;
     safeSetItem(STORAGE_KEYS.OBJECTS, JSON.stringify(all));
     return updated;
   }
@@ -54,7 +55,7 @@ export class ObjectRepository {
   }
 
   public saveAll(objects: ObjectEntity[]): void {
-    this.cache = objects;
+    this.cache = [...objects];
     safeSetItem(STORAGE_KEYS.OBJECTS, JSON.stringify(objects));
   }
 }
