@@ -50,6 +50,7 @@ import { useOpcStore } from './useOpcStore';
 import { useOmmStore } from '../features/omm/store/useOmmStore';
 import { seedOmmData } from '../features/omm/services/OmmSeedService';
 import { clearAllOmmData } from '../features/omm/repository';
+import { useBatchStore } from './useBatchStore';
 
 interface ObjectModelStoreState {
   // Navigation & Theme
@@ -1678,6 +1679,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       seedService.seedInitialDataIfNeeded(true);
       clearAllOmmData();
       seedOmmData();
+      useBatchStore.getState().resetBatchStore();
       get().init();
       useOmmStore.getState().refresh();
     },
@@ -1686,6 +1688,7 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
       seedService.seedInitialDataIfNeeded(true);
       clearAllOmmData();
       seedOmmData();
+      useBatchStore.getState().resetBatchStore();
       get().init();
       useOmmStore.getState().refresh();
     },
@@ -1731,6 +1734,8 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         state.historyValues = {};
         state.alarmEvents = [];
       });
+
+      useBatchStore.getState().resetBatchStore();
 
       // 4. Rebuild search index
       try {

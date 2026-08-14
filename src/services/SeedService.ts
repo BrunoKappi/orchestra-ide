@@ -350,13 +350,19 @@ export class SeedService {
       makeProp(baseTankTplId, 'template', 'Volume', 'Float', '0.0', 'Volume atual armazenado (m³)', 'Inventário'),
       makeProp(baseTankTplId, 'template', 'Level', 'Float', '0.0', 'Nível de preenchimento do tanque (%)', 'Inventário'),
       makeProp(baseTankTplId, 'template', 'Mass', 'Float', '0.0', 'Massa total armazenada (toneladas)', 'Inventário'),
- 
+
       // Processo
       makeProp(baseTankTplId, 'template', 'Flow', 'Float', '0.0', 'Vazão volumétrica atual (m³/h)', 'Processo'),
       makeProp(baseTankTplId, 'template', 'Temperature', 'Float', '20.0', 'Temperatura interna do produto (°C)', 'Processo'),
       makeProp(baseTankTplId, 'template', 'Pressure', 'Float', '1.0', 'Pressão manométrica interna (bar)', 'Processo'),
       makeProp(baseTankTplId, 'template', 'Density', 'Float', '800.0', 'Densidade operacional do produto (kg/m³)', 'Processo'),
+
+      // Controle Operacional (graváveis — utilizados pelo Card de Comando no Grid Designer)
+      makeProp(baseTankTplId, 'template', 'OperationalMode', 'Enum', 'Automático', 'Modo operacional do equipamento: Automático, Manual ou Manutenção', 'Controle'),
+      makeProp(baseTankTplId, 'template', 'PumpEnabled', 'Boolean', 'false', 'Habilita ou desabilita a bomba de transferência associada ao tanque', 'Controle'),
+      makeProp(baseTankTplId, 'template', 'TemperatureSetpoint', 'Float', '25.0', 'Setpoint de temperatura de referência operacional (°C)', 'Controle'),
     ];
+
 
     baseTplProps.forEach((p) =>
       propertyRepo.save({ id: uuidv4(), ...p, createdAt: now, updatedAt: now })

@@ -14,7 +14,8 @@ export type LogOperation =
   | 'LOGOUT'
   | 'CONFIGURE'
   | 'EXPORT'
-  | 'IMPORT';
+  | 'IMPORT'
+  | 'MONITOR';
 
 export interface AuditLog {
   id: string;

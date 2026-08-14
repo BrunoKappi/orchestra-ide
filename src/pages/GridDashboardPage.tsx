@@ -192,6 +192,95 @@ export const GridDashboardPage = () => {
     showToast('Cartão removido');
   };
 
+  const handleCommandSelected = (config: any) => {
+    if (!pendingAdd) return;
+    const { sRow, sCol, rSpan, cSpan } = pendingAdd;
+
+    const newCard: TankCardData = {
+      id: `command-${uuidv4()}`,
+      cardType: 'command',
+      tag: 'COMANDO',
+      category: 'CONTROLE',
+      title: config.commandLabel,
+      description: `Comando para ${config.propertyLabel} do objeto ${config.objectName}`,
+      geometryType: 'vertical_cylindrical',
+      levelPercent: 0,
+      status: 'NORMAL',
+      footerLabel: 'Operacional',
+      fieldBindings: [],
+      startRow: sRow,
+      startCol: sCol,
+      rowSpan: rSpan,
+      colSpan: cSpan,
+      commandConfig: config,
+    };
+
+    updateActiveScreenCards([...cards, newCard]);
+    setSelectedCardId(newCard.id);
+    setPendingAdd(null);
+    showToast(`✓ Comando "${config.commandLabel}" adicionado!`);
+  };
+
+  const handleAlertSelected = (config: any) => {
+    if (!pendingAdd) return;
+    const { sRow, sCol, rSpan, cSpan } = pendingAdd;
+
+    const newCard: TankCardData = {
+      id: `alert-${uuidv4()}`,
+      cardType: 'alert',
+      tag: 'ALERTAS',
+      category: 'STATUS',
+      title: config.scopeType === 'all'
+        ? 'Alertas de Processo'
+        : `Alertas · ${config.scopeName}`,
+      description: 'Painel de alertas operacionais ativos',
+      geometryType: 'vertical_cylindrical',
+      levelPercent: 0,
+      status: 'NORMAL',
+      footerLabel: 'Monitoramento',
+      fieldBindings: [],
+      startRow: sRow,
+      startCol: sCol,
+      rowSpan: rSpan,
+      colSpan: cSpan,
+      alertConfig: config,
+    };
+
+    updateActiveScreenCards([...cards, newCard]);
+    setSelectedCardId(newCard.id);
+    setPendingAdd(null);
+    showToast(`✓ Painel de alertas adicionado!`);
+  };
+
+  const handleKpiSelected = (config: any) => {
+    if (!pendingAdd) return;
+    const { sRow, sCol, rSpan, cSpan } = pendingAdd;
+
+    const newCard: TankCardData = {
+      id: `kpi-${uuidv4()}`,
+      cardType: 'kpi',
+      tag: 'KPI',
+      category: 'DESEMPENHO',
+      title: `${config.objectName} · ${config.propertyLabel}`,
+      description: `Indicador de processo com meta`,
+      geometryType: 'vertical_cylindrical',
+      levelPercent: 0,
+      status: 'NORMAL',
+      footerLabel: 'Analítico',
+      fieldBindings: [],
+      startRow: sRow,
+      startCol: sCol,
+      rowSpan: rSpan,
+      colSpan: cSpan,
+      kpiConfig: config,
+    };
+
+    updateActiveScreenCards([...cards, newCard]);
+    setSelectedCardId(newCard.id);
+    setPendingAdd(null);
+    showToast(`✓ Indicador "${config.propertyLabel}" adicionado!`);
+  };
+
   const selectedCard = cards.find((c) => c.id === selectedCardId);
   const alreadySelectedObjectIds = cards.map((c) => c.objectId).filter((id): id is string => id != null);
 
@@ -319,6 +408,9 @@ export const GridDashboardPage = () => {
             handleTrendSelected(properties);
           }
         }}
+        onSelectCommand={handleCommandSelected}
+        onSelectAlert={handleAlertSelected}
+        onSelectKpi={handleKpiSelected}
       />
     </div>
   );

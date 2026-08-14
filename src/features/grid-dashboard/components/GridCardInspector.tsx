@@ -57,48 +57,170 @@ export const GridCardInspector: React.FC<GridCardInspectorProps> = ({
         </div>
 
         {/* Conditional Configuration Sections */}
-        {!card.isTrend ? (
+        {card.cardType === 'command' ? (
           <>
-
-            {/* Exibição de Campos */}
-            <div className="space-y-2.5">
+            {/* Configurações do Comando */}
+            <div className="space-y-3.5">
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5 text-sky-500" /> Exibição de Campos
-                (Bindings)
+                Configurações do Comando
               </label>
 
-              <div className="space-y-2 text-xs">
-                {(card.fieldBindings || []).map((binding, idx) => (
-                  <label
-                    key={binding.propertyName || idx}
-                    className="flex items-center justify-between cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <span className="text-slate-700 dark:text-slate-300 font-mono font-semibold">
-                      {binding.label} ({binding.propertyName})
-                    </span>
-                    <input
-                      type="checkbox"
-                      checked={binding.visible}
-                      onChange={() => {
-                        const newBindings = [...card.fieldBindings];
-                        newBindings[idx] = {
-                          ...newBindings[idx],
-                          visible: !newBindings[idx].visible,
-                        };
-                        onUpdateCard({ ...card, fieldBindings: newBindings });
-                      }}
-                      className="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 border-slate-300 dark:border-slate-700"
-                    />
-                  </label>
-                ))}
-                {(!card.fieldBindings || card.fieldBindings.length === 0) && (
-                  <p className="text-[11px] text-slate-400">
-                    Nenhum binding ativo no momento.
-                  </p>
-                )}
+              <div>
+                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                  Label do Comando
+                </label>
+                <input
+                  type="text"
+                  value={card.commandConfig?.commandLabel || ""}
+                  onChange={(e) => {
+                    if (card.commandConfig) {
+                      onUpdateCard({
+                        ...card,
+                        commandConfig: { ...card.commandConfig, commandLabel: e.target.value },
+                        title: e.target.value,
+                      });
+                    }
+                  }}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
+              </div>
+
+              <label className="flex items-center justify-between cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 text-xs font-semibold">
+                <span className="text-slate-700 dark:text-slate-300">Exigir Confirmação</span>
+                <input
+                  type="checkbox"
+                  checked={card.commandConfig?.confirmBeforeExecute || false}
+                  onChange={() => {
+                    if (card.commandConfig) {
+                      onUpdateCard({
+                        ...card,
+                        commandConfig: { ...card.commandConfig, confirmBeforeExecute: !card.commandConfig.confirmBeforeExecute },
+                      });
+                    }
+                  }}
+                  className="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 border-slate-300 dark:border-slate-700"
+                />
+              </label>
+
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 text-[10px] text-slate-400 font-mono">
+                <div>Objeto: {card.commandConfig?.objectName}</div>
+                <div>Propriedade: {card.commandConfig?.propertyName}</div>
+                <div>Tipo: {card.commandConfig?.dataType}</div>
               </div>
             </div>
           </>
-        ) : (
+        ) : card.cardType === 'alert' ? (
+          <>
+            {/* Configurações do Alerta */}
+            <div className="space-y-3.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                Configurações do Painel
+              </label>
+
+              <div>
+                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                  Máximo de Alertas Exibidos
+                </label>
+                <select
+                  value={card.alertConfig?.maxItems || 5}
+                  onChange={(e) => {
+                    if (card.alertConfig) {
+                      onUpdateCard({
+                        ...card,
+                        alertConfig: { ...card.alertConfig, maxItems: parseInt(e.target.value) || 5 },
+                      });
+                    }
+                  }}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                >
+                  {[3, 5, 8, 10].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+
+              <label className="flex items-center justify-between cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 text-xs font-semibold">
+                <span className="text-slate-700 dark:text-slate-300">Exibir Alertas Encerrados</span>
+                <input
+                  type="checkbox"
+                  checked={card.alertConfig?.showResolved || false}
+                  onChange={() => {
+                    if (card.alertConfig) {
+                      onUpdateCard({
+                        ...card,
+                        alertConfig: { ...card.alertConfig, showResolved: !card.alertConfig.showResolved },
+                      });
+                    }
+                  }}
+                  className="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 border-slate-300 dark:border-slate-700"
+                />
+              </label>
+
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 text-[10px] text-slate-400 font-mono">
+                <div>Escopo: {card.alertConfig?.scopeType === 'all' ? 'Global (Todos)' : card.alertConfig?.scopeType === 'object' ? 'Por Objeto' : 'Por Área'}</div>
+                {card.alertConfig?.scopeType !== 'all' && <div>Origem: {card.alertConfig?.scopeName}</div>}
+              </div>
+            </div>
+          </>
+        ) : card.cardType === 'kpi' ? (
+          <>
+            {/* Configurações do Indicador */}
+            <div className="space-y-3.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                Configurações da Meta
+              </label>
+
+              <div>
+                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                  Valor da Meta
+                </label>
+                <input
+                  type="number"
+                  value={card.kpiConfig?.goalValue !== null && card.kpiConfig?.goalValue !== undefined ? card.kpiConfig.goalValue : ""}
+                  onChange={(e) => {
+                    if (card.kpiConfig) {
+                      const val = parseFloat(e.target.value);
+                      onUpdateCard({
+                        ...card,
+                        kpiConfig: { ...card.kpiConfig, goalValue: isNaN(val) ? null : val },
+                      });
+                    }
+                  }}
+                  placeholder="Nenhuma meta de referência"
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+                  Tipo de Meta
+                </label>
+                <select
+                  value={card.kpiConfig?.goalType || "max"}
+                  onChange={(e) => {
+                    if (card.kpiConfig) {
+                      onUpdateCard({
+                        ...card,
+                        kpiConfig: { ...card.kpiConfig, goalType: e.target.value as any },
+                      });
+                    }
+                  }}
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                >
+                  <option value="max">Maximizar (Maior é melhor)</option>
+                  <option value="min">Minimizar (Menor é melhor)</option>
+                  <option value="reference">Referência (Sem julgamento)</option>
+                </select>
+              </div>
+
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 text-[10px] text-slate-400 font-mono">
+                <div>Objeto: {card.kpiConfig?.objectName}</div>
+                <div>Propriedade: {card.kpiConfig?.propertyName}</div>
+                {card.kpiConfig?.unit && <div>Unidade: {card.kpiConfig.unit}</div>}
+              </div>
+            </div>
+          </>
+        ) : card.isTrend || card.cardType === 'trend' ? (
           <>
             {/* Variáveis no Gráfico */}
             <div className="space-y-2.5">
@@ -165,6 +287,45 @@ export const GridCardInspector: React.FC<GridCardInspectorProps> = ({
               </div>
             </div>
           </>
+        ) : (
+          <>
+            {/* Exibição de Campos */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-sky-500" /> Exibição de Campos (Bindings)
+              </label>
+
+              <div className="space-y-2 text-xs">
+                {(card.fieldBindings || []).map((binding, idx) => (
+                  <label
+                    key={binding.propertyName || idx}
+                    className="flex items-center justify-between cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <span className="text-slate-700 dark:text-slate-300 font-mono font-semibold">
+                      {binding.label} ({binding.propertyName})
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={binding.visible}
+                      onChange={() => {
+                        const newBindings = [...card.fieldBindings];
+                        newBindings[idx] = {
+                          ...newBindings[idx],
+                          visible: !newBindings[idx].visible,
+                        };
+                        onUpdateCard({ ...card, fieldBindings: newBindings });
+                      }}
+                      className="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 border-slate-300 dark:border-slate-700"
+                    />
+                  </label>
+                ))}
+                {(!card.fieldBindings || card.fieldBindings.length === 0) && (
+                  <p className="text-[11px] text-slate-400">
+                    Nenhum binding ativo no momento.
+                  </p>
+                )}
+              </div>
+            </div>
+          </>
         )}
 
         {/* Ações Locais */}
@@ -173,10 +334,11 @@ export const GridCardInspector: React.FC<GridCardInspectorProps> = ({
             onClick={() => onDeleteCard(card.id)}
             className="w-full py-2 px-3 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-semibold text-xs flex items-center justify-center gap-2 transition-colors">
             <Trash2 className="w-3.5 h-3.5" />
-            {card.isTrend ? "Excluir Gráfico da Grade" : "Excluir Cartão da Grade"}
+            Remover da Grade
           </button>
         </div>
       </div>
     </div>
   );
 };
+

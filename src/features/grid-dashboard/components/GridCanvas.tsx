@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { TankCardData, GridConfig } from '../types';
 import { IndustrialTankCard } from './IndustrialTankCard';
 import { TrendChartCard } from './TrendChartCard';
+import { CommandCard } from './CommandCard';
+import { AlertLocalCard } from './AlertLocalCard';
+import { KpiCard } from './KpiCard';
 import { cn } from '../../../utils/cn';
 
 interface GridCanvasProps {
@@ -341,8 +344,29 @@ export const GridCanvas: React.FC<GridCanvasProps> = ({
                 isBeingMoved && "opacity-40"
               )}
             >
-              {/* Tank Component or Trend Chart */}
-              {card.isTrend ? (
+              {/* Card type routing */}
+              {card.cardType === 'command' ? (
+                <CommandCard
+                  card={card}
+                  isSelected={isSelected}
+                  isViewMode={isViewMode}
+                  onClick={() => !isViewMode && onSelectCard(card.id)}
+                />
+              ) : card.cardType === 'alert' ? (
+                <AlertLocalCard
+                  card={card}
+                  isSelected={isSelected}
+                  isViewMode={isViewMode}
+                  onClick={() => !isViewMode && onSelectCard(card.id)}
+                />
+              ) : card.cardType === 'kpi' ? (
+                <KpiCard
+                  card={card}
+                  isSelected={isSelected}
+                  isViewMode={isViewMode}
+                  onClick={() => !isViewMode && onSelectCard(card.id)}
+                />
+              ) : card.isTrend ? (
                 <TrendChartCard
                   card={card}
                   isSelected={isSelected}
