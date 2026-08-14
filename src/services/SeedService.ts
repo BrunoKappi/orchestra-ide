@@ -440,6 +440,91 @@ export class SeedService {
     templateRepo.save(tplSpherical);
     templateRepo.save(tplPressurized);
 
+    const tplValve = {
+      id: 'tpl-valve',
+      name: 'Valve Template',
+      parentTemplateId: null,
+      description: 'Template de válvula industrial (abertura/fechamento manual ou automatizado)',
+      graphicConfig: {
+        geometryType: 'valve' as any,
+        visibleFields: {
+          tag: true,
+          description: true,
+          product: false,
+          level: false,
+          volume: false,
+          temperature: false,
+          pressure: false,
+          flow: false,
+          density: false,
+          status: true,
+          alarm: false,
+        },
+        fieldBindings: [
+          { propertyName: 'IsOpen', label: 'Aberta', unit: '', decimalPlaces: 0, visible: true }
+        ],
+        decimalPlaces: 0,
+        showLevelFill: false,
+        showFooter: false,
+      },
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const tplPump = {
+      id: 'tpl-pump',
+      name: 'Pump Template',
+      parentTemplateId: null,
+      description: 'Template de bomba centrífuga para transferência de fluidos',
+      graphicConfig: {
+        geometryType: 'pump' as any,
+        visibleFields: {
+          tag: true,
+          description: true,
+          product: false,
+          level: false,
+          volume: false,
+          temperature: false,
+          pressure: false,
+          flow: false,
+          density: false,
+          status: true,
+          alarm: false,
+        },
+        fieldBindings: [
+          { propertyName: 'IsRunning', label: 'Em Execução', unit: '', decimalPlaces: 0, visible: true }
+        ],
+        decimalPlaces: 0,
+        showLevelFill: false,
+        showFooter: false,
+      },
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    templateRepo.save(tplValve);
+    templateRepo.save(tplPump);
+
+    const valveTplProps: PropDef[] = [
+      makeProp('tpl-valve', 'template', 'Tag', 'String', '', 'TAG industrial da válvula', 'Identificação'),
+      makeProp('tpl-valve', 'template', 'Description', 'String', '', 'Descrição operacional da válvula', 'Identificação'),
+      makeProp('tpl-valve', 'template', 'IsOpen', 'Boolean', 'true', 'Estado da válvula (Aberta/Fechada)', 'Controle'),
+    ];
+
+    const pumpTplProps: PropDef[] = [
+      makeProp('tpl-pump', 'template', 'Tag', 'String', '', 'TAG industrial da bomba', 'Identificação'),
+      makeProp('tpl-pump', 'template', 'Description', 'String', '', 'Descrição operacional da bomba', 'Identificação'),
+      makeProp('tpl-pump', 'template', 'IsRunning', 'Boolean', 'false', 'Estado de operação da bomba (Ligada/Desligada)', 'Controle'),
+    ];
+
+    valveTplProps.forEach((p) =>
+      propertyRepo.save({ id: uuidv4(), ...p, createdAt: now, updatedAt: now })
+    );
+
+    pumpTplProps.forEach((p) =>
+      propertyRepo.save({ id: uuidv4(), ...p, createdAt: now, updatedAt: now })
+    );
+
     // -------------------------------------------------------------------------
     // 6. Tank Instances — only VALUE OVERRIDES (not duplicating template props)
     // -------------------------------------------------------------------------
@@ -1062,6 +1147,159 @@ export class SeedService {
         targetId: seed.id,
         parentFolderId: targetFolderId,
         order: idx + 1,
+        createdAt: now,
+        updatedAt: now,
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // 6b. Valve & Pump Instances
+    // -------------------------------------------------------------------------
+    const valveAndPumpSeeds = [
+      {
+        id: 'valve-xv-301',
+        tag: 'XV-301',
+        name: 'XV-301',
+        description: 'Válvula de Bloqueio da Rota TK-301/302',
+        templateId: 'tpl-valve',
+        areaId: 'area-300',
+        areaName: 'Unidade 300 - Parque de Tanques de Matéria-Prima',
+        properties: [
+          { name: 'Tag', type: 'String', val: 'XV-301' },
+          { name: 'Description', type: 'String', val: 'Válvula de Bloqueio da Rota TK-301/302' },
+          { name: 'IsOpen', type: 'Boolean', val: 'true' },
+        ]
+      },
+      {
+        id: 'pump-p-301',
+        tag: 'P-301',
+        name: 'P-301',
+        description: 'Bomba de Transferência de Nafta',
+        templateId: 'tpl-pump',
+        areaId: 'area-300',
+        areaName: 'Unidade 300 - Parque de Tanques de Matéria-Prima',
+        properties: [
+          { name: 'Tag', type: 'String', val: 'P-301' },
+          { name: 'Description', type: 'String', val: 'Bomba de Transferência de Nafta' },
+          { name: 'IsRunning', type: 'Boolean', val: 'false' },
+        ]
+      },
+      {
+        id: 'valve-xv-403',
+        tag: 'XV-403',
+        name: 'XV-403',
+        description: 'Válvula de Rota TK-403/404',
+        templateId: 'tpl-valve',
+        areaId: 'area-400',
+        areaName: 'Unidade 400 - Parque de Tanques Intermediários',
+        properties: [
+          { name: 'Tag', type: 'String', val: 'XV-403' },
+          { name: 'Description', type: 'String', val: 'Válvula de Rota TK-403/404' },
+          { name: 'IsOpen', type: 'Boolean', val: 'true' },
+        ]
+      },
+      {
+        id: 'pump-p-403',
+        tag: 'P-403',
+        name: 'P-403',
+        description: 'Bomba de Transferência de Para-Xileno',
+        templateId: 'tpl-pump',
+        areaId: 'area-400',
+        areaName: 'Unidade 400 - Parque de Tanques Intermediários',
+        properties: [
+          { name: 'Tag', type: 'String', val: 'P-403' },
+          { name: 'Description', type: 'String', val: 'Bomba de Transferência de Para-Xileno' },
+          { name: 'IsRunning', type: 'Boolean', val: 'false' },
+        ]
+      },
+      {
+        id: 'valve-xv-501',
+        tag: 'XV-501',
+        name: 'XV-501',
+        description: 'Válvula de Rota Eteno V-301/302',
+        templateId: 'tpl-valve',
+        areaId: 'area-500',
+        areaName: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        properties: [
+          { name: 'Tag', type: 'String', val: 'XV-501' },
+          { name: 'Description', type: 'String', val: 'Válvula de Rota Eteno V-301/302' },
+          { name: 'IsOpen', type: 'Boolean', val: 'true' },
+        ]
+      },
+      {
+        id: 'pump-p-501',
+        tag: 'P-501',
+        name: 'P-501',
+        description: 'Bomba Booster de Eteno',
+        templateId: 'tpl-pump',
+        areaId: 'area-500',
+        areaName: 'Unidade 500 - Esferas e Pressurizados de Olefinas',
+        properties: [
+          { name: 'Tag', type: 'String', val: 'P-501' },
+          { name: 'Description', type: 'String', val: 'Bomba Booster de Eteno' },
+          { name: 'IsRunning', type: 'Boolean', val: 'false' },
+        ]
+      }
+    ];
+
+    valveAndPumpSeeds.forEach((seed, idx) => {
+      const targetFolderId =
+        seed.areaId === 'area-300' ? folder300Id :
+        seed.areaId === 'area-400' ? folder400Id : folder500Id;
+
+      objectRepo.save({
+        id: seed.id,
+        name: seed.name,
+        templateId: seed.templateId,
+        description: seed.description,
+        isDeployed: true,
+        graphicConfig: {
+          geometryType: (seed.templateId === 'tpl-valve' ? 'valve' : 'pump') as any,
+          visibleFields: {
+            tag: true,
+            description: true,
+            product: false,
+            level: false,
+            volume: false,
+            temperature: false,
+            pressure: false,
+            flow: false,
+            density: false,
+            status: true,
+            alarm: false,
+          },
+          fieldBindings: [
+            { propertyName: seed.templateId === 'tpl-valve' ? 'IsOpen' : 'IsRunning', label: seed.templateId === 'tpl-valve' ? 'Aberta' : 'Ligada', unit: '', decimalPlaces: 0, visible: true }
+          ],
+          decimalPlaces: 0,
+          showLevelFill: false,
+          showFooter: false,
+        },
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      seed.properties.forEach((p) => {
+        propertyRepo.save({
+          id: uuidv4(),
+          targetId: seed.id,
+          targetType: 'instance',
+          name: p.name,
+          dataType: p.type as any,
+          defaultValue: p.val,
+          description: p.name === 'Tag' ? 'TAG industrial' : p.name === 'Description' ? 'Descrição operacional' : 'Variável de estado',
+          category: 'Controle',
+          createdAt: now,
+          updatedAt: now,
+        });
+      });
+
+      deploymentRepo.saveNode({
+        id: uuidv4(),
+        type: 'object',
+        targetId: seed.id,
+        parentFolderId: targetFolderId,
+        order: idx + 20,
         createdAt: now,
         updatedAt: now,
       });

@@ -53,7 +53,9 @@ export type TankGeometryType =
   | 'vertical_cylindrical'
   | 'horizontal_cylindrical'
   | 'spherical'
-  | 'pressurized';
+  | 'pressurized'
+  | 'valve'
+  | 'pump';
 
 // ----------------------------------------------------------------------------
 // Tank Strapping / Capacity Table Types (API MPMS Chapter 2.2A — simplified)

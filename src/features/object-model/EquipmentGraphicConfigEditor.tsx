@@ -80,6 +80,22 @@ export const EquipmentGraphicConfigEditor: React.FC = () => {
   const activeEntity = selectedEntity?.type === 'template' ? selectedTemplate : selectedObject;
   const currentConfig: EquipmentGraphicConfig = activeEntity?.graphicConfig || DEFAULT_CONFIG;
 
+  const isValve =
+    activeEntity?.id === 'tpl-valve' ||
+    (selectedEntity?.type === 'template' && (activeEntity as any).parentTemplateId === 'tpl-valve') ||
+    (selectedEntity?.type === 'instance' && (activeEntity as any).templateId === 'tpl-valve');
+
+  const isPump =
+    activeEntity?.id === 'tpl-pump' ||
+    (selectedEntity?.type === 'template' && (activeEntity as any).parentTemplateId === 'tpl-pump') ||
+    (selectedEntity?.type === 'instance' && (activeEntity as any).templateId === 'tpl-pump');
+
+  const geometryOptions = isValve
+    ? [{ type: 'valve' as const, title: 'Válvula de Rota', description: 'Válvula industrial para controle on/off' }]
+    : isPump
+    ? [{ type: 'pump' as const, title: 'Bomba de Transferência', description: 'Bomba centrífuga para controle de rota' }]
+    : GEOMETRY_OPTIONS;
+
   const [config, setConfig] = useState<EquipmentGraphicConfig>({
     ...DEFAULT_CONFIG,
     ...currentConfig,
@@ -90,9 +106,27 @@ export const EquipmentGraphicConfigEditor: React.FC = () => {
   // Sync state if selected entity changes
   React.useEffect(() => {
     const cfg = activeEntity?.graphicConfig || DEFAULT_CONFIG;
+    const isV =
+      activeEntity?.id === 'tpl-valve' ||
+      (selectedEntity?.type === 'template' && (activeEntity as any).parentTemplateId === 'tpl-valve') ||
+      (selectedEntity?.type === 'instance' && (activeEntity as any).templateId === 'tpl-valve');
+
+    const isP =
+      activeEntity?.id === 'tpl-pump' ||
+      (selectedEntity?.type === 'template' && (activeEntity as any).parentTemplateId === 'tpl-pump') ||
+      (selectedEntity?.type === 'instance' && (activeEntity as any).templateId === 'tpl-pump');
+    
+    let resolvedGeometry = cfg.geometryType;
+    if (isV && resolvedGeometry !== 'valve') {
+      resolvedGeometry = 'valve';
+    } else if (isP && resolvedGeometry !== 'pump') {
+      resolvedGeometry = 'pump';
+    }
+
     setConfig({
       ...DEFAULT_CONFIG,
       ...cfg,
+      geometryType: resolvedGeometry,
       fieldBindings: cfg.fieldBindings?.length ? cfg.fieldBindings : DEFAULT_FIELD_BINDINGS,
     });
   }, [selectedEntity?.id]);
@@ -237,7 +271,7 @@ export const EquipmentGraphicConfigEditor: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {GEOMETRY_OPTIONS.map((g) => {
+              {geometryOptions.map((g) => {
                 const isSelected = config.geometryType === g.type;
                 return (
                   <button

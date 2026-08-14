@@ -48,6 +48,17 @@ export const CentralEditor: React.FC = () => {
     }
   }, [currentEntity?.id, currentEntity?.name, currentEntity?.description]);
 
+  const isTemplate = selectedEntity?.type === "template";
+  const isValveOrPump =
+    (isTemplate && (selectedTemplate?.id === 'tpl-valve' || selectedTemplate?.parentTemplateId === 'tpl-valve' || selectedTemplate?.id === 'tpl-pump' || selectedTemplate?.parentTemplateId === 'tpl-pump')) ||
+    (!isTemplate && (selectedObject?.templateId === 'tpl-valve' || selectedObject?.templateId === 'tpl-pump'));
+
+  useEffect(() => {
+    if (isValveOrPump && activeEditorTab === "strapping") {
+      setActiveEditorTab("properties");
+    }
+  }, [isValveOrPump, activeEditorTab, setActiveEditorTab]);
+
   if (!selectedEntity || !currentEntity) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-slate-50/50 dark:bg-slate-950 text-slate-400">
@@ -65,7 +76,8 @@ export const CentralEditor: React.FC = () => {
     );
   }
 
-  const isTemplate = selectedEntity.type === "template";
+
+
   const isDerived = isTemplate && selectedTemplate?.parentTemplateId !== null;
 
   // Origin template resolution
@@ -251,17 +263,19 @@ export const CentralEditor: React.FC = () => {
           <span>Gráfico do Equipamento</span>
         </button>
 
-        <button
-          onClick={() => setActiveEditorTab("strapping")}
-          className={cn(
-            "flex items-center gap-2 py-3 px-4 border-b-2 font-semibold transition-colors duration-150 cursor-pointer",
-            activeEditorTab === "strapping"
-              ? "border-sky-600 text-sky-600 dark:text-sky-400 bg-white dark:bg-slate-900"
-              : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
-          )}>
-          <BarChart3 className="w-4 h-4 text-emerald-500" />
-          <span>Arqueação</span>
-        </button>
+        {!isValveOrPump && (
+          <button
+            onClick={() => setActiveEditorTab("strapping")}
+            className={cn(
+              "flex items-center gap-2 py-3 px-4 border-b-2 font-semibold transition-colors duration-150 cursor-pointer",
+              activeEditorTab === "strapping"
+                ? "border-sky-600 text-sky-600 dark:text-sky-400 bg-white dark:bg-slate-900"
+                : "border-transparent hover:text-slate-900 dark:hover:text-slate-100",
+            )}>
+            <BarChart3 className="w-4 h-4 text-emerald-500" />
+            <span>Arqueação</span>
+          </button>
+        )}
       </div>
 
       {/* Tab Content Display */}

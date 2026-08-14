@@ -54,6 +54,7 @@ export const SimulatorPage: React.FC = () => {
     toggleMockConfigEnabled,
     deployObject,
     undeployObject,
+    updateSimulatedValue,
     init: initObjectModelStore,
   } = useObjectModelStore();
 
@@ -594,20 +595,39 @@ export const SimulatorPage: React.FC = () => {
 
                             {/* Live Value */}
                             <td className="py-1.5 px-3 whitespace-nowrap">
-                              <div
-                                className={cn(
-                                  'inline-flex items-center px-2 py-0.5 rounded-lg font-mono text-[11px] font-bold transition-all duration-300 whitespace-nowrap',
-                                  !row.isDeployed
-                                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                                    : isChanged
-                                    ? 'bg-sky-500 text-white scale-105 shadow-xs'
-                                    : isEnabled
-                                    ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                                )}
-                              >
-                                <span>{row.isDeployed ? row.liveValue : 'Off'}</span>
-                              </div>
+                              {row.isDeployed && row.property.dataType === 'Boolean' ? (
+                                <button
+                                  onClick={() => {
+                                    const nextVal = row.liveValue === 'true' ? 'false' : 'true';
+                                    updateSimulatedValue(rowKey, nextVal);
+                                  }}
+                                  className={cn(
+                                    'inline-flex items-center px-2.5 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border shadow-xs active:scale-95',
+                                    row.liveValue === 'true'
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                                  )}
+                                  title="Clique para alternar o valor lógico"
+                                >
+                                  <span className={cn('w-1.5 h-1.5 rounded-full mr-1.5 shrink-0', row.liveValue === 'true' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500')} />
+                                  <span>{row.liveValue === 'true' ? 'ABERTO / ON' : 'FECHADO / OFF'}</span>
+                                </button>
+                              ) : (
+                                <div
+                                  className={cn(
+                                    'inline-flex items-center px-2 py-0.5 rounded-lg font-mono text-[11px] font-bold transition-all duration-300 whitespace-nowrap',
+                                    !row.isDeployed
+                                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                      : isChanged
+                                      ? 'bg-sky-500 text-white scale-105 shadow-xs'
+                                      : isEnabled
+                                      ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                  )}
+                                >
+                                  <span>{row.isDeployed ? row.liveValue : 'Off'}</span>
+                                </div>
+                              )}
                             </td>
 
                             {/* Preset Badge */}

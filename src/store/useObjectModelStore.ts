@@ -745,6 +745,32 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
             historyEngine.record(objectId, prop.id, value, prop.historyConfig, 'runtime');
           }
 
+          // Persist manual value update to PropertyRepository so simulation tick doesn't overwrite it
+          const properties = propertyRepo.getByTargetId(objectId);
+          const existingProp = properties.find((p) => p.name === propName);
+          if (existingProp) {
+            existingProp.defaultValue = value;
+            existingProp.updatedAt = new Date().toISOString();
+            propertyRepo.save(existingProp);
+          } else if (prop) {
+            const now = new Date().toISOString();
+            propertyRepo.save({
+              id: uuidv4(),
+              targetId: objectId,
+              targetType: 'instance',
+              name: prop.name,
+              dataType: prop.dataType,
+              defaultValue: value,
+              description: prop.description,
+              category: prop.category,
+              alarmConfig: prop.alarmConfig,
+              historyConfig: prop.historyConfig,
+              opcTagPath: prop.opcTagPath,
+              createdAt: now,
+              updatedAt: now,
+            });
+          }
+
           // Register central log for manual update
           useLogStore.getState().addLog({
             user: 'Bruno Kappi',
@@ -796,6 +822,8 @@ export const useObjectModelStore = create<ObjectModelStoreState>()(
         state.alarmEvents = alarmRepo.getAll();
         state.activeEvents = [];
       });
+
+      get().refreshData();
     },
 
     evaluateEvents: () => {

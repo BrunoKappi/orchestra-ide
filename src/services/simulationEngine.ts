@@ -4,6 +4,7 @@ import { STORAGE_KEYS } from '../repository/storageKey';
 import { AlarmEngine } from './AlarmEngine';
 import { inheritanceService } from './InheritanceService';
 import { ProcessAlertEngine } from './ProcessAlertEngine';
+import { alarmRepo } from '../repository/AlarmRepository';
 
 export interface MovementEntity {
   id: string;
@@ -153,6 +154,99 @@ export class SimulationEngine {
 
       if (!srcProps || !destProps) return;
 
+      // Determine route valve and pump
+      let routeValveId: string | null = null;
+      let routePumpId: string | null = null;
+
+      if ((srcId === 'tank-tk-301' && destId === 'tank-tk-302') || (srcId === 'tank-tk-302' && destId === 'tank-tk-301')) {
+        routeValveId = 'valve-xv-301';
+        routePumpId = 'pump-p-301';
+      } else if ((srcId === 'tank-tk-403' && destId === 'tank-tk-404') || (srcId === 'tank-tk-404' && destId === 'tank-tk-403')) {
+        routeValveId = 'valve-xv-403';
+        routePumpId = 'pump-p-403';
+      } else if ((srcId === 'tank-v-301' && destId === 'tank-v-302') || (srcId === 'tank-v-302' && destId === 'tank-v-301')) {
+        routeValveId = 'valve-xv-501';
+        routePumpId = 'pump-p-501';
+      }
+
+      let isValveOpen = true;
+      if (routeValveId && propsByObject[routeValveId]) {
+        const isOpenProp = propsByObject[routeValveId]['IsOpen'];
+        if (isOpenProp) {
+          isValveOpen = isOpenProp.defaultValue === 'true' || isOpenProp.defaultValue === true;
+        }
+      }
+
+      if (!isValveOpen) {
+        // Interlock triggered! Pause the transfer, set flow to 0, trigger alarm.
+        ommMov.simPaused = true;
+        ommMov.currentFlow = 0;
+        updatedOmmMovements = true;
+
+        // Turn pump OFF if any
+        if (routePumpId && propsByObject[routePumpId]) {
+          const pumpProp = propsByObject[routePumpId]['IsRunning'];
+          if (pumpProp && pumpProp.defaultValue !== 'false') {
+            pumpProp.defaultValue = 'false';
+            propertyRepo.save(pumpProp);
+          }
+        }
+
+        // Trigger alarm
+        const valveTag = routeValveId === 'valve-xv-301' ? 'XV-301' : routeValveId === 'valve-xv-403' ? 'XV-403' : 'XV-501';
+        const alarmId = `alarm-interlock-${ommMov.id}`;
+        
+        const activeAlarms = alarmRepo.getAll();
+        const alarmExists = activeAlarms.some((a) => a.id === alarmId || (a.objectId === routeValveId && a.status.startsWith('Active')));
+        
+        if (!alarmExists) {
+          const now = new Date().toISOString();
+          alarmRepo.save({
+            id: alarmId,
+            ruleId: 'rule-valve-interlock',
+            objectId: routeValveId!,
+            objectName: valveTag,
+            propertyName: 'IsOpen',
+            currentValue: 'FECHADO',
+            configuredValue: 'ABERTO',
+            severity: 'critical',
+            priority: 95,
+            message: `[OMM INTERLOCK] Válvula ${valveTag} fechada na rota da transferência ativa ${ommMov.number || ommMov.code || ommMov.id}`,
+            color: '#ef4444',
+            icon: 'ShieldAlert',
+            activatedAt: now,
+            acknowledgedAt: null,
+            clearedAt: null,
+            ackedBy: null,
+            durationMs: 0,
+            status: 'Active Unacknowledged',
+          });
+        }
+        
+        return; // Skip transfer for this tick!
+      }
+
+      // Valve is open! Auto-start the pump if it is not running
+      if (routePumpId && propsByObject[routePumpId]) {
+        const pumpProp = propsByObject[routePumpId]['IsRunning'];
+        if (pumpProp && pumpProp.defaultValue !== 'true') {
+          pumpProp.defaultValue = 'true';
+          propertyRepo.save(pumpProp);
+        }
+      }
+
+      // Auto-clear alarm if valve is open
+      if (routeValveId) {
+        const activeAlarms = alarmRepo.getAll();
+        const interlockAlarm = activeAlarms.find((a) => a.objectId === routeValveId && a.ruleId === 'rule-valve-interlock' && !a.clearedAt);
+        if (interlockAlarm) {
+          const now = new Date().toISOString();
+          interlockAlarm.clearedAt = now;
+          interlockAlarm.status = interlockAlarm.status === 'Active Acknowledged' ? 'Cleared Acknowledged' : 'Cleared Unacknowledged';
+          alarmRepo.save(interlockAlarm);
+        }
+      }
+
       const flowRate = (ommMov.simFlowRate !== undefined && ommMov.simFlowRate !== null) ? ommMov.simFlowRate : (ommMov.plannedFlow || 100);
       // Delta time in hours for 1s tick with speed multiplier
       const deltaTimeHours = (1 * this.speedMult) / 3600;
@@ -211,9 +305,48 @@ export class SimulationEngine {
           ommMov.status = 'Completed';
           ommMov.currentFlow = 0;
           ommMov.completedAt = nowIso;
+
+          if (routePumpId && propsByObject[routePumpId]) {
+            const pumpProp = propsByObject[routePumpId]['IsRunning'];
+            if (pumpProp && pumpProp.defaultValue !== 'false') {
+              pumpProp.defaultValue = 'false';
+              propertyRepo.save(pumpProp);
+            }
+          }
         }
 
         updatedOmmMovements = true;
+      }
+    });
+
+    // For any mapped pump where there is NO active running movement on that route, set IsRunning to false
+    const activeRunningMovements = ommMovements.filter((m) => m.status === 'Active' && !m.simPaused);
+    const activeRunningTanks = new Set<string>();
+    activeRunningMovements.forEach((m) => {
+      const sId = m.originId || m.sourceTankId;
+      const dId = m.destinationId || m.destinationTankId;
+      if (sId && dId) {
+        activeRunningTanks.add(`${sId}->${dId}`);
+        activeRunningTanks.add(`${dId}->${sId}`);
+      }
+    });
+
+    ['pump-p-301', 'pump-p-403', 'pump-p-501'].forEach((pumpId) => {
+      let shouldRun = false;
+      if (pumpId === 'pump-p-301' && (activeRunningTanks.has('tank-tk-301->tank-tk-302') || activeRunningTanks.has('tank-tk-302->tank-tk-301'))) {
+        shouldRun = true;
+      } else if (pumpId === 'pump-p-403' && (activeRunningTanks.has('tank-tk-403->tank-tk-404') || activeRunningTanks.has('tank-tk-404->tank-tk-403'))) {
+        shouldRun = true;
+      } else if (pumpId === 'pump-p-501' && (activeRunningTanks.has('tank-v-301->tank-v-302') || activeRunningTanks.has('tank-v-302->tank-v-301'))) {
+        shouldRun = true;
+      }
+
+      if (!shouldRun && propsByObject[pumpId]) {
+        const pumpProp = propsByObject[pumpId]['IsRunning'];
+        if (pumpProp && pumpProp.defaultValue !== 'false') {
+          pumpProp.defaultValue = 'false';
+          propertyRepo.save(pumpProp);
+        }
       }
     });
 

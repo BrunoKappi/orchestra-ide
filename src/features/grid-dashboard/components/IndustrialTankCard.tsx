@@ -58,8 +58,21 @@ export const IndustrialTankCard: React.FC<IndustrialTankCardProps> = ({
   const liveLevel = parseFloat(liveLevelStr) || 0;
   const liveInventoryStatus = resolveObjectPropValue(objectId, 'Status', 'Normal');
 
+  const isValve = card.geometryType === 'valve';
+  const isPump = card.geometryType === 'pump';
+  const isValveOrPump = isValve || isPump;
+
+  const liveIsOpen = resolveObjectPropValue(objectId, 'IsOpen', 'true');
+  const liveIsRunning = resolveObjectPropValue(objectId, 'IsRunning', 'false');
+
   // Determine status for color
-  const accentColor = card.statusColor || getLevelColor(liveLevel);
+  const accentColor = card.statusColor || (
+    isValve
+      ? (liveIsOpen === 'true' ? '#10b981' : '#ef4444')
+      : isPump
+        ? (liveIsRunning === 'true' ? '#10b981' : '#64748b')
+        : getLevelColor(liveLevel)
+  );
 
   // Resolve all field binding values
   const resolvedBindings = card.fieldBindings
@@ -114,7 +127,7 @@ export const IndustrialTankCard: React.FC<IndustrialTankCardProps> = ({
           <div className="shrink-0 flex items-center justify-center">
             <TankGeometrySvg
               geometry={card.geometryType}
-              levelPercent={liveLevel}
+              levelPercent={isValve ? (liveIsOpen === 'true' ? 100 : 0) : isPump ? (liveIsRunning === 'true' ? 100 : 0) : liveLevel}
               fillColor={accentColor}
               width={56}
               height={72}
@@ -123,14 +136,42 @@ export const IndustrialTankCard: React.FC<IndustrialTankCardProps> = ({
 
           {/* Right: Level + field bindings */}
           <div className="flex-1 min-w-0 flex flex-col justify-center gap-1 overflow-hidden">
-            {/* Primary: Level */}
-            <div className="shrink-0">
-              <div className="text-[10px] font-medium text-slate-400 leading-none">Nível Medido</div>
-              <div className="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                {liveLevel.toFixed(1)}
-                <span className="text-sm font-semibold ml-0.5">%</span>
+            {/* Primary: Level or Operational State */}
+            {isValveOrPump ? (
+              <div className="shrink-0">
+                <div className="text-[10px] font-medium text-slate-400 leading-none">Estado Operacional</div>
+                <div className={cn(
+                  "text-[11px] font-black tracking-tight leading-tight mt-1 inline-flex items-center px-2 py-0.5 rounded-md border shadow-xs whitespace-nowrap",
+                  isValve
+                    ? liveIsOpen === 'true'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                    : liveIsRunning === 'true'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800'
+                )}>
+                  <span className={cn(
+                    "w-1.5 h-1.5 rounded-full mr-1.5 shrink-0",
+                    isValve
+                      ? liveIsOpen === 'true' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+                      : liveIsRunning === 'true' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                  )} />
+                  <span>
+                    {isValve
+                      ? liveIsOpen === 'true' ? 'ABERTA' : 'FECHADA'
+                      : liveIsRunning === 'true' ? 'EM OPERAÇÃO' : 'DESLIGADA'}
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="shrink-0">
+                <div className="text-[10px] font-medium text-slate-400 leading-none">Nível Medido</div>
+                <div className="text-xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                  {liveLevel.toFixed(1)}
+                  <span className="text-sm font-semibold ml-0.5">%</span>
+                </div>
+              </div>
+            )}
 
             {/* Dynamic field bindings — unlimited, scroll if needed */}
             <div className="overflow-y-auto max-h-[100px] pr-0.5">

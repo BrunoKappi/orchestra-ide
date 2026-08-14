@@ -38,6 +38,10 @@ export const TankGeometrySvg: React.FC<TankGeometrySvgProps> = ({
       return <SphericalSvg level={clampedLevel} fillColor={fillColor} width={width} height={height} className={className} />;
     case 'pressurized':
       return <PressurizedSvg level={clampedLevel} fillColor={fillColor} width={width} height={height} className={className} />;
+    case 'valve':
+      return <ValveGeometrySvg level={clampedLevel} width={width} height={height} className={className} />;
+    case 'pump':
+      return <PumpGeometrySvg level={clampedLevel} width={width} height={height} className={className} />;
     default:
       return null;
   }
@@ -311,6 +315,106 @@ const PressurizedSvg: React.FC<{
           stroke="#475569" strokeWidth="1.5" opacity={0.6}
         />
       ))}
+    </svg>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 5. Valve Symbol
+// ---------------------------------------------------------------------------
+const ValveGeometrySvg: React.FC<{
+  level: number; width: number; height: number; className?: string;
+}> = ({ level, width, height, className }) => {
+  const cx = width / 2;
+  const cy = height / 2;
+  // level = 100 means open, 0 means closed.
+  const isOpen = level === 100;
+
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className={className} style={{ overflow: 'visible' }}>
+      {/* Pipe line through */}
+      <line x1={4} y1={cy} x2={width - 4} y2={cy} stroke="#475569" strokeWidth="2.5" />
+      
+      {/* Left triangle */}
+      <polygon
+        points={`${cx - 16},${cy - 10} ${cx - 16},${cy + 10} ${cx},${cy}`}
+        fill="#1e293b"
+        stroke="#475569"
+        strokeWidth="1.5"
+      />
+      
+      {/* Right triangle */}
+      <polygon
+        points={`${cx + 16},${cy - 10} ${cx + 16},${cy + 10} ${cx},${cy}`}
+        fill="#1e293b"
+        stroke="#475569"
+        strokeWidth="1.5"
+      />
+      
+      {/* Actuator stem */}
+      <line x1={cx} y1={cy} x2={cx} y2={cy - 14} stroke="#475569" strokeWidth="1.5" />
+      
+      {/* Actuator head (diaphragm style) */}
+      <path
+        d={`M ${cx - 8} ${cy - 14} Q ${cx} ${cy - 20} ${cx + 8} ${cy - 14}`}
+        fill="none"
+        stroke="#475569"
+        strokeWidth="1.5"
+      />
+      
+      {/* Status indicator light */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r="4"
+        fill={isOpen ? '#10b981' : '#ef4444'}
+        stroke="#334155"
+        strokeWidth="1"
+      />
+    </svg>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 6. Centrifugal Pump Symbol
+// ---------------------------------------------------------------------------
+const PumpGeometrySvg: React.FC<{
+  level: number; width: number; height: number; className?: string;
+}> = ({ level, width, height, className }) => {
+  const cx = width / 2;
+  const cy = height / 2;
+  const isRunning = level === 100;
+
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className={className} style={{ overflow: 'visible' }}>
+      {/* Suction (inlet) pipe line */}
+      <line x1={4} y1={cy} x2={cx - 12} y2={cy} stroke="#475569" strokeWidth="2.5" />
+      
+      {/* Discharge (outlet) pipe line */}
+      <path d={`M ${cx + 6} ${cy - 10} L ${cx + 6} ${cy - 18} L ${width - 4} ${cy - 18}`} fill="none" stroke="#475569" strokeWidth="2.5" />
+      
+      {/* Pump circular casing */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r="12"
+        fill="#1e293b"
+        stroke="#475569"
+        strokeWidth="1.5"
+      />
+      
+      {/* Support base */}
+      <path d={`M ${cx - 7} ${cy + 12} L ${cx + 7} ${cy + 12} L ${cx + 10} ${cy + 18} L ${cx - 10} ${cy + 18} Z`} fill="#334155" stroke="#475569" strokeWidth="1.5" />
+      
+      {/* Status indicator inner light */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r="4.5"
+        fill={isRunning ? '#10b981' : '#475569'}
+        stroke="#334155"
+        strokeWidth="1"
+      />
     </svg>
   );
 };
